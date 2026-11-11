@@ -22,6 +22,7 @@ model Project {
   assets       Asset[]
   playCount    Int            @default(0)
   likesCount   Int            @default(0)
+  dislikesCount Int            @default(0)
   allowRemix   Boolean        @default(true)
   priceCents   Int            @default(0)
   purchases    GamePurchase[]

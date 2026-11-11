@@ -75,7 +75,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 
 ### 5. Community Arcade, Remixing, Creator Storefront & Monetization
 - **Landing Page (`/`):** Showcases platform highlights alongside live playable cards for the unowned public demo and community-published games.
-- **Public Arcade & Explore Gallery (`/explore`):** Searchable, filterable community showcase displaying all published games with automatic genre badges (`VISUAL NOVEL`, `SANDBOX`, `TOPDOWN`, `BATTLE`), live **Play Counts**, interactive **Like / Heart Counters**, pricing badges, and creator names.
+- **Public Arcade & Explore Gallery (`/explore`):** Searchable, filterable community showcase displaying all published games with automatic genre badges (`VISUAL NOVEL`, `SANDBOX`, `TOPDOWN`, `BATTLE`, `QUIZ`), live **Play Counts**, interactive **Like & Dislike Counters**, pricing badges, and creator names.
 - **Creator Distribution & Remix Controls:** Inside the Studio Editor, creators can toggle whether other users are permitted to **Remix** their game (`allowRemix`) and optionally set a one-time **Price to Play** (`$0.00` for free or custom USD pricing via Stripe Checkout + Webhook).
 - **One-Click "Remix This Game":** When enabled by the author, authenticated users can clone the public demo or any published community game into their own Dashboard (respecting their `maxProjects` limit) with all scene IDs, branching wires, and assets cleanly remapped.
 - **Creator Dashboard (`/dashboard`):** Authenticated creators can create new projects from a **Blank Canvas** or **2-Scene Starter Template**, monitor their project slot usage bar, and delete old projects.

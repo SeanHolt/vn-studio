@@ -4,17 +4,35 @@ import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function likeArcadeGame(
-  projectId: string
-): Promise<{ likesCount: number }> {
+export type VoteChoice = 'LIKE' | 'DISLIKE' | 'NONE';
+
+export async function voteArcadeGame(
+  projectId: string,
+  prevVote: VoteChoice,
+  nextVote: VoteChoice
+): Promise<{ likesCount: number; dislikesCount: number }> {
+  let likeDelta = 0;
+  let dislikeDelta = 0;
+
+  if (prevVote === 'LIKE') likeDelta -= 1;
+  if (prevVote === 'DISLIKE') dislikeDelta -= 1;
+  if (nextVote === 'LIKE') likeDelta += 1;
+  if (nextVote === 'DISLIKE') dislikeDelta += 1;
+
   const updated = await prisma.project.update({
     where: { id: projectId },
-    data: { likesCount: { increment: 1 } },
-    select: { likesCount: true },
+    data: {
+      likesCount: { increment: likeDelta },
+      dislikesCount: { increment: dislikeDelta },
+    },
+    select: { likesCount: true, dislikesCount: true },
   });
 
   revalidatePath('/explore');
-  return { likesCount: updated.likesCount };
+  return {
+    likesCount: Math.max(0, updated.likesCount),
+    dislikesCount: Math.max(0, updated.dislikesCount),
+  };
 }
 
 export async function recordGamePlay(projectId: string): Promise<void> {

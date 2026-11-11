@@ -64,6 +64,7 @@ async function ArcadeLoader() {
       theme: proj.theme,
       playCount: proj.playCount,
       likesCount: proj.likesCount,
+      dislikesCount: proj.dislikesCount,
       allowRemix: proj.allowRemix,
       priceCents: proj.priceCents,
       isOwnedByViewer: isOwned,

@@ -3,14 +3,15 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { remixProject } from '@/app/actions/remix-actions';
-import { likeArcadeGame } from '@/app/actions/arcade-actions';
+import { voteArcadeGame, VoteChoice } from '@/app/actions/arcade-actions';
 import {
   Play,
   GitFork,
   Search,
   Layers,
   User as UserIcon,
-  Heart,
+  ThumbsUp,
+  ThumbsDown,
   Eye,
   Lock,
 } from 'lucide-react';
@@ -26,6 +27,7 @@ export interface ArcadeProjectCard {
   theme: string;
   playCount: number;
   likesCount: number;
+  dislikesCount: number;
   allowRemix: boolean;
   priceCents: number;
   isOwnedByViewer: boolean;
@@ -51,20 +53,45 @@ export default function ArcadeBrowser({
 }: ArcadeBrowserProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('ALL');
-  const [likeCounts, setLikeCounts] = useState(() =>
-    Object.fromEntries(projects.map((p) => [p.id, p.likesCount]))
+  const [counts, setCounts] = useState(() =>
+    Object.fromEntries(
+      projects.map((p) => [
+        p.id,
+        { likes: p.likesCount, dislikes: p.dislikesCount },
+      ])
+    )
   );
-  const [likedIds, setLikedIds] = useState(['']);
+  const [userVotes, setUserVotes] = useState<Record<string, VoteChoice>>({});
 
-  const handleLike = async (projectId: string) => {
-    if (likedIds.includes(projectId)) return;
-    setLikedIds((prev) => [...prev, projectId]);
-    setLikeCounts((prev) => ({
+  const handleVote = async (projectId: string, clicked: 'LIKE' | 'DISLIKE') => {
+    const prevVote: VoteChoice = userVotes[projectId] ?? 'NONE';
+    const nextVote: VoteChoice = prevVote === clicked ? 'NONE' : clicked;
+
+    setUserVotes((prev) => ({ ...prev, [projectId]: nextVote }));
+    setCounts((prev) => {
+      const curr = prev[projectId] ?? { likes: 0, dislikes: 0 };
+      let nextLikes = curr.likes;
+      let nextDislikes = curr.dislikes;
+
+      if (prevVote === 'LIKE') nextLikes = Math.max(0, nextLikes - 1);
+      if (prevVote === 'DISLIKE') nextDislikes = Math.max(0, nextDislikes - 1);
+      if (nextVote === 'LIKE') nextLikes += 1;
+      if (nextVote === 'DISLIKE') nextDislikes += 1;
+
+      return {
+        ...prev,
+        [projectId]: { likes: nextLikes, dislikes: nextDislikes },
+      };
+    });
+
+    const serverCounts = await voteArcadeGame(projectId, prevVote, nextVote);
+    setCounts((prev) => ({
       ...prev,
-      [projectId]: (prev[projectId] ?? 0) + 1,
+      [projectId]: {
+        likes: serverCounts.likesCount,
+        dislikes: serverCounts.dislikesCount,
+      },
     }));
-    const res = await likeArcadeGame(projectId);
-    setLikeCounts((prev) => ({ ...prev, [projectId]: res.likesCount }));
   };
 
   const filtered = useMemo(() => {
@@ -121,8 +148,10 @@ export default function ArcadeBrowser({
           {filtered.map((proj) => {
             const playHref = proj.isDemo ? '/play/demo' : `/play/${proj.id}`;
             const remixAction = remixProject.bind(null, proj.id);
-            const currentLikes = likeCounts[proj.id] ?? proj.likesCount;
-            const hasLiked = likedIds.includes(proj.id);
+            const voteState = userVotes[proj.id] ?? 'NONE';
+            const currentLikes = counts[proj.id]?.likes ?? proj.likesCount;
+            const currentDislikes =
+              counts[proj.id]?.dislikes ?? proj.dislikesCount;
 
             return (
               <div
@@ -161,19 +190,38 @@ export default function ArcadeBrowser({
                     </span>
 
                     <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1 text-slate-400">
+                      <span
+                        title="Views"
+                        className="flex items-center gap-1 text-slate-400"
+                      >
                         <Eye className="h-3.5 w-3.5" /> {proj.playCount}
                       </span>
+
                       <button
                         type="button"
-                        onClick={() => void handleLike(proj.id)}
+                        title="Like"
+                        onClick={() => void handleVote(proj.id, 'LIKE')}
                         className={`flex items-center gap-1 transition ${
-                          hasLiked
+                          voteState === 'LIKE'
+                            ? 'font-bold text-emerald-400'
+                            : 'text-slate-400 hover:text-emerald-300'
+                        }`}
+                      >
+                        <ThumbsUp className="h-3.5 w-3.5" /> {currentLikes}
+                      </button>
+
+                      <button
+                        type="button"
+                        title="Dislike"
+                        onClick={() => void handleVote(proj.id, 'DISLIKE')}
+                        className={`flex items-center gap-1 transition ${
+                          voteState === 'DISLIKE'
                             ? 'font-bold text-rose-400'
                             : 'text-slate-400 hover:text-rose-300'
                         }`}
                       >
-                        <Heart className="h-3.5 w-3.5" /> {currentLikes}
+                        <ThumbsDown className="h-3.5 w-3.5" />{' '}
+                        {currentDislikes}
                       </button>
                     </div>
                   </div>
