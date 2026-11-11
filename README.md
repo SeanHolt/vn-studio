@@ -84,28 +84,23 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 ## Local Setup & Commands
 
 1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+   `npm install`
 
 2. **Configure environment variables in `.env`:**
-   ```env
-   DATABASE_URL="file:./dev.db"
-   AUTH_SECRET="your-random-32-char-secret"
-   STRIPE_SECRET_KEY="sk_test_..."
-   STRIPE_WEBHOOK_SECRET="whsec_..."
-   NEXT_PUBLIC_APP_URL="http://localhost:3000"
-   ```
+   - `DATABASE_URL="file:./dev.db"`
+   - `AUTH_SECRET="your-random-32-char-secret"`
+   - `STRIPE_SECRET_KEY="sk_test_..."`
+   - `STRIPE_WEBHOOK_SECRET="whsec_..."`
+   - `NEXT_PUBLIC_APP_URL="http://localhost:3000"`
 
 3. **Initialize SQLite database & seed the 6-scene interactive demo:**
-   ```bash
-   npx prisma db push
-   npx prisma generate
-   npx prisma db seed
-   ```
+   - `npx prisma db push`
+   - `npx prisma generate`
+   - `npx prisma db seed`
 
 4. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
+   - `npm run dev`
    - **Homepage:** `http://localhost:3000`
+   - **Playable Demo:** `http://localhost:3000/play/demo`
+   - **Open Demo Editor:** `http://localhost:3000/editor/demo`
+   - **Creator Dashboard:** `http://localhost:3000/dashboard`
