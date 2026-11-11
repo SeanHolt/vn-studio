@@ -15,6 +15,8 @@ import TimerBlockInspector from './TimerBlockInspector';
 import AffinityBlockInspector from './AffinityBlockInspector';
 import TimeBlockInspector from './TimeBlockInspector';
 import AchievementBlockInspector from './AchievementBlockInspector';
+import TopDownRoomInspector from './TopDownRoomInspector';
+import BattleEncounterInspector from './BattleEncounterInspector';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -47,6 +49,12 @@ export default function BlockInspector({
                 </span>
             </div>
 
+            {block.type === 'AFFINITY' && (
+                <AffinityBlockInspector block={block} onChange={onChange} />
+            )}
+            {block.type === 'ADVANCE_TIME' && (
+                <TimeBlockInspector block={block} onChange={onChange} />
+            )}
             {block.type === 'BACKGROUND' && (
                 <label className="flex flex-col gap-1.5">
                     <span className="text-xs text-slate-400">Image URL</span>
@@ -57,81 +65,12 @@ export default function BlockInspector({
                     />
                 </label>
             )}
-            {block.type === 'SET_VARIABLE' && (
-                <div className="flex flex-col gap-3">
-                    <label className="flex flex-col gap-1.5">
-                        <span className="text-xs text-slate-400">Target Variable</span>
-                        <select
-                            value={block.variableKey}
-                            onChange={(e) => {
-                                const nextKey = e.target.value;
-                                const sample = variables[nextKey];
-                                const defaultVal =
-                                    typeof sample === 'boolean' ? true : typeof sample === 'number' ? 1 : '';
-                                onChange({ ...block, variableKey: nextKey, value: defaultVal });
-                            }}
-                            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-white"
-                        >
-                            {Object.keys(variables).map((k) => (
-                                <option key={k} value={k}>
-                                    {k}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-
-                    <label className="flex flex-col gap-1.5">
-                        <span className="text-xs text-slate-400">Operation</span>
-                        <select
-                            value={block.operation}
-                            onChange={(e) =>
-                                onChange({
-                                    ...block,
-                                    operation: e.target.value as 'set' | 'add' | 'subtract',
-                                })
-                            }
-                            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
-                        >
-                            <option value="set">Set (=)</option>
-                            <option value="add">Add (+)</option>
-                            <option value="subtract">Subtract (-)</option>
-                        </select>
-                    </label>
-
-                    <label className="flex flex-col gap-1.5">
-                        <span className="text-xs text-slate-400">New Value</span>
-                        {typeof variables[block.variableKey] === 'boolean' ? (
-                            <select
-                                value={String(block.value)}
-                                onChange={(e) => onChange({ ...block, value: e.target.value === 'true' })}
-                                className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
-                            >
-                                <option value="true">true</option>
-                                <option value="false">false</option>
-                            </select>
-                        ) : typeof variables[block.variableKey] === 'number' ? (
-                            <input
-                                type="number"
-                                value={Number(block.value)}
-                                onChange={(e) => onChange({ ...block, value: Number(e.target.value) })}
-                                className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
-                            />
-                        ) : (
-                            <input
-                                type="text"
-                                value={String(block.value)}
-                                onChange={(e) => onChange({ ...block, value: e.target.value })}
-                                className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
-                            />
-                        )}
-                    </label>
-                </div>
-            )}
-            {block.type === 'ADVANCE_TIME' && (
-                <TimeBlockInspector block={block} onChange={onChange} />
-            )}
-            {block.type === 'UNLOCK_ACHIEVEMENT' && (
-                <AchievementBlockInspector block={block} onChange={onChange} />
+            {block.type === 'BATTLE_ENCOUNTER' && (
+                <BattleEncounterInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
             )}
             {block.type === 'CHARACTER' && (
                 <>
@@ -240,28 +179,6 @@ export default function BlockInspector({
                     </div>
                 </>
             )}
-            {block.type === 'DIALOGUE' && (
-                <>
-                    <label className="flex flex-col gap-1.5">
-                        <span className="text-xs text-slate-400">Speaker</span>
-                        <input
-                            type="text"
-                            value={block.speaker}
-                            onChange={(e) => onChange({ ...block, speaker: e.target.value })}
-                            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-                        />
-                    </label>
-                    <label className="flex flex-col gap-1.5">
-                        <span className="text-xs text-slate-400">Dialogue Text</span>
-                        <textarea
-                            rows={4}
-                            value={block.text}
-                            onChange={(e) => onChange({ ...block, text: e.target.value })}
-                            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-                        />
-                    </label>
-                </>
-            )}
             {block.type === 'CHOICE' && (
                 <div className="flex flex-col gap-3">
                     <label className="flex flex-col gap-1.5">
@@ -358,6 +275,28 @@ export default function BlockInspector({
                     ))}
                 </div>
             )}
+            {block.type === 'DIALOGUE' && (
+                <>
+                    <label className="flex flex-col gap-1.5">
+                        <span className="text-xs text-slate-400">Speaker</span>
+                        <input
+                            type="text"
+                            value={block.speaker}
+                            onChange={(e) => onChange({ ...block, speaker: e.target.value })}
+                            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-white"
+                        />
+                    </label>
+                    <label className="flex flex-col gap-1.5">
+                        <span className="text-xs text-slate-400">Dialogue Text</span>
+                        <textarea
+                            rows={4}
+                            value={block.text}
+                            onChange={(e) => onChange({ ...block, text: e.target.value })}
+                            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-white"
+                        />
+                    </label>
+                </>
+            )}
             {block.type === 'HOTSPOT_ROOM' && (
                 <HotspotRoomInspector
                     block={block}
@@ -377,6 +316,77 @@ export default function BlockInspector({
             {block.type === 'PLAY_AUDIO' && (
                 <AudioInspector block={block} onChange={onChange} />
             )}
+
+            {block.type === 'SET_VARIABLE' && (
+                <div className="flex flex-col gap-3">
+                    <label className="flex flex-col gap-1.5">
+                        <span className="text-xs text-slate-400">Target Variable</span>
+                        <select
+                            value={block.variableKey}
+                            onChange={(e) => {
+                                const nextKey = e.target.value;
+                                const sample = variables[nextKey];
+                                const defaultVal =
+                                    typeof sample === 'boolean' ? true : typeof sample === 'number' ? 1 : '';
+                                onChange({ ...block, variableKey: nextKey, value: defaultVal });
+                            }}
+                            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-white"
+                        >
+                            {Object.keys(variables).map((k) => (
+                                <option key={k} value={k}>
+                                    {k}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <label className="flex flex-col gap-1.5">
+                        <span className="text-xs text-slate-400">Operation</span>
+                        <select
+                            value={block.operation}
+                            onChange={(e) =>
+                                onChange({
+                                    ...block,
+                                    operation: e.target.value as 'set' | 'add' | 'subtract',
+                                })
+                            }
+                            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+                        >
+                            <option value="set">Set (=)</option>
+                            <option value="add">Add (+)</option>
+                            <option value="subtract">Subtract (-)</option>
+                        </select>
+                    </label>
+
+                    <label className="flex flex-col gap-1.5">
+                        <span className="text-xs text-slate-400">New Value</span>
+                        {typeof variables[block.variableKey] === 'boolean' ? (
+                            <select
+                                value={String(block.value)}
+                                onChange={(e) => onChange({ ...block, value: e.target.value === 'true' })}
+                                className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+                            >
+                                <option value="true">true</option>
+                                <option value="false">false</option>
+                            </select>
+                        ) : typeof variables[block.variableKey] === 'number' ? (
+                            <input
+                                type="number"
+                                value={Number(block.value)}
+                                onChange={(e) => onChange({ ...block, value: Number(e.target.value) })}
+                                className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+                            />
+                        ) : (
+                            <input
+                                type="text"
+                                value={String(block.value)}
+                                onChange={(e) => onChange({ ...block, value: e.target.value })}
+                                className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"
+                            />
+                        )}
+                    </label>
+                </div>
+            )}
             {block.type === 'TIMER' && (
                 <TimerBlockInspector
                     block={block}
@@ -384,8 +394,15 @@ export default function BlockInspector({
                     onChange={onChange}
                 />
             )}
-            {block.type === 'AFFINITY' && (
-                <AffinityBlockInspector block={block} onChange={onChange} />
+            {block.type === 'TOPDOWN_ROOM' && (
+                <TopDownRoomInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
+            )}
+            {block.type === 'UNLOCK_ACHIEVEMENT' && (
+                <AchievementBlockInspector block={block} onChange={onChange} />
             )}
         </div>
     );

@@ -1,5 +1,27 @@
 import { z } from "zod";
 
+export type SceneType =
+  | "TITLE"
+  | "DIALOGUE"
+  | "HOTSPOT"
+  | "TOPDOWN"
+  | "BATTLE"
+  | "ENDING";
+
+export const TopDownEntitySchema = z.object({
+  id: z.string(),
+  label: z.string().min(1),
+  kind: z.enum(["NPC", "CHEST", "DOOR", "SIGN"]),
+  icon: z.string().default("🧙"),
+  x: z.number().min(0).max(11),
+  y: z.number().min(0).max(7),
+  dialogueText: z.string().optional(),
+  itemName: z.string().optional(),
+  targetSceneId: z.string().optional(),
+  requiredItem: z.string().optional(),
+});
+
+export type TopDownEntity = z.infer<typeof TopDownEntitySchema>;
 export const ChoiceOptionSchema = z.object({
   id: z.string(),
   label: z.string().min(1, "Choice text is required"),
@@ -140,12 +162,38 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     description: z.string().default("Unlocked a special milestone!"),
     icon: z.string().default("🏆"),
   }),
+  z.object({
+    id: z.string(),
+    type: z.literal("TOPDOWN_ROOM"),
+    mapTheme: z
+      .enum(["GRASSLAND", "DUNGEON", "CASTLE", "SPACE"])
+      .default("GRASSLAND"),
+    playerIcon: z.string().default("🧑"),
+    spawnX: z.number().min(0).max(11).default(1),
+    spawnY: z.number().min(0).max(7).default(3),
+    walls: z.array(z.string()).default([]),
+    entities: z.array(TopDownEntitySchema).default([]),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("BATTLE_ENCOUNTER"),
+    backgroundUrl: z.string().default("/assets/bg-night-sky.svg"),
+    enemyName: z.string().min(1).default("Clockwork Golem"),
+    enemySpriteUrl: z.string().default("/assets/char-mage-violet.svg"),
+    enemyMaxHp: z.number().min(1).max(9999).default(50),
+    enemyAttack: z.number().min(1).max(999).default(8),
+    playerMaxHp: z.number().min(1).max(9999).default(40),
+    playerAttack: z.number().min(1).max(999).default(12),
+    skillName: z.string().default("Starlight Strike"),
+    healItemName: z.string().default("Health Potion"),
+    victorySceneId: z.string(),
+    defeatSceneId: z.string(),
+  }),
 ]);
 
 export type HotspotZone = z.infer<typeof HotspotZoneSchema>;
 export type ChoiceOption = z.infer<typeof ChoiceOptionSchema>;
 export type SceneBlock = z.infer<typeof SceneBlockSchema>;
-export type SceneType = "TITLE" | "DIALOGUE" | "HOTSPOT" | "ENDING";
 export type CharacterEmotion =
   | "neutral"
   | "happy"

@@ -48,6 +48,8 @@ import {
 import { advanceGameClock, GameClockState, TIME_DISPLAY } from '@/lib/vn-clock';
 import GalleryModal, { AchievementDef, EndingDef } from './GalleryModal';
 import DialogueBacklogModal, { BacklogEntry } from './DialogueBacklogModal';
+import TopDownStageOverlay from './TopDownStageOverlay';
+import BattleStageOverlay from './BattleStageOverlay';
 
 export interface PlayableScene {
     id: string;
@@ -774,7 +776,57 @@ export default function VNPlayer({
                         }}
                     />
                 )}
-
+                {currentBlock?.type === 'TOPDOWN_ROOM' && (
+                    <TopDownStageOverlay
+                        mapTheme={currentBlock.mapTheme}
+                        playerIcon={currentBlock.playerIcon}
+                        spawnX={currentBlock.spawnX}
+                        spawnY={currentBlock.spawnY}
+                        walls={currentBlock.walls}
+                        entities={currentBlock.entities}
+                        inventory={inventory}
+                        onCollectItem={(itemName) =>
+                            setInventory((prev) =>
+                                prev.includes(itemName) ? prev : [...prev, itemName]
+                            )
+                        }
+                        onJumpScene={(targetId) => goToScene(targetId)}
+                    />
+                )}
+                {currentBlock?.type === 'BATTLE_ENCOUNTER' && (
+                    <BattleStageOverlay
+                        backgroundUrl={currentBlock.backgroundUrl}
+                        enemyName={currentBlock.enemyName}
+                        enemySpriteUrl={currentBlock.enemySpriteUrl}
+                        enemyMaxHp={currentBlock.enemyMaxHp}
+                        enemyAttack={currentBlock.enemyAttack}
+                        playerMaxHp={currentBlock.playerMaxHp}
+                        playerAttack={currentBlock.playerAttack}
+                        skillName={currentBlock.skillName}
+                        healItemName={currentBlock.healItemName}
+                        inventory={inventory}
+                        onConsumeItem={(itemName) =>
+                            setInventory((prev) => {
+                                const idx = prev.indexOf(itemName);
+                                if (idx === -1) return prev;
+                                const copy = [...prev];
+                                copy.splice(idx, 1);
+                                return copy;
+                            })
+                        }
+                        onBattleEnd={(won, remainingHp) => {
+                            setVariables((prev) => ({ ...prev, playerHP: remainingHp }));
+                            const nextScene = won
+                                ? currentBlock.victorySceneId
+                                : currentBlock.defeatSceneId;
+                            if (nextScene) {
+                                goToScene(nextScene);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                    />
+                )}
                 {/* Player Text Input Overlay */}
                 {currentBlock?.type === 'INPUT_TEXT' && (
                     <TextInputOverlay

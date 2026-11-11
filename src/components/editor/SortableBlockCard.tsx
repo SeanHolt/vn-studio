@@ -21,6 +21,8 @@ import {
     Heart,
     Clock,
     Trophy,
+    Compass,
+    Swords,
 } from 'lucide-react';
 
 interface SortableBlockCardProps {
@@ -138,6 +140,18 @@ export default function SortableBlockCard({
                         {block.icon} Achievement: <strong>{block.title}</strong>
                     </span>
                 );
+            case 'TOPDOWN_ROOM':
+                return (
+                    <span className="text-emerald-300">
+                        2D Map ({block.mapTheme}): {block.entities.length} object(s)
+                    </span>
+                );
+            case 'BATTLE_ENCOUNTER':
+                return (
+                    <span className="text-rose-300">
+                        Battle: <strong>{block.enemyName}</strong> ({block.enemyMaxHp} HP)
+                    </span>
+                );
         }
     };
 
@@ -156,7 +170,8 @@ export default function SortableBlockCard({
         AFFINITY: <Heart className="h-4 w-4 text-rose-400" />,
         ADVANCE_TIME: <Clock className="h-4 w-4 text-amber-300" />,
         UNLOCK_ACHIEVEMENT: <Trophy className="h-4 w-4 text-amber-400" />,
-
+        TOPDOWN_ROOM: <Compass className="h-4 w-4 text-emerald-400" />,
+        BATTLE_ENCOUNTER: <Swords className="h-4 w-4 text-rose-500" />,
     };
 
     return (

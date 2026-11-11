@@ -221,6 +221,52 @@ export default function SimpleEditorWorkspace({
                 description: 'Discovered a hidden clue!',
                 icon: '🏆',
             });
+        } else if (type === 'TOPDOWN_ROOM') {
+            store.addBlock({
+                id,
+                type,
+                mapTheme: 'GRASSLAND',
+                playerIcon: '🧑',
+                spawnX: 1,
+                spawnY: 3,
+                walls: ['0,0', '1,0', '2,0', '3,0', '4,0', '5,0'],
+                entities: [
+                    {
+                        id: createUniqueId('td'),
+                        label: 'Village Elder',
+                        kind: 'NPC',
+                        icon: '🧙',
+                        x: 5,
+                        y: 3,
+                        dialogueText: 'Welcome to the meadow! Check the chest to the north.',
+                    },
+                    {
+                        id: createUniqueId('td'),
+                        label: 'Oak Chest',
+                        kind: 'CHEST',
+                        icon: '🧰',
+                        x: 8,
+                        y: 2,
+                        itemName: 'Forest Key',
+                    },
+                ],
+            });
+        } else if (type === 'BATTLE_ENCOUNTER') {
+            store.addBlock({
+                id,
+                type,
+                backgroundUrl: '/assets/bg-night-sky.svg',
+                enemyName: 'Clockwork Golem',
+                enemySpriteUrl: '/assets/char-mage-violet.svg',
+                enemyMaxHp: 50,
+                enemyAttack: 8,
+                playerMaxHp: 40,
+                playerAttack: 12,
+                skillName: 'Starlight Strike',
+                healItemName: 'Health Potion',
+                victorySceneId: fallbackScene,
+                defeatSceneId: fallbackScene,
+            });
         }
     };
 
@@ -454,6 +500,8 @@ export default function SimpleEditorWorkspace({
                                             <option value="DIALOGUE">DIALOGUE</option>
                                             <option value="HOTSPOT">HOTSPOT (Sandbox)</option>
                                             <option value="ENDING">ENDING</option>
+                                            <option value="TOPDOWN">TOPDOWN (2D Map)</option>
+                                            <option value="BATTLE">BATTLE (RPG)</option>
                                         </select>
                                     </div>
 
@@ -480,6 +528,8 @@ export default function SimpleEditorWorkspace({
                                                 'INPUT_TEXT',
                                                 'HOTSPOT_ROOM',
                                                 'CHOICE',
+                                                'TOPDOWN_ROOM',
+                                                'BATTLE_ENCOUNTER'
                                             ] as const
                                         ).map((type) => (
                                             <button

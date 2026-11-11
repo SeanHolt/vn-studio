@@ -106,6 +106,21 @@ export default function SceneNodeGraph({
                             markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
                         });
                     }
+                } else if (block.type === 'TOPDOWN_ROOM') {
+                    block.entities.forEach((entity) => {
+                        if (!entity.targetSceneId) return;
+                        result.push({
+                            id: `${scene.id}_${entity.id}_${entity.targetSceneId}`,
+                            source: scene.id,
+                            target: entity.targetSceneId,
+                            label: `${entity.icon} ${entity.label}`,
+                            animated: true,
+                            style: { stroke: '#2dd4bf', strokeWidth: 2 },
+                            labelStyle: { fill: '#99f6e4', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#2dd4bf' },
+                        });
+                    });
                 } else if (block.type === 'HOTSPOT_ROOM') {
                     block.hotspots.forEach((zone) => {
                         if (zone.actionType !== 'JUMP_SCENE' || !zone.targetSceneId) return;
@@ -133,6 +148,33 @@ export default function SceneNodeGraph({
                             labelStyle: { fill: '#fed7aa', fontSize: 10, fontWeight: 600 },
                             labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
                             markerEnd: { type: MarkerType.ArrowClosed, color: '#fb923c' },
+                        });
+                    }
+                } else if (block.type === 'BATTLE_ENCOUNTER') {
+                    if (block.victorySceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_win_${block.victorySceneId}`,
+                            source: scene.id,
+                            target: block.victorySceneId,
+                            label: `Win vs ${block.enemyName}`,
+                            animated: true,
+                            style: { stroke: '#34d399', strokeWidth: 2 },
+                            labelStyle: { fill: '#6ee7b7', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#34d399' },
+                        });
+                    }
+                    if (block.defeatSceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_lose_${block.defeatSceneId}`,
+                            source: scene.id,
+                            target: block.defeatSceneId,
+                            label: `Lose vs ${block.enemyName}`,
+                            animated: true,
+                            style: { stroke: '#fb7185', strokeWidth: 2, strokeDasharray: '4,4' },
+                            labelStyle: { fill: '#fda4af', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
                         });
                     }
                 }
