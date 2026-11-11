@@ -43,6 +43,7 @@ import {
     Lock,
 } from 'lucide-react';
 import { buildPresetQuestions } from '@/lib/vn-trivia-presets';
+import DistributionPanel from './DistributionPanel';
 
 function createUniqueId(prefix: string): string {
     return `${prefix}_${crypto.randomUUID()}`;
@@ -57,6 +58,8 @@ interface WorkspaceProps {
     isDemo: boolean;
     initialTheme: VNThemeId;
     initialEnableClock: boolean;
+    initialAllowRemix: boolean;
+    initialPriceCents: number;
     initialAssets: ProjectAsset[];
 }
 export default function SimpleEditorWorkspace({
@@ -68,6 +71,8 @@ export default function SimpleEditorWorkspace({
     isDemo,
     initialTheme,
     initialEnableClock,
+    initialAllowRemix,
+    initialPriceCents,
     initialAssets,
 }: WorkspaceProps) {
     const [isPending, startTransition] = useTransition();
@@ -609,6 +614,14 @@ export default function SimpleEditorWorkspace({
                         enableClock={store.enableClock}
                         onToggleClock={store.setEnableClock}
                     />
+
+                    {!isDemo && (
+                        <DistributionPanel
+                            projectId={projectId}
+                            initialAllowRemix={initialAllowRemix}
+                            initialPriceCents={initialPriceCents}
+                        />
+                    )}
 
                     <VariablesPanel
                         variables={store.variables}

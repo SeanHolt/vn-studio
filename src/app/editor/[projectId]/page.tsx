@@ -55,7 +55,10 @@ async function EditorLoader({ params }: EditorPageProps) {
     sceneType: s.sceneType as SceneType,
     order: s.order,
     blocks: s.blocks as unknown as SceneBlock[],
-    nodePos: (s.nodePos as { x: number; y: number }) || { x: s.order * 320, y: 150 },
+    nodePos: (s.nodePos as { x: number; y: number }) || {
+      x: s.order * 320,
+      y: 150,
+    },
   }));
 
   const initialAssets: ProjectAsset[] = project.assets.map((a) => ({
@@ -75,6 +78,8 @@ async function EditorLoader({ params }: EditorPageProps) {
       isDemo={project.userId === null}
       initialTheme={(project.theme as VNThemeId) || 'MODERN'}
       initialEnableClock={project.enableClock}
+      initialAllowRemix={project.allowRemix}
+      initialPriceCents={project.priceCents}
       initialAssets={initialAssets}
     />
   );

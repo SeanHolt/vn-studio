@@ -32,7 +32,8 @@ export default async function FeaturedGames() {
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {projects.map((project) => {
-        const isPublicDemo = project.userId === null;
+        const isPublicDemo =
+          project.userId === null && project.title === 'The Clockwork Lighthouse';
         const playHref = isPublicDemo ? '/play/demo' : `/play/${project.id}`;
         const editHref = isPublicDemo ? '/editor/demo' : `/editor/${project.id}`;
 

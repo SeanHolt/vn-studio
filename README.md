@@ -73,16 +73,18 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **Built-In Web Audio Synthesizer:** Generates retro chimes, pickup sounds, mystery alerts, and ambient loops in-browser with no audio files required.
 - **Project Asset Manager (`/api/upload`):** Creators can upload custom images (`PNG`, `JPG`, `WebP`, `GIF`) and audio (`MP3`, `WAV`, `OGG`) up to 5MB, rename assets inline, preview audio tracks, and reuse uploaded files across every scene in their project.
 
-### 5. Community Arcade, Remixing, Accounts & Monetization
+### 5. Community Arcade, Remixing, Creator Storefront & Monetization
 - **Landing Page (`/`):** Showcases platform highlights alongside live playable cards for the unowned public demo and community-published games.
-- **Public Arcade & Explore Gallery (`/explore`):** Searchable, filterable community showcase displaying all published games with automatic genre badges (`VISUAL NOVEL`, `SANDBOX`, `TOPDOWN`, `BATTLE`), creator names, and play links.
-- **One-Click "Remix This Game":** Authenticated users can clone the public demo or any published community game into their own Dashboard (respecting their `maxProjects` limit) with all scene IDs, branching wires, and assets cleanly remapped.
+- **Public Arcade & Explore Gallery (`/explore`):** Searchable, filterable community showcase displaying all published games with automatic genre badges (`VISUAL NOVEL`, `SANDBOX`, `TOPDOWN`, `BATTLE`), live **Play Counts**, interactive **Like / Heart Counters**, pricing badges, and creator names.
+- **Creator Distribution & Remix Controls:** Inside the Studio Editor, creators can toggle whether other users are permitted to **Remix** their game (`allowRemix`) and optionally set a one-time **Price to Play** (`$0.00` for free or custom USD pricing via Stripe Checkout + Webhook).
+- **One-Click "Remix This Game":** When enabled by the author, authenticated users can clone the public demo or any published community game into their own Dashboard (respecting their `maxProjects` limit) with all scene IDs, branching wires, and assets cleanly remapped.
 - **Creator Dashboard (`/dashboard`):** Authenticated creators can create new projects from a **Blank Canvas** or **2-Scene Starter Template**, monitor their project slot usage bar, and delete old projects.
 - **Owner-Protected Editor & Publish Toggle:** `/editor/[projectId]` and `saveProjectScenes` enforce server-side ownership verification while keeping `/editor/demo` open for public experimentation. Creators can toggle their games between **Private** and **Published** right from the editor header.
 - **Free Tier & Stripe Upgrades (`/pricing`):**
   - **Starter (Free):** Up to **3** game projects per account.
   - **+10 Project Slots (\$9 One-Time):** Permanently increments a user's `maxProjects` quota via Stripe Checkout + Webhook.
   - **Pro Creator (\$12/month):** Unlocks unlimited game projects (`maxProjects: 999`).
+
 
 ### 6. Built-In Playable Sample Games (`prisma/seed.ts`)
 Running `npx prisma db seed` populates the Homepage and Public Arcade (`/explore`) with **3 complete, remixable example projects** showcasing every genre and system:

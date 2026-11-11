@@ -7,67 +7,74 @@ datasource db {
 }
 
 model Project {
-  id           String   @id @default(cuid())
-  title        String
-  description  String?
-  coverUrl     String?
-  isPublished  Boolean  @default(false)
-  
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  coverUrl    String?
+  isPublished Boolean @default(false)
+
   variables    Json
   startSceneId String?
-  theme        String   @default("MODERN")
-  enableClock  Boolean  @default(false)
-   userId       String?
-  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-    assets       Asset[]
+  theme        String         @default("MODERN")
+  enableClock  Boolean        @default(false)
+  userId       String?
+  user         User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assets       Asset[]
+  playCount    Int            @default(0)
+  likesCount   Int            @default(0)
+  allowRemix   Boolean        @default(true)
+  priceCents   Int            @default(0)
+  purchases    GamePurchase[]
   scenes       Scene[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 }
+
 model Asset {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   name      String
-  category  String   // "IMAGE" | "AUDIO"
+  category  String // "IMAGE" | "AUDIO"
   url       String
   createdAt DateTime @default(now())
 }
+
 model Scene {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  name      String   @default("Untitled Scene")
-  sceneType String   @default("DIALOGUE")
-  order     Int      @default(0)
-  
-  blocks    Json
-  nodePos   Json
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  name      String @default("Untitled Scene")
+  sceneType String @default("DIALOGUE")
+  order     Int    @default(0)
+
+  blocks  Json
+  nodePos Json
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model User {
-  id               String    @id @default(cuid())
-  name             String?
-  email            String?   @unique
-  emailVerified    DateTime?
-  image            String?
-  passwordHash     String?
-  
-  // Monetization & Project Limits
-  planTier         String    @default("FREE") // "FREE" | "PACK_10" | "PRO"
-  maxProjects      Int       @default(3)
-  stripeCustomerId String?   @unique
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
 
+  // Monetization & Project Limits
+  planTier         String         @default("FREE") // "FREE" | "PACK_10" | "PRO"
+  maxProjects      Int            @default(3)
+  stripeCustomerId String?        @unique
+  purchases        GamePurchase[]
   accounts         Account[]
   sessions         Session[]
   projects         Project[]
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 }
 
 model Account {
@@ -103,4 +110,17 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model GamePurchase {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  amount    Int
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
 }

@@ -40,6 +40,26 @@ export async function POST(request: NextRequest) {
         },
       });
     }
+    const purchaseType = session.metadata?.purchaseType;
+    const purchasedProjectId = session.metadata?.projectId;
+    const paidCents = Number(session.metadata?.priceCents || 0);
+
+    if (userId && purchaseType === 'GAME_UNLOCK' && purchasedProjectId) {
+      await prisma.gamePurchase.upsert({
+        where: {
+          userId_projectId: {
+            userId,
+            projectId: purchasedProjectId,
+          },
+        },
+        update: {},
+        create: {
+          userId,
+          projectId: purchasedProjectId,
+          amount: paidCents,
+        },
+      });
+    }
   }
 
   return NextResponse.json({ received: true });

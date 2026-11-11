@@ -1,7 +1,10 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import VNPlayer, { PlayableScene } from '@/components/player/VNPlayer';
+import PaidGameGate from '@/components/player/PaidGameGate';
 import { SceneBlock, SceneType } from '@/lib/vn-schema';
 import { GameVariables } from '@/lib/vn-engine';
 
@@ -10,6 +13,7 @@ interface PlayPageProps {
 }
 
 async function PlayerLoader({ params }: PlayPageProps) {
+  await connection();
   const { projectId } = await params;
 
   const project =
@@ -26,6 +30,39 @@ async function PlayerLoader({ params }: PlayPageProps) {
   if (!project || !project.startSceneId) {
     notFound();
   }
+
+  if (project.priceCents > 0) {
+    const session = await auth();
+    const userId = session?.user?.id;
+    const isOwner = Boolean(userId && project.userId === userId);
+
+    let hasPurchased = false;
+    if (userId && !isOwner) {
+      const purchase = await prisma.gamePurchase.findUnique({
+        where: {
+          userId_projectId: { userId, projectId: project.id },
+        },
+      });
+      hasPurchased = Boolean(purchase);
+    }
+
+    if (!isOwner && !hasPurchased) {
+      return (
+        <PaidGameGate
+          projectId={project.id}
+          title={project.title}
+          description={project.description}
+          priceCents={project.priceCents}
+          isLoggedIn={Boolean(userId)}
+        />
+      );
+    }
+  }
+
+  await prisma.project.update({
+    where: { id: project.id },
+    data: { playCount: { increment: 1 } },
+  });
 
   const playableScenes: PlayableScene[] = project.scenes.map((scene) => ({
     id: scene.id,

@@ -114,7 +114,9 @@ export async function remixProject(sourceProjectId: string): Promise<void> {
   if (!source || (!source.isPublished && source.userId !== null)) {
     redirect('/explore');
   }
-
+   if (!source.allowRemix) {
+    redirect('/explore?error=remix_disabled');
+  }
   const sceneIdMap = new Map<string, string>();
   source.scenes.forEach((sc) => {
     sceneIdMap.set(sc.id, `sc_${crypto.randomUUID()}`);

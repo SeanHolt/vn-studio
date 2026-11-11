@@ -3,13 +3,16 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { remixProject } from '@/app/actions/remix-actions';
+import { likeArcadeGame } from '@/app/actions/arcade-actions';
 import {
   Play,
   GitFork,
   Search,
   Layers,
   User as UserIcon,
-  Sparkles,
+  Heart,
+  Eye,
+  Lock,
 } from 'lucide-react';
 
 export interface ArcadeProjectCard {
@@ -21,6 +24,11 @@ export interface ArcadeProjectCard {
   sceneCount: number;
   genres: string[];
   theme: string;
+  playCount: number;
+  likesCount: number;
+  allowRemix: boolean;
+  priceCents: number;
+  isOwnedByViewer: boolean;
 }
 
 interface ArcadeBrowserProps {
@@ -34,6 +42,7 @@ const GENRE_FILTERS = [
   { id: 'SANDBOX', label: 'Point & Click' },
   { id: 'TOPDOWN', label: '2D Top-Down RPG' },
   { id: 'BATTLE', label: 'Turn-Based Battle' },
+  { id: 'QUIZ', label: 'Trivia & Riddles' },
 ];
 
 export default function ArcadeBrowser({
@@ -42,6 +51,21 @@ export default function ArcadeBrowser({
 }: ArcadeBrowserProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('ALL');
+  const [likeCounts, setLikeCounts] = useState(() =>
+    Object.fromEntries(projects.map((p) => [p.id, p.likesCount]))
+  );
+  const [likedIds, setLikedIds] = useState(['']);
+
+  const handleLike = async (projectId: string) => {
+    if (likedIds.includes(projectId)) return;
+    setLikedIds((prev) => [...prev, projectId]);
+    setLikeCounts((prev) => ({
+      ...prev,
+      [projectId]: (prev[projectId] ?? 0) + 1,
+    }));
+    const res = await likeArcadeGame(projectId);
+    setLikeCounts((prev) => ({ ...prev, [projectId]: res.likesCount }));
+  };
 
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -60,7 +84,7 @@ export default function ArcadeBrowser({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-md">
+        <div className="relative max-w-md flex-1">
           <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-500" />
           <input
             type="text"
@@ -88,7 +112,6 @@ export default function ArcadeBrowser({
           ))}
         </div>
       </div>
-
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 p-12 text-center text-sm text-slate-400">
           No published games match your current search or filter.
@@ -98,6 +121,8 @@ export default function ArcadeBrowser({
           {filtered.map((proj) => {
             const playHref = proj.isDemo ? '/play/demo' : `/play/${proj.id}`;
             const remixAction = remixProject.bind(null, proj.id);
+            const currentLikes = likeCounts[proj.id] ?? proj.likesCount;
+            const hasLiked = likedIds.includes(proj.id);
 
             return (
               <div
@@ -123,19 +148,34 @@ export default function ArcadeBrowser({
 
                   <h3 className="text-lg font-bold text-white">{proj.title}</h3>
                   <p className="mt-1.5 line-clamp-2 text-sm text-slate-400">
-                    {proj.description || 'An interactive adventure created in VN Studio.'}
+                    {proj.description ||
+                      'An interactive adventure created in VN Studio.'}
                   </p>
                 </div>
 
                 <div className="mt-5 border-t border-slate-800/80 pt-4">
                   <div className="mb-3 flex items-center justify-between text-xs text-slate-400">
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex items-center gap-1.5 truncate">
                       <UserIcon className="h-3.5 w-3.5 text-slate-500" />
                       {proj.authorName}
                     </span>
-                    <span className="flex items-center gap-1 font-mono text-[10px] text-slate-500">
-                      <Sparkles className="h-3 w-3 text-indigo-400" /> {proj.theme}
-                    </span>
+
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1 text-slate-400">
+                        <Eye className="h-3.5 w-3.5" /> {proj.playCount}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => void handleLike(proj.id)}
+                        className={`flex items-center gap-1 transition ${
+                          hasLiked
+                            ? 'font-bold text-rose-400'
+                            : 'text-slate-400 hover:text-rose-300'
+                        }`}
+                      >
+                        <Heart className="h-3.5 w-3.5" /> {currentLikes}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -143,16 +183,24 @@ export default function ArcadeBrowser({
                       href={playHref}
                       className="flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500"
                     >
-                      <Play className="h-3.5 w-3.5" /> Play
+                      <Play className="h-3.5 w-3.5" />
+                      {proj.priceCents === 0 || proj.isOwnedByViewer
+                        ? 'Play Free'
+                        : `Play ($${(proj.priceCents / 100).toFixed(2)})`}
                     </Link>
 
-                    {isLoggedIn ? (
+                    {!proj.allowRemix ? (
+                      <div className="flex items-center justify-center gap-1 rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-500">
+                        <Lock className="h-3 w-3" /> No Remix
+                      </div>
+                    ) : isLoggedIn ? (
                       <form action={remixAction}>
                         <button
                           type="submit"
                           className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700"
                         >
-                          <GitFork className="h-3.5 w-3.5 text-emerald-400" /> Remix
+                          <GitFork className="h-3.5 w-3.5 text-emerald-400" />{' '}
+                          Remix
                         </button>
                       </form>
                     ) : (
@@ -160,7 +208,8 @@ export default function ArcadeBrowser({
                         href="/login"
                         className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700"
                       >
-                        <GitFork className="h-3.5 w-3.5 text-emerald-400" /> Sign in to Remix
+                        <GitFork className="h-3.5 w-3.5 text-emerald-400" />{' '}
+                        Remix
                       </Link>
                     )}
                   </div>

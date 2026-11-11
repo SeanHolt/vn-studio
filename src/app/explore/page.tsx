@@ -24,42 +24,71 @@ async function ArcadeLoader() {
     }),
   ]);
 
+  const viewerId = session?.user?.id;
+  const purchasedIds = new Set(['']);
+
+  if (viewerId) {
+    const purchases = await prisma.gamePurchase.findMany({
+      where: { userId: viewerId },
+      select: { projectId: true },
+    });
+    purchases.forEach((p) => purchasedIds.add(p.projectId));
+  }
+
   const cards: ArcadeProjectCard[] = rawProjects.map((proj) => {
     const types = new Set(proj.scenes.map((s) => s.sceneType));
     const genres: string[] = [];
     if (types.has('HOTSPOT')) genres.push('SANDBOX');
     if (types.has('TOPDOWN')) genres.push('TOPDOWN');
     if (types.has('BATTLE')) genres.push('BATTLE');
+    if (types.has('QUIZ')) genres.push('QUIZ');
     if (genres.length === 0 || types.has('DIALOGUE')) {
       genres.unshift('VISUAL_NOVEL');
     }
+
+    const isOwned =
+      Boolean(viewerId && proj.userId === viewerId) ||
+      purchasedIds.has(proj.id);
 
     return {
       id: proj.id,
       title: proj.title,
       description: proj.description,
-      authorName: proj.userId === null ? 'VN Studio Official' : proj.user?.name || 'Creator',
-      isDemo: proj.userId === null,
+      authorName:
+        proj.userId === null
+          ? 'VN Studio Official'
+          : proj.user?.name || 'Creator',
+      isDemo: proj.userId === null && proj.title === 'The Clockwork Lighthouse',
       sceneCount: proj.scenes.length,
       genres,
       theme: proj.theme,
+      playCount: proj.playCount,
+      likesCount: proj.likesCount,
+      allowRemix: proj.allowRemix,
+      priceCents: proj.priceCents,
+      isOwnedByViewer: isOwned,
     };
   });
 
   return (
     <ArcadeBrowser
       projects={cards}
-      isLoggedIn={Boolean(session?.user?.id)}
+      isLoggedIn={Boolean(viewerId)}
     />
   );
 }
 
 export default function ExploreArcadePage() {
+  const skeletons = Array.from({ length: 3 }, (_, idx) => idx);
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <nav className="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2.5 text-lg font-bold text-white">
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 text-lg font-bold text-white"
+          >
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
               <Gamepad2 className="h-5 w-5" />
             </div>
@@ -92,15 +121,16 @@ export default function ExploreArcadePage() {
             Explore &amp; Remix Community Games
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-400 sm:text-base">
-            Play interactive visual novels, escape rooms, 2D RPGs, and battles made by creators—or
-            click Remix to clone any game into your own studio and see how it works.
+            Play interactive visual novels, escape rooms, 2D RPGs, and battles
+            made by creators—or click Remix to clone any game into your own
+            studio.
           </p>
         </div>
 
         <Suspense
           fallback={
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((n) => (
+              {skeletons.map((n) => (
                 <div
                   key={n}
                   className="h-60 animate-pulse rounded-2xl border border-slate-800 bg-slate-900/50"
