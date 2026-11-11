@@ -1,6 +1,6 @@
 # VN Studio — Multi-Genre Visual Novel & Sandbox Game Creation Platform
 
-**VN Studio** is a no-code, browser-based game creation platform built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**, **Prisma 7 (SQLite)**, **Zustand**, **Auth.js**, and **Stripe**. Designed for both first-time young creators and experienced storytellers, it pairs a kid-friendly drag-and-drop block editor with a 2D node-graph canvas, variables, inventory, point-and-click sandbox rooms, 2D top-down RPG maps, turn-based battles, and an instant playable runtime.
+**VN Studio** is a no-code, browser-based game creation platform built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**, **Prisma 7 (SQLite)**, **Zustand**, **Auth.js**, and **Stripe**. Designed for both first-time young creators and experienced storytellers, it pairs a kid-friendly drag-and-drop block editor with a 2D node-graph canvas, variables, inventory, point-and-click sandbox rooms, 2D top-down RPG maps, turn-based battles, community remixing, and an instant playable runtime.
 
 ---
 
@@ -53,7 +53,6 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`ADVANCE_TIME`:** Steps the optional Day & Time-of-Day clock forward (`MORNING` → `AFTERNOON` → `EVENING` → `NIGHT`) or jumps to an exact time and day.
 - **`PLAY_AUDIO`:** Plays or stops Sound Effects (`SFX`) or looping Background Music (`BGM`) using built-in zero-dependency Web Audio synthesizer presets or uploaded `.mp3`/`.wav`/`.ogg` files.
 - **`UNLOCK_ACHIEVEMENT`:** Unlocks a custom trophy badge with an emoji icon, title, and description, displaying a celebratory toast and persisting progress to `localStorage`.
-
 ### 3. Playable Runtime (`VNPlayer` at `/play/[projectId]`)
 - **Typewriter Text Engine:** Reveals dialogue character-by-character; clicking once finishes the current sentence immediately and clicking again advances to the next block.
 - **Custom Visual Themes & Typography:** Supports 4 built-in UI themes (**Modern Studio**, **Sci-Fi Terminal**, **Fantasy Parchment**, and **8-Bit Arcade**) that style dialogue boxes, speaker tags, choice buttons, and fonts.
@@ -70,8 +69,10 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **Built-In Web Audio Synthesizer:** Generates retro chimes, pickup sounds, mystery alerts, and ambient loops in-browser with no audio files required.
 - **Project Asset Manager (`/api/upload`):** Creators can upload custom images (`PNG`, `JPG`, `WebP`, `GIF`) and audio (`MP3`, `WAV`, `OGG`) up to 5MB, rename assets inline, preview audio tracks, and reuse uploaded files across every scene in their project.
 
-### 5. User Accounts, Dashboard, Publishing & Monetization
+### 5. Community Arcade, Remixing, Accounts & Monetization
 - **Landing Page (`/`):** Showcases platform highlights alongside live playable cards for the unowned public demo and community-published games.
+- **Public Arcade & Explore Gallery (`/explore`):** Searchable, filterable community showcase displaying all published games with automatic genre badges (`VISUAL NOVEL`, `SANDBOX`, `TOPDOWN`, `BATTLE`), creator names, and play links.
+- **One-Click "Remix This Game":** Authenticated users can clone the public demo or any published community game into their own Dashboard (respecting their `maxProjects` limit) with all scene IDs, branching wires, and assets cleanly remapped.
 - **Creator Dashboard (`/dashboard`):** Authenticated creators can create new projects from a **Blank Canvas** or **2-Scene Starter Template**, monitor their project slot usage bar, and delete old projects.
 - **Owner-Protected Editor & Publish Toggle:** `/editor/[projectId]` and `saveProjectScenes` enforce server-side ownership verification while keeping `/editor/demo` open for public experimentation. Creators can toggle their games between **Private** and **Published** right from the editor header.
 - **Free Tier & Stripe Upgrades (`/pricing`):**
@@ -101,6 +102,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 4. **Start the development server:**
    - `npm run dev`
    - **Homepage:** `http://localhost:3000`
+   - **Public Arcade:** `http://localhost:3000/explore`
    - **Playable Demo:** `http://localhost:3000/play/demo`
    - **Open Demo Editor:** `http://localhost:3000/editor/demo`
    - **Creator Dashboard:** `http://localhost:3000/dashboard`
