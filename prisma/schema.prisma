@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  coverUrl     String?
+  isPublished  Boolean  @default(false)
+  
+  variables    Json
+  startSceneId String?
+  theme        String   @default("MODERN")
+  enableClock  Boolean  @default(false)
+   userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    assets       Asset[]
+  scenes       Scene[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+model Asset {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  name      String
+  category  String   // "IMAGE" | "AUDIO"
+  url       String
+  createdAt DateTime @default(now())
+}
+model Scene {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  name      String   @default("Untitled Scene")
+  sceneType String   @default("DIALOGUE")
+  order     Int      @default(0)
+  
+  blocks    Json
+  nodePos   Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id               String    @id @default(cuid())
+  name             String?
+  email            String?   @unique
+  emailVerified    DateTime?
+  image            String?
+  passwordHash     String?
+  
+  // Monetization & Project Limits
+  planTier         String    @default("FREE") // "FREE" | "PACK_10" | "PRO"
+  maxProjects      Int       @default(3)
+  stripeCustomerId String?   @unique
+
+  accounts         Account[]
+  sessions         Session[]
+  projects         Project[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
