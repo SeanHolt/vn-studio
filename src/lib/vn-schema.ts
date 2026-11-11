@@ -6,6 +6,7 @@ export type SceneType =
   | "HOTSPOT"
   | "TOPDOWN"
   | "BATTLE"
+  | "QUIZ"
   | "ENDING";
 
 export const TopDownEntitySchema = z.object({
@@ -50,6 +51,14 @@ export const HotspotZoneSchema = z.object({
   targetSceneId: z.string().optional(),
   requiredItem: z.string().optional(),
 });
+export const QuizQuestionSchema = z.object({
+  id: z.string(),
+  question: z.string().min(1),
+  options: z.array(z.string().min(1)).min(2).max(4),
+  correctIndex: z.number().min(0).max(3),
+  explanation: z.string().optional(),
+});
+
 export const SceneBlockSchema = z.discriminatedUnion("type", [
   z.object({
     id: z.string(),
@@ -189,8 +198,28 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     victorySceneId: z.string(),
     defeatSceneId: z.string(),
   }),
+  z.object({
+    id: z.string(),
+    type: z.literal("KEYPAD_PUZZLE"),
+    lockMode: z.enum(["PIN", "PASSWORD"]).default("PIN"),
+    promptText: z.string().default("Enter the 4-digit security code:"),
+    hintText: z.string().optional(),
+    secretCode: z.string().min(1).default("1984"),
+    maxAttempts: z.number().min(0).max(20).default(0),
+    unlockSceneId: z.string(),
+    failSceneId: z.string().optional(),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("QUIZ_CHALLENGE"),
+    title: z.string().default("Knowledge Trial"),
+    passingScore: z.number().min(1).max(50).default(3),
+    questions: z.array(QuizQuestionSchema).min(1),
+    passSceneId: z.string(),
+    failSceneId: z.string(),
+  }),
 ]);
-
+export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 export type HotspotZone = z.infer<typeof HotspotZoneSchema>;
 export type ChoiceOption = z.infer<typeof ChoiceOptionSchema>;
 export type SceneBlock = z.infer<typeof SceneBlockSchema>;

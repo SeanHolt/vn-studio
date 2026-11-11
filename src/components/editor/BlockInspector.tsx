@@ -17,6 +17,8 @@ import TimeBlockInspector from './TimeBlockInspector';
 import AchievementBlockInspector from './AchievementBlockInspector';
 import TopDownRoomInspector from './TopDownRoomInspector';
 import BattleEncounterInspector from './BattleEncounterInspector';
+import KeypadPuzzleInspector from './KeypadPuzzleInspector';
+import QuizChallengeInspector from './QuizChallengeInspector';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -313,10 +315,23 @@ export default function BlockInspector({
                     onChange={onChange}
                 />
             )}
+            {block.type === 'KEYPAD_PUZZLE' && (
+                <KeypadPuzzleInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
+            )}
             {block.type === 'PLAY_AUDIO' && (
                 <AudioInspector block={block} onChange={onChange} />
             )}
-
+            {block.type === 'QUIZ_CHALLENGE' && (
+                <QuizChallengeInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
+            )}
             {block.type === 'SET_VARIABLE' && (
                 <div className="flex flex-col gap-3">
                     <label className="flex flex-col gap-1.5">

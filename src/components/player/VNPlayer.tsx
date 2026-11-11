@@ -44,10 +44,22 @@ import {
     Heart,
     Trophy,
     History,
+    Save,
 } from 'lucide-react';
 import { advanceGameClock, GameClockState, TIME_DISPLAY } from '@/lib/vn-clock';
 import GalleryModal, { AchievementDef, EndingDef } from './GalleryModal';
 import DialogueBacklogModal, { BacklogEntry } from './DialogueBacklogModal';
+import {
+    subscribeSaves,
+    getSaveSlotsSnapshot,
+    getServerSaveSlotsSnapshot,
+    writeSaveSlot,
+    deleteSaveSlot,
+    SaveSlotSnapshot,
+} from '@/lib/vn-save-storage';
+import SaveLoadModal from './SaveLoadModal';
+import QuizStageOverlay from './QuizStageOverlay';
+import KeypadStageOverlay from './KeypadStageOverlay';
 import TopDownStageOverlay from './TopDownStageOverlay';
 import BattleStageOverlay from './BattleStageOverlay';
 
@@ -126,6 +138,14 @@ export default function VNPlayer({
     );
     const unlockedAchievements = galleryData.achievements;
     const discoveredEndings = galleryData.endings;
+    const saveStorageKey = `vn_saves_${projectId}`;
+    const saveSlots = useSyncExternalStore(
+        subscribeSaves,
+        () => getSaveSlotsSnapshot(saveStorageKey),
+        getServerSaveSlotsSnapshot
+    );
+    const [showSaveModal, setShowSaveModal] = useState(false);
+    const [saveToast, setSaveToast] = useState<string | null>(null);
 
     const [showGallery, setShowGallery] = useState<boolean>(false);
     const [achievementToast, setAchievementToast] = useState<AchievementDef | null>(null);
@@ -167,6 +187,95 @@ export default function VNPlayer({
         }
     }, [currentScene, currentBlock, isTypingDone, blockIndex, variables]);
 
+    const buildSnapshot = useCallback(
+        (
+            slotId: string,
+            slotLabel: string,
+            overrideSceneId?: string,
+            overrideSceneName?: string,
+            overrideBlockIndex?: number
+        ): SaveSlotSnapshot => ({
+            slotId,
+            slotLabel,
+            savedAt: new Date().toLocaleString([], {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            }),
+            sceneId: overrideSceneId ?? currentSceneId,
+            sceneName: overrideSceneName ?? currentScene?.name ?? 'Unknown Scene',
+            blockIndex: overrideBlockIndex ?? blockIndex,
+            variables,
+            inventory,
+            affinity,
+            clock,
+            backgroundUrl,
+            characters,
+            backlog,
+        }),
+        [
+            currentSceneId,
+            currentScene,
+            blockIndex,
+            variables,
+            inventory,
+            affinity,
+            clock,
+            backgroundUrl,
+            characters,
+            backlog,
+        ]
+    );
+
+    const goToScene = useCallback(
+        (targetId: string) => {
+            const targetScene = scenes.find((s) => s.id === targetId);
+            if (targetScene?.sceneType === 'ENDING') {
+                saveEndingToStorage(storageKey, targetScene.id);
+            }
+            if (targetScene) {
+                writeSaveSlot(
+                    saveStorageKey,
+                    buildSnapshot(
+                        'slot_auto',
+                        'Auto-Save Checkpoint',
+                        targetScene.id,
+                        targetScene.name,
+                        0
+                    )
+                );
+            }
+            setCurrentSceneId(targetId);
+            setBlockIndex(0);
+        },
+        [scenes, storageKey, saveStorageKey, buildSnapshot]
+    );
+
+    const handleManualSave = (slotId: string, slotLabel: string) => {
+        writeSaveSlot(saveStorageKey, buildSnapshot(slotId, slotLabel));
+        setSaveToast(`Saved to ${slotLabel}!`);
+        window.setTimeout(() => setSaveToast(null), 2200);
+    };
+
+    const handleLoadSnapshot = (snap: SaveSlotSnapshot) => {
+        bgmCleanupRef.current?.();
+        bgmCleanupRef.current = null;
+        setActiveTimer(null);
+        setVariables(snap.variables);
+        setInventory(snap.inventory);
+        setAffinity(snap.affinity);
+        setClock(snap.clock);
+        setBackgroundUrl(snap.backgroundUrl);
+        setCharacters(snap.characters);
+        setBacklog(snap.backlog);
+        setCurrentSceneId(snap.sceneId);
+        setBlockIndex(snap.blockIndex);
+        setIsTypingDone(false);
+        setForceFinishKey(0);
+        setSaveToast(`Loaded ${snap.slotLabel}!`);
+        window.setTimeout(() => setSaveToast(null), 2200);
+    };
     const handleSelectChoice = (targetSceneId: string, choiceLabel?: string) => {
         if (currentScene && choiceLabel) {
             setBacklog((prev) => [
@@ -408,17 +517,6 @@ export default function VNPlayer({
             allEndings: endings,
         };
     }, [scenes]);
-    const goToScene = useCallback(
-        (targetId: string) => {
-            const targetScene = scenes.find((s) => s.id === targetId);
-            if (targetScene?.sceneType === 'ENDING') {
-                saveEndingToStorage(storageKey, targetScene.id);
-            }
-            setCurrentSceneId(targetId);
-            setBlockIndex(0);
-        },
-        [scenes, storageKey]
-    );
 
     useEffect(() => {
         if (!achievementToast) return;
@@ -527,6 +625,13 @@ export default function VNPlayer({
                     >
                         <History className="h-3.5 w-3.5 text-indigo-400" /> Log (
                         {visibleBacklog.length})
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setShowSaveModal(true)}
+                        className="flex items-center gap-1 rounded bg-slate-800 px-2.5 py-1 text-xs text-emerald-300 hover:bg-slate-700"
+                    >
+                        <Save className="h-3.5 w-3.5 text-emerald-400" /> Save / Load
                     </button>
                     <button
                         type="button"
@@ -736,6 +841,20 @@ export default function VNPlayer({
                         </div>
                     </div>
                 )}
+                {saveToast && (
+                    <div className="animate-vn-slide-in absolute top-3 left-1/2 z-30 -translate-x-1/2 rounded-full border border-emerald-400/50 bg-slate-950/90 px-4 py-1 text-xs font-semibold text-emerald-300 shadow-lg backdrop-blur-md">
+                        {saveToast}
+                    </div>
+                )}
+                {showSaveModal && (
+                    <SaveLoadModal
+                        slots={saveSlots}
+                        onSaveToSlot={handleManualSave}
+                        onLoadFromSlot={handleLoadSnapshot}
+                        onDeleteSlot={(slotId) => deleteSaveSlot(saveStorageKey, slotId)}
+                        onClose={() => setShowSaveModal(false)}
+                    />
+                )}
 
                 {/* Sandbox Hotspot Room Overlay */}
                 {currentBlock?.type === 'HOTSPOT_ROOM' && (
@@ -773,6 +892,50 @@ export default function VNPlayer({
                                 setBlockIndex(0);
                             }
                             return null;
+                        }}
+                    />
+                )}
+                {/* Escape Room Keypad / Password Lock Overlay */}
+                {currentBlock?.type === 'KEYPAD_PUZZLE' && (
+                    <KeypadStageOverlay
+                        lockMode={currentBlock.lockMode}
+                        promptText={interpolateVariables(currentBlock.promptText, variables)}
+                        hintText={currentBlock.hintText}
+                        secretCode={currentBlock.secretCode}
+                        maxAttempts={currentBlock.maxAttempts}
+                        isMuted={isMuted}
+                        onUnlock={() => {
+                            if (currentBlock.unlockSceneId) {
+                                goToScene(currentBlock.unlockSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                        onFailOut={() => {
+                            if (currentBlock.failSceneId) {
+                                goToScene(currentBlock.failSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                    />
+                )}
+                {currentBlock?.type === 'QUIZ_CHALLENGE' && (
+                    <QuizStageOverlay
+                        title={interpolateVariables(currentBlock.title, variables)}
+                        passingScore={currentBlock.passingScore}
+                        questions={currentBlock.questions}
+                        isMuted={isMuted}
+                        onQuizComplete={(passed, score) => {
+                            setVariables((prev) => ({ ...prev, quizScore: score }));
+                            const nextScene = passed
+                                ? currentBlock.passSceneId
+                                : currentBlock.failSceneId;
+                            if (nextScene) {
+                                goToScene(nextScene);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
                         }}
                     />
                 )}

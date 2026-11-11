@@ -23,6 +23,8 @@ import {
     Trophy,
     Compass,
     Swords,
+    KeyRound,
+    HelpCircle,
 } from 'lucide-react';
 
 interface SortableBlockCardProps {
@@ -152,6 +154,18 @@ export default function SortableBlockCard({
                         Battle: <strong>{block.enemyName}</strong> ({block.enemyMaxHp} HP)
                     </span>
                 );
+            case 'KEYPAD_PUZZLE':
+                return (
+                    <span className="text-amber-300">
+                        {block.lockMode} Lock: Code <strong>{block.secretCode}</strong>
+                    </span>
+                );
+            case 'QUIZ_CHALLENGE':
+                return (
+                    <span className="text-purple-300">
+                        Trivia/Riddles: <strong>{block.title}</strong> ({block.questions.length} Qs)
+                    </span>
+                );
         }
     };
 
@@ -172,6 +186,8 @@ export default function SortableBlockCard({
         UNLOCK_ACHIEVEMENT: <Trophy className="h-4 w-4 text-amber-400" />,
         TOPDOWN_ROOM: <Compass className="h-4 w-4 text-emerald-400" />,
         BATTLE_ENCOUNTER: <Swords className="h-4 w-4 text-rose-500" />,
+        KEYPAD_PUZZLE: <KeyRound className="h-4 w-4 text-amber-400" />,
+        QUIZ_CHALLENGE: <HelpCircle className="h-4 w-4 text-purple-400" />,
     };
 
     return (

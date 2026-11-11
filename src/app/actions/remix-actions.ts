@@ -72,6 +72,14 @@ function remapBlockSceneIds(
         defeatSceneId: idMap.get(blk.defeatSceneId) ?? blk.defeatSceneId,
       };
     }
+    if (blk.type === 'QUIZ_CHALLENGE') {
+      return {
+        ...blk,
+        id: newId,
+        passSceneId: idMap.get(blk.passSceneId) ?? blk.passSceneId,
+        failSceneId: idMap.get(blk.failSceneId) ?? blk.failSceneId,
+      };
+    }
     return { ...blk, id: newId };
   });
 }

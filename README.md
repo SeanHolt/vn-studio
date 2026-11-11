@@ -1,6 +1,6 @@
 # VN Studio — Multi-Genre Visual Novel & Sandbox Game Creation Platform
 
-**VN Studio** is a no-code, browser-based game creation platform built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**, **Prisma 7 (SQLite)**, **Zustand**, **Auth.js**, and **Stripe**. Designed for both first-time young creators and experienced storytellers, it pairs a kid-friendly drag-and-drop block editor with a 2D node-graph canvas, variables, inventory, point-and-click sandbox rooms, 2D top-down RPG maps, turn-based battles, community remixing, and an instant playable runtime.
+**VN Studio** is a no-code, browser-based game creation platform built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**, **Prisma 7 (SQLite)**, **Zustand**, **Auth.js**, and **Stripe**. Designed for both first-time young creators and experienced storytellers, it pairs a kid-friendly drag-and-drop block editor with a 2D node-graph canvas, variables, inventory, point-and-click sandbox rooms, escape-room keypad locks, 2D top-down RPG maps, turn-based battles, community remixing, and an instant playable runtime.
 
 ---
 
@@ -23,7 +23,7 @@
 Creators can toggle seamlessly between two synchronized editing views at any time:
 - **Simple Mode (Drag-and-Drop Timeline):** Snap together ordered scene blocks (`DIALOGUE`, `BACKGROUND`, `CHARACTER`, `CHOICE`, etc.) using drag-and-drop reordering and edit properties in a dedicated Inspector panel.
 - **Advanced Mode (2D Node Graph Canvas):** Visualize every scene as an interactive node on an infinite 2D canvas powered by `@xyflow/react`.
-  - Color-coded animated wires automatically render for **Choices** (indigo), **Conditional Choices** (amber), **`IF / ELSE` Branches** (emerald/rose), **Sandbox Doorways** (sky blue), **2D Map Doors & NPCs** (teal), **Battle Victory/Defeat Outcomes** (emerald/dashed rose), and **Countdown Timeouts** (dashed orange).
+  - Color-coded animated wires automatically render for **Choices** (indigo), **Conditional Choices** (amber), **`IF / ELSE` Branches** (emerald/rose), **Sandbox Doorways** (sky blue), **Keypad Unlock/Lockout Routes** (emerald/dashed rose), **2D Map Doors & NPCs** (teal), **Battle Victory/Defeat Outcomes** (emerald/dashed rose), and **Countdown Timeouts** (dashed orange).
   - Dragging a wire between two scene nodes automatically generates a linked choice option.
   - Node `(x, y)` coordinates persist directly to SQLite.
 - **Live Stage Preview:** An embedded 16:9 mini-stage inside the editor updates in real time as blocks are selected, edited, or reordered—displaying active backgrounds, staged character sprites, emotions, themes, and dashed sandbox hotspot bounding boxes.
@@ -38,9 +38,11 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`CHARACTER`:** Stages characters at `left`, `center`, or `right` positions with `enter`/`exit` actions, **5 expressions** (`neutral`, `happy`, `angry`, `shocked`, `sad`), and **5 stage animations** (`none`, `slide-in`, `bounce`, `shake`, `pulse`).
 - **`CHOICE`:** Presents branching player decisions with optional **variable condition rules** (`==`, `!=`, `>`, `<`, `>=`, `<=`) and **required inventory item** locks.
 - **`INPUT_TEXT`:** Prompts the player to type their name or a secret password and saves their response directly into a game variable.
+- **`QUIZ_CHALLENGE` (Trivia & Riddle Trials):** Embeds a multi-question multiple-choice quiz or riddle challenge with instant answer explanations, synth audio feedback, score tracking (`quizScore`), Pass/Fail scene routing, and a built-in **20-question preset bank** covering **Sci-Fi Movies**, **Fantasy Movies**, **Sci-Fi & Fantasy TV**, and **Classic Riddles**.
 
 #### Interactive Game Genres & Mini-Games
 - **`HOTSPOT_ROOM` (Point-and-Click Sandbox):** Turns a scene into an interactive exploration room with percentage-positioned clickable zones (`x`, `y`, `width`, `height`). Clicking a hotspot can show inspection text, grant an item, set a variable, jump to another room/scene, or require a specific key item to unlock.
+- **`KEYPAD_PUZZLE` (Escape Room PIN & Safe Lock):** Embeds an interactive 0–9 digital safe keypad or secret password terminal with optional clue hints, configurable attempt limits (unlimited or lockout), shake feedback, synth chime/alert audio, and separate Unlock and Fail destination scenes.
 - **`TOPDOWN_ROOM` (2D Top-Down RPG / Adventure Map):** Embeds a playable 12×8 tile grid with 4 environment themes (**Forest Meadow**, **Stone Dungeon**, **Royal Hall**, **Starship Deck**), customizable player avatars, paintable walls/obstacles, and interactive **NPCs**, **Treasure Chests**, **Doors**, and **Signs**. Supports Arrow keys, WASD, and on-screen D-Pad controls.
 - **`BATTLE_ENCOUNTER` (Turn-Based RPG Combat):** Launches a JRPG-style encounter with customizable enemy sprites, HP/Attack stats, player stats, special skills (with cooldowns), and Backpack healing item consumption. Routes automatically to Victory or Defeat scenes and syncs `playerHP` into global variables.
 
@@ -53,8 +55,10 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`ADVANCE_TIME`:** Steps the optional Day & Time-of-Day clock forward (`MORNING` → `AFTERNOON` → `EVENING` → `NIGHT`) or jumps to an exact time and day.
 - **`PLAY_AUDIO`:** Plays or stops Sound Effects (`SFX`) or looping Background Music (`BGM`) using built-in zero-dependency Web Audio synthesizer presets or uploaded `.mp3`/`.wav`/`.ogg` files.
 - **`UNLOCK_ACHIEVEMENT`:** Unlocks a custom trophy badge with an emoji icon, title, and description, displaying a celebratory toast and persisting progress to `localStorage`.
+
 ### 3. Playable Runtime (`VNPlayer` at `/play/[projectId]`)
 - **Typewriter Text Engine:** Reveals dialogue character-by-character; clicking once finishes the current sentence immediately and clicking again advances to the next block.
+- **In-Game Save/Load Slots & Auto-Save (`Save / Load`):** Persists full playthrough snapshots (active scene, block position, variables, inventory, relationship scores, clock state, staged characters, and dialogue history) to `localStorage` across **3 manual save slots** plus an automatic scene-transition **Auto-Save** checkpoint.
 - **Custom Visual Themes & Typography:** Supports 4 built-in UI themes (**Modern Studio**, **Sci-Fi Terminal**, **Fantasy Parchment**, and **8-Bit Arcade**) that style dialogue boxes, speaker tags, choice buttons, and fonts.
 - **Toggleable Day & Time-of-Day Clock:** When enabled by the author, displays a live `Day X • Morning/Afternoon/Evening/Night` HUD badge and applies smooth atmospheric lighting tints across the stage.
 - **Interactive HUD Drawers & Modals:**
@@ -79,6 +83,12 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
   - **Starter (Free):** Up to **3** game projects per account.
   - **+10 Project Slots (\$9 One-Time):** Permanently increments a user's `maxProjects` quota via Stripe Checkout + Webhook.
   - **Pro Creator (\$12/month):** Unlocks unlimited game projects (`maxProjects: 999`).
+
+### 6. Built-In Playable Sample Games (`prisma/seed.ts`)
+Running `npx prisma db seed` populates the Homepage and Public Arcade (`/explore`) with **3 complete, remixable example projects** showcasing every genre and system:
+1. **The Clockwork Lighthouse (Mystery & Point-and-Click Sandbox):** Demonstrates custom player name entry (`INPUT_TEXT`), character expressions & animations, relationship heart toasts (`AFFINITY`), a point-and-click forest sandbox (`HOTSPOT_ROOM`), inventory checks, and multiple endings.
+2. **Starship Orion: Escape Protocol (Sci-Fi Escape Room & Trivia):** Uses the **Sci-Fi Terminal** theme alongside a live 30-second reactor countdown (`TIMER`), a 4-digit airlock safe keypad (`KEYPAD_PUZZLE`), and a 5-question Sci-Fi Cinema trivia trial (`QUIZ_CHALLENGE`).
+3. **Chronicles of Eldoria: The Sunstone (2D Top-Down RPG & Turn-Based Battle):** Uses the **Fantasy Parchment** theme and **Day/Time-of-Day Clock** across a walkable 12×8 tile meadow (`TOPDOWN_ROOM`) with NPCs, treasure chests, and a turn-based RPG boss battle (`BATTLE_ENCOUNTER`).
 
 ---
 

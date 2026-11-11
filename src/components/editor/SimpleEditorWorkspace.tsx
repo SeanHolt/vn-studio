@@ -42,6 +42,7 @@ import {
     Globe,
     Lock,
 } from 'lucide-react';
+import { buildPresetQuestions } from '@/lib/vn-trivia-presets';
 
 function createUniqueId(prefix: string): string {
     return `${prefix}_${crypto.randomUUID()}`;
@@ -266,6 +267,27 @@ export default function SimpleEditorWorkspace({
                 healItemName: 'Health Potion',
                 victorySceneId: fallbackScene,
                 defeatSceneId: fallbackScene,
+            });
+        } else if (type === 'KEYPAD_PUZZLE') {
+            store.addBlock({
+                id,
+                type,
+                lockMode: 'PIN',
+                promptText: 'Enter the 4-digit safe combination:',
+                hintText: 'Look for clues in the room!',
+                secretCode: '1984',
+                maxAttempts: 0,
+                unlockSceneId: fallbackScene,
+            });
+        } else if (type === 'QUIZ_CHALLENGE') {
+            store.addBlock({
+                id,
+                type,
+                title: 'Sci-Fi & Fantasy Trial',
+                passingScore: 3,
+                questions: buildPresetQuestions('MIXED'),
+                passSceneId: fallbackScene,
+                failSceneId: fallbackScene,
             });
         }
     };
