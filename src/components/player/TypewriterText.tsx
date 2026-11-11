@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface TypewriterTextProps {
   text: string;
@@ -10,33 +10,40 @@ interface TypewriterTextProps {
 
 export default function TypewriterText({
   text,
-  speedMs = 22,
+  speedMs = 24,
   onCompleteChange,
 }: TypewriterTextProps) {
   const [visibleCount, setVisibleCount] = useState(0);
+  const completedTextRef = useRef('');
 
   useEffect(() => {
     setVisibleCount(0);
+    completedTextRef.current = '';
     onCompleteChange?.(false);
 
     if (!text) {
+      completedTextRef.current = text;
       onCompleteChange?.(true);
       return;
     }
 
+    let currentCount = 0;
     const timer = window.setInterval(() => {
-      setVisibleCount((prev) => {
-        if (prev + 1 >= text.length) {
-          window.clearInterval(timer);
+      currentCount += 1;
+      if (currentCount >= text.length) {
+        window.clearInterval(timer);
+        setVisibleCount(text.length);
+        if (completedTextRef.current !== text) {
+          completedTextRef.current = text;
           onCompleteChange?.(true);
-          return text.length;
         }
-        return prev + 1;
-      });
+      } else {
+        setVisibleCount(currentCount);
+      }
     }, speedMs);
 
     return () => window.clearInterval(timer);
   }, [text, speedMs, onCompleteChange]);
 
-  return <span>{text.slice(0, visibleCount)}</span>;
+  return React.createElement('span', null, text.slice(0, visibleCount));
 }
