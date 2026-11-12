@@ -97,12 +97,15 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 
 
 ### 6. Built-In Playable Sample Games (`prisma/seed.ts`)
-Running `npx prisma db seed` populates the Homepage and Public Arcade (`/explore`) with **5 complete, remixable example projects** showcasing every genre and system:
+Running `npx prisma db seed` populates the Homepage and Public Arcade (`/explore`) with **7 complete, remixable example projects** showcasing every genre and feature:
 1. **The Clockwork Lighthouse (Mystery & Point-and-Click Sandbox):** Demonstrates custom player name entry (`INPUT_TEXT`), character expressions & animations, relationship heart toasts (`AFFINITY`), a point-and-click forest sandbox (`HOTSPOT_ROOM`), inventory checks, and multiple endings.
 2. **Starship Orion: Escape Protocol (Sci-Fi Escape Room & Trivia):** Uses the **Sci-Fi Terminal** theme alongside a live 30-second reactor countdown (`TIMER`), a 4-digit airlock safe keypad (`KEYPAD_PUZZLE`), and a 5-question Sci-Fi Cinema trivia trial (`QUIZ_CHALLENGE`).
 3. **Chronicles of Eldoria: The Sunstone (2D Top-Down RPG & Turn-Based Battle):** Uses the **Fantasy Parchment** theme and **Day/Time-of-Day Clock** across a walkable 12×8 tile meadow (`TOPDOWN_ROOM`) with NPCs, treasure chests, and a turn-based RPG boss battle (`BATTLE_ENCOUNTER`).
 4. **Arcane Duelists: Academy of Cards (Card Duel & Riddles):** Uses the **8-Bit Arcade** theme to showcase a multi-round **Elemental Card Showdown (`CARD_DUEL`)** paired with the **5-Riddle Sphinx Trial (`QUIZ_CHALLENGE`)**.
 5. **Cyber Heist: Neon Vault (Quick-Time Reflex & Password Heist):** Combines a sweeping laser **Quick-Time Reaction Bar (`QTE_ACTION`)**, a secret password lock (`KEYPAD_PUZZLE`), and a live firewall trace timer (`TIMER`).
+6. **Aether Core: Circuit Breach (5×5 Wire Circuit & Interrogation):** Combines a rotatable **5×5 Neon Circuit Puzzle (`CIRCUIT_PUZZLE`)** with a **Present Evidence Cross-Examination (`EVIDENCE_CHECK`)** and TTS voice narration presets.
+7. **Asteroid Belt Tycoon: 10-Tier Idle (Idle / Incremental Tycoon):** Showcases the **10-Tier Space Mining Idle Tycoon (`IDLE_TYCOON`)** with `1x / 10x / MAX` bulk-buying, passive per-second income, and a 10,000 Star Credit goal milestone.
+
 
 
 ---
