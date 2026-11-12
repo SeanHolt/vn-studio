@@ -70,6 +70,7 @@ import { speakDialogueLine, stopSpeechNarration } from '@/lib/vn-tts';
 import EvidenceStageOverlay from './EvidenceStageOverlay';
 import CircuitStageOverlay from './CircuitStageOverlay';
 import IdleStageOverlay from './IdleStageOverlay';
+import SlidingPuzzleStageOverlay from './SlidingPuzzleStageOverlay';
 
 export interface PlayableScene {
     id: string;
@@ -1019,6 +1020,31 @@ export default function VNPlayer({
                                 setBlockIndex(0);
                             }
                             return null;
+                        }}
+                    />
+                )}
+                {currentBlock?.type === 'SLIDING_PUZZLE' && (
+                    <SlidingPuzzleStageOverlay
+                        title={interpolateVariables(currentBlock.title, variables)}
+                        gridSize={currentBlock.gridSize}
+                        puzzleMode={currentBlock.puzzleMode}
+                        imageUrl={currentBlock.imageUrl}
+                        runeTheme={currentBlock.runeTheme}
+                        maxMoves={currentBlock.maxMoves}
+                        isMuted={isMuted}
+                        onUnlock={() => {
+                            if (currentBlock.unlockSceneId) {
+                                goToScene(currentBlock.unlockSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                        onFailOut={() => {
+                            if (currentBlock.failSceneId) {
+                                goToScene(currentBlock.failSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
                         }}
                     />
                 )}

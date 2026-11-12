@@ -25,6 +25,7 @@ import { VoiceStyleId, speakDialogueLine } from '@/lib/vn-tts';
 import EvidenceCheckInspector from './EvidenceCheckInspector';
 import CircuitPuzzleInspector from './CircuitPuzzleInspector';
 import IdleTycoonInspector from './IdleTycoonInspector';
+import SlidingPuzzleInspector from './SlidingPuzzleInspector';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -476,6 +477,13 @@ export default function BlockInspector({
             )}
             {block.type === 'TIMER' && (
                 <TimerBlockInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
+            )}
+            {block.type === 'SLIDING_PUZZLE' && (
+                <SlidingPuzzleInspector
                     block={block}
                     allScenes={allScenes}
                     onChange={onChange}

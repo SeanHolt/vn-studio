@@ -52,6 +52,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`EVIDENCE_CHECK` (Dialogue Interrogation & "Present Evidence"):** Challenges players to inspect a witness's testimony and present the matching contradictory item from their Backpack—complete with strike counters, clue hints, synth feedback, and branching confession/failure routes.
 - **`CIRCUIT_PUZZLE` (Wire-Connecting Circuit Puzzle):** Embeds an interactive 4×4, 5×5, 6×6, or 7×7 rotatable wire/pipe grid with live Breadth-First Search power flow, 3 visual themes (**Sci-Fi Neon Circuit**, **Steampunk Brass Pipes**, **Arcane Mana Channels**), optional move limits, and a one-click **Generate Solvable Board** builder.
 - **`IDLE_TYCOON` (Idle / Incremental Tycoon):** Embeds a cookie-clicker/tycoon generator game with unlimited upgrade tiers (`+X/sec` auto-generators and `+X/click` power boosters), `1x / 10x / MAX` geometric bulk-buy controls, big-number formatting (`K`, `M`, `B`, `T`, `Qa`), 3 deep 10-tier preset packs, global variable currency syncing, and optional story goal milestones.
+- **`SLIDING_PUZZLE` (Sliding Image & Rune Tile Puzzle):** Slices any built-in or uploaded artwork into a scrambled 3×3, 4×4, or 5×5 sliding tile puzzle—or switches to **Elder Arcane Runes**, **Numbers**, or **Cyber Glyphs**—with guaranteed-solvable shuffling, hold-to-peek goal preview, and optional move limits.
 
 #### Logic, Progression & World Systems
 - **`SET_VARIABLE`:** Modifies global project variables (`boolean`, `number`, `string`) using `set`, `add`, or `subtract` operations.
@@ -105,6 +106,7 @@ Running `npx prisma db seed` populates the Homepage and Public Arcade (`/explore
 5. **Cyber Heist: Neon Vault (Quick-Time Reflex & Password Heist):** Combines a sweeping laser **Quick-Time Reaction Bar (`QTE_ACTION`)**, a secret password lock (`KEYPAD_PUZZLE`), and a live firewall trace timer (`TIMER`).
 6. **Aether Core: Circuit Breach (5×5 Wire Circuit & Interrogation):** Combines a rotatable **5×5 Neon Circuit Puzzle (`CIRCUIT_PUZZLE`)** with a **Present Evidence Cross-Examination (`EVIDENCE_CHECK`)** and TTS voice narration presets.
 7. **Asteroid Belt Tycoon: 10-Tier Idle (Idle / Incremental Tycoon):** Showcases the **10-Tier Space Mining Idle Tycoon (`IDLE_TYCOON`)** with `1x / 10x / MAX` bulk-buying, passive per-second income, and a 10,000 Star Credit goal milestone.
+8. **The Sunken Temple: Rune Vault (Sliding Image & Rune Puzzle):** Uses the **Fantasy Parchment** theme to challenge players with both a 3×3 **Image Slice Mosaic (`SLIDING_PUZZLE`)** and an **Elder Arcane Rune** tile lock.
 
 
 

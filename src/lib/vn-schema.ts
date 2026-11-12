@@ -117,6 +117,18 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     id: z.string(),
+    type: z.literal("SLIDING_PUZZLE"),
+    title: z.string().default("Reassemble the Ancient Seal"),
+    gridSize: z.union([z.literal(3), z.literal(4), z.literal(5)]).default(3),
+    puzzleMode: z.enum(["IMAGE", "RUNES"]).default("IMAGE"),
+    imageUrl: z.string().default("/assets/bg-sunset-bay.svg"),
+    runeTheme: z.enum(["ARCANE", "NUMBERS", "CYBER"]).default("ARCANE"),
+    maxMoves: z.number().min(0).max(500).default(0),
+    unlockSceneId: z.string(),
+    failSceneId: z.string().optional(),
+  }),
+  z.object({
+    id: z.string(),
     type: z.literal("CARD_DUEL"),
     opponentName: z.string().min(1).default("Archmage Lyra"),
     deckTheme: z.enum(["ELEMENTAL", "SCIFI", "KNIGHTS"]).default("ELEMENTAL"),

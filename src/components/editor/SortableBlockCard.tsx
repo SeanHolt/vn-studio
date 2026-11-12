@@ -30,6 +30,7 @@ import {
     Scale,
     Cpu,
     Coins,
+    Grid,
 } from 'lucide-react';
 
 interface SortableBlockCardProps {
@@ -204,6 +205,13 @@ export default function SortableBlockCard({
                         tiers)
                     </span>
                 );
+            case 'SLIDING_PUZZLE':
+                return (
+                    <span className="text-purple-300">
+                        Sliding Puzzle ({block.gridSize}×{block.gridSize} {block.puzzleMode}
+                        ): <strong>{block.title}</strong>
+                    </span>
+                );
         }
     };
 
@@ -231,6 +239,7 @@ export default function SortableBlockCard({
         EVIDENCE_CHECK: <Scale className="h-4 w-4 text-amber-400" />,
         CIRCUIT_PUZZLE: <Cpu className="h-4 w-4 text-cyan-400" />,
         IDLE_TYCOON: <Coins className="h-4 w-4 text-amber-400" />,
+        SLIDING_PUZZLE: <Grid className="h-4 w-4 text-purple-400" />,
     };
 
     return (

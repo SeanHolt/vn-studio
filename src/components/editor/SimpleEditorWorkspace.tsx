@@ -288,6 +288,18 @@ export default function SimpleEditorWorkspace({
                 description: 'Discovered a hidden clue!',
                 icon: '🏆',
             });
+        } else if (type === 'SLIDING_PUZZLE') {
+            store.addBlock({
+                id,
+                type,
+                title: 'Reassemble the Ancient Seal',
+                gridSize: 3,
+                puzzleMode: 'IMAGE',
+                imageUrl: '/assets/bg-sunset-bay.svg',
+                runeTheme: 'ARCANE',
+                maxMoves: 0,
+                unlockSceneId: fallbackScene,
+            });
         } else if (type === 'TOPDOWN_ROOM') {
             store.addBlock({
                 id,
