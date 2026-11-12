@@ -71,6 +71,7 @@ import EvidenceStageOverlay from './EvidenceStageOverlay';
 import CircuitStageOverlay from './CircuitStageOverlay';
 import IdleStageOverlay from './IdleStageOverlay';
 import SlidingPuzzleStageOverlay from './SlidingPuzzleStageOverlay';
+import CraftingStageOverlay from './CraftingStageOverlay';
 
 export interface PlayableScene {
     id: string;
@@ -1020,6 +1021,39 @@ export default function VNPlayer({
                                 setBlockIndex(0);
                             }
                             return null;
+                        }}
+                    />
+                )}
+                {/* Alchemy / Potion Mixing Lab Overlay */}
+                {currentBlock?.type === 'CRAFTING_PUZZLE' && (
+                    <CraftingStageOverlay
+                        title={interpolateVariables(currentBlock.title, variables)}
+                        recipePrompt={interpolateVariables(
+                            currentBlock.recipePrompt,
+                            variables
+                        )}
+                        hintText={currentBlock.hintText}
+                        availableIngredients={currentBlock.availableIngredients}
+                        requiredIngredients={currentBlock.requiredIngredients}
+                        craftedItemName={currentBlock.craftedItemName}
+                        maxAttempts={currentBlock.maxAttempts}
+                        isMuted={isMuted}
+                        onCraftSuccess={(craftedItem) => {
+                            setInventory((prev) =>
+                                prev.includes(craftedItem) ? prev : [...prev, craftedItem]
+                            );
+                            if (currentBlock.successSceneId) {
+                                goToScene(currentBlock.successSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                        onCraftFailOut={() => {
+                            if (currentBlock.failSceneId) {
+                                goToScene(currentBlock.failSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
                         }}
                     />
                 )}

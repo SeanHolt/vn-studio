@@ -57,6 +57,9 @@ function extractOutgoingSceneIds(block: SceneBlock): string[] {
   } else if (block.type === 'SLIDING_PUZZLE') {
     if (block.unlockSceneId) targets.push(block.unlockSceneId);
     if (block.failSceneId) targets.push(block.failSceneId);
+  } else if (block.type === 'CRAFTING_PUZZLE') {
+    if (block.successSceneId) targets.push(block.successSceneId);
+    if (block.failSceneId) targets.push(block.failSceneId);
   }
 
   return targets;

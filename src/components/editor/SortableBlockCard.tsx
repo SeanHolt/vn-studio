@@ -31,6 +31,7 @@ import {
     Cpu,
     Coins,
     Grid,
+    FlaskConical,
 } from 'lucide-react';
 
 interface SortableBlockCardProps {
@@ -212,6 +213,12 @@ export default function SortableBlockCard({
                         ): <strong>{block.title}</strong>
                     </span>
                 );
+            case 'CRAFTING_PUZZLE':
+                return (
+                    <span className="text-emerald-300">
+                        Alchemy Lab: Brew <strong>{block.craftedItemName}</strong>
+                    </span>
+                );
         }
     };
 
@@ -240,6 +247,7 @@ export default function SortableBlockCard({
         CIRCUIT_PUZZLE: <Cpu className="h-4 w-4 text-cyan-400" />,
         IDLE_TYCOON: <Coins className="h-4 w-4 text-amber-400" />,
         SLIDING_PUZZLE: <Grid className="h-4 w-4 text-purple-400" />,
+        CRAFTING_PUZZLE: <FlaskConical className="h-4 w-4 text-emerald-400" />,
     };
 
     return (

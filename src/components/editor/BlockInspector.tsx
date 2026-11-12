@@ -26,6 +26,7 @@ import EvidenceCheckInspector from './EvidenceCheckInspector';
 import CircuitPuzzleInspector from './CircuitPuzzleInspector';
 import IdleTycoonInspector from './IdleTycoonInspector';
 import SlidingPuzzleInspector from './SlidingPuzzleInspector';
+import CraftingPuzzleInspector from './CraftingPuzzleInspector';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -63,13 +64,6 @@ export default function BlockInspector({
             )}
             {block.type === 'ADVANCE_TIME' && (
                 <TimeBlockInspector block={block} onChange={onChange} />
-            )}
-            {block.type === 'CIRCUIT_PUZZLE' && (
-                <CircuitPuzzleInspector
-                    block={block}
-                    allScenes={allScenes}
-                    onChange={onChange}
-                />
             )}
             {block.type === 'BACKGROUND' && (
                 <label className="flex flex-col gap-1.5">
@@ -290,6 +284,20 @@ export default function BlockInspector({
                         </div>
                     ))}
                 </div>
+            )}
+            {block.type === 'CIRCUIT_PUZZLE' && (
+                <CircuitPuzzleInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
+            )}
+            {block.type === 'CRAFTING_PUZZLE' && (
+                <CraftingPuzzleInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
             )}
             {block.type === 'DIALOGUE' && (
                 <>

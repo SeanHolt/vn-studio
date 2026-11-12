@@ -1,14 +1,15 @@
 import { z } from "zod";
 
 export type SceneType =
-  | "TITLE"
-  | "DIALOGUE"
-  | "HOTSPOT"
-  | "TOPDOWN"
-  | "BATTLE"
-  | "QUIZ"
-  | "IDLE"
-  | "ENDING";
+  | 'TITLE'
+  | 'DIALOGUE'
+  | 'HOTSPOT'
+  | 'TOPDOWN'
+  | 'BATTLE'
+  | 'QUIZ'
+  | 'IDLE'
+  | 'CRAFTING'
+  | 'ENDING';
 
 export const TopDownEntitySchema = z.object({
   id: z.string(),
@@ -85,6 +86,21 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     type: z.literal("BACKGROUND"),
     assetUrl: z.string(),
     transition: z.enum(["none", "fade"]).default("fade"),
+  }),
+   z.object({
+    id: z.string(),
+    type: z.literal('CRAFTING_PUZZLE'),
+    title: z.string().default('Arcane Alchemy Cauldron'),
+    recipePrompt: z
+      .string()
+      .default('Combine 2 ingredients to brew the Elixir of True Sight!'),
+    hintText: z.string().optional(),
+    availableIngredients: z.array(z.string().min(1)).min(3).max(8),
+    requiredIngredients: z.array(z.string().min(1)).min(2).max(4),
+    craftedItemName: z.string().min(1).default('Elixir of True Sight'),
+    maxAttempts: z.number().min(0).max(15).default(0),
+    successSceneId: z.string(),
+    failSceneId: z.string().optional(),
   }),
   z.object({
     id: z.string(),

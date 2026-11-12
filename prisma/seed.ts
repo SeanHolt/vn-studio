@@ -9,6 +9,7 @@ import { seedCyberHeistDemo } from './seed-cyber-heist';
 import { seedCircuitPuzzleDemo } from './seed-circuit';
 import { seedIdleTycoonDemo } from './seed-idle';
 import { seedSlidingPuzzleDemo } from './seed-sliding';
+import { seedCraftingDemo } from './seed-crafting';
 
 const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL || 'file:./dev.db',
@@ -25,6 +26,7 @@ async function main() {
   await seedCircuitPuzzleDemo(prisma);
   await seedIdleTycoonDemo(prisma);
   await seedSlidingPuzzleDemo(prisma);
+  await seedCraftingDemo(prisma);
 }
 
 main()

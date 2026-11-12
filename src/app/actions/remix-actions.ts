@@ -83,6 +83,16 @@ function remapBlockSceneIds(
           : undefined,
       };
     }
+    if (blk.type === 'CRAFTING_PUZZLE') {
+      return {
+        ...blk,
+        id: newId,
+        successSceneId: idMap.get(blk.successSceneId) ?? blk.successSceneId,
+        failSceneId: blk.failSceneId
+          ? idMap.get(blk.failSceneId) ?? blk.failSceneId
+          : undefined,
+      };
+    }
     if (blk.type === "BATTLE_ENCOUNTER") {
       return {
         ...blk,
