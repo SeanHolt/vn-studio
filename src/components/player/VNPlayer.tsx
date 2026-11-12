@@ -63,6 +63,7 @@ import KeypadStageOverlay from './KeypadStageOverlay';
 import TopDownStageOverlay from './TopDownStageOverlay';
 import BattleStageOverlay from './BattleStageOverlay';
 import QteStageOverlay from './QteStageOverlay';
+import CardDuelStageOverlay from './CardDuelStageOverlay';
 
 export interface PlayableScene {
     id: string;
@@ -951,6 +952,27 @@ export default function VNPlayer({
                             const nextScene = succeeded
                                 ? currentBlock.successSceneId
                                 : currentBlock.failSceneId;
+                            if (nextScene) {
+                                goToScene(nextScene);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                    />
+                )}
+                {currentBlock?.type === 'CARD_DUEL' && (
+                    <CardDuelStageOverlay
+                        opponentName={interpolateVariables(
+                            currentBlock.opponentName,
+                            variables
+                        )}
+                        deckTheme={currentBlock.deckTheme}
+                        roundsToWin={currentBlock.roundsToWin}
+                        isMuted={isMuted}
+                        onDuelComplete={(playerWon) => {
+                            const nextScene = playerWon
+                                ? currentBlock.victorySceneId
+                                : currentBlock.defeatSceneId;
                             if (nextScene) {
                                 goToScene(nextScene);
                             } else {

@@ -39,6 +39,8 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`CHOICE`:** Presents branching player decisions with optional **variable condition rules** (`==`, `!=`, `>`, `<`, `>=`, `<=`) and **required inventory item** locks.
 - **`INPUT_TEXT`:** Prompts the player to type their name or a secret password and saves their response directly into a game variable.
 - **`QUIZ_CHALLENGE` (Trivia & Riddle Trials):** Embeds a multi-question multiple-choice quiz or riddle challenge with instant answer explanations, synth audio feedback, score tracking (`quizScore`), Pass/Fail scene routing, and a built-in **20-question preset bank** covering **Sci-Fi Movies**, **Fantasy Movies**, **Sci-Fi & Fantasy TV**, and **Classic Riddles**.
+- **`CARD_DUEL` (Card Duel & Elemental Showdown):** Launches a multi-round tactical card battle with 3 selectable deck themes (**Elemental Magic**, **Sci-Fi Systems**, and **Royal Arena**), live score tracking, synth audio feedback, and Victory/Defeat scene routing. - First Version - Expect much more later!
+
 
 #### Interactive Game Genres & Mini-Games
 - **`HOTSPOT_ROOM` (Point-and-Click Sandbox):** Turns a scene into an interactive exploration room with percentage-positioned clickable zones (`x`, `y`, `width`, `height`). Clicking a hotspot can show inspection text, grant an item, set a variable, jump to another room/scene, or require a specific key item to unlock.

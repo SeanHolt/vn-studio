@@ -216,6 +216,16 @@ export default function SimpleEditorWorkspace({
                     },
                 ],
             });
+        } else if (type === 'CARD_DUEL') {
+            store.addBlock({
+                id,
+                type,
+                opponentName: 'Archmage Lyra',
+                deckTheme: 'ELEMENTAL',
+                roundsToWin: 2,
+                victorySceneId: fallbackScene,
+                defeatSceneId: fallbackScene,
+            });
         } else if (type === 'CHOICE') {
             store.addBlock({
                 id,

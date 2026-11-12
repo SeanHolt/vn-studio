@@ -20,6 +20,7 @@ import BattleEncounterInspector from './BattleEncounterInspector';
 import KeypadPuzzleInspector from './KeypadPuzzleInspector';
 import QuizChallengeInspector from './QuizChallengeInspector';
 import QteBlockInspector from './QteBlockInspector';
+import CardDuelInspector from './CardDuelInspector';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -332,6 +333,13 @@ export default function BlockInspector({
             )}
             {block.type === 'PLAY_AUDIO' && (
                 <AudioInspector block={block} onChange={onChange} />
+            )}
+            {block.type === 'CARD_DUEL' && (
+                <CardDuelInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
             )}
             {block.type === 'QUIZ_CHALLENGE' && (
                 <QuizChallengeInspector

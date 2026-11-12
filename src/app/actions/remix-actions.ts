@@ -88,6 +88,14 @@ function remapBlockSceneIds(
         failSceneId: idMap.get(blk.failSceneId) ?? blk.failSceneId,
       };
     }
+    if (blk.type === "CARD_DUEL") {
+      return {
+        ...blk,
+        id: newId,
+        victorySceneId: idMap.get(blk.victorySceneId) ?? blk.victorySceneId,
+        defeatSceneId: idMap.get(blk.defeatSceneId) ?? blk.defeatSceneId,
+      };
+    }
     return { ...blk, id: newId };
   });
 }

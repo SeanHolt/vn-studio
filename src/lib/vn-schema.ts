@@ -78,6 +78,15 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     id: z.string(),
+    type: z.literal('CARD_DUEL'),
+    opponentName: z.string().min(1).default('Archmage Lyra'),
+    deckTheme: z.enum(['ELEMENTAL', 'SCIFI', 'KNIGHTS']).default('ELEMENTAL'),
+    roundsToWin: z.number().min(1).max(5).default(2),
+    victorySceneId: z.string(),
+    defeatSceneId: z.string(),
+  }),
+  z.object({
+    id: z.string(),
     type: z.literal("CHARACTER"),
     name: z.string(),
     spriteUrl: z.string(),
