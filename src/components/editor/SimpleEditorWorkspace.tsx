@@ -41,9 +41,12 @@ import {
     Workflow,
     Globe,
     Lock,
+    ShieldCheck,
 } from 'lucide-react';
 import { buildPresetQuestions } from '@/lib/vn-trivia-presets';
 import DistributionPanel from './DistributionPanel';
+import { validateProjectStory } from '@/lib/vn-validator';
+import StoryValidatorModal from './StoryValidatorModal';
 
 function createUniqueId(prefix: string): string {
     return `${prefix}_${crypto.randomUUID()}`;
@@ -80,7 +83,8 @@ export default function SimpleEditorWorkspace({
     const [isPublished, setIsPublished] = useState<boolean>(initialIsPublished);
     const [isPublishing, startPublishTransition] = useTransition();
     const store = useEditorStore();
-
+    const [showValidator, setShowValidator] = useState(false);
+    const validationIssues = validateProjectStory(store.scenes);
     useEffect(() => {
         store.initProject(
             projectId,
@@ -444,6 +448,19 @@ export default function SimpleEditorWorkspace({
                     </Link>
                     <button
                         type="button"
+                        onClick={() => setShowValidator(true)}
+                        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition ${validationIssues.length > 0
+                            ? 'border-amber-500/40 bg-amber-950/50 text-amber-200 hover:bg-amber-900/60'
+                            : 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700'
+                            }`}
+                    >
+                        <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
+                        {validationIssues.length > 0
+                            ? `Check (${validationIssues.length})`
+                            : 'Validate'}
+                    </button>
+                    <button
+                        type="button"
                         disabled={isPending || !store.isDirty}
                         onClick={handleSave}
                         className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-40"
@@ -653,6 +670,17 @@ export default function SimpleEditorWorkspace({
                     <AssetLibraryPanel />
                 </aside>
             </div>
+            {showValidator && (
+                <StoryValidatorModal
+                    issues={validationIssues}
+                    onJumpToIssue={(sceneId, blockId) => {
+                        setEditorMode('SIMPLE');
+                        store.selectScene(sceneId);
+                        if (blockId) store.selectBlock(blockId);
+                    }}
+                    onClose={() => setShowValidator(false)}
+                />
+            )}
         </div>
     );
 }

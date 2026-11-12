@@ -31,29 +31,30 @@ async function PlayerLoader({ params }: PlayPageProps) {
     notFound();
   }
 
-  if (project.priceCents > 0) {
-    const session = await auth();
-    const userId = session?.user?.id;
-    const isOwner = Boolean(userId && project.userId === userId);
+  const session = await auth();
+  const viewerId = session?.user?.id;
+  const isOwner = Boolean(viewerId && project.userId === viewerId);
+  const canDebug = project.userId === null || isOwner;
 
+  if (project.priceCents > 0 && !isOwner) {
     let hasPurchased = false;
-    if (userId && !isOwner) {
+    if (viewerId) {
       const purchase = await prisma.gamePurchase.findUnique({
         where: {
-          userId_projectId: { userId, projectId: project.id },
+          userId_projectId: { userId: viewerId, projectId: project.id },
         },
       });
       hasPurchased = Boolean(purchase);
     }
 
-    if (!isOwner && !hasPurchased) {
+    if (!hasPurchased) {
       return (
         <PaidGameGate
           projectId={project.id}
           title={project.title}
           description={project.description}
           priceCents={project.priceCents}
-          isLoggedIn={Boolean(userId)}
+          isLoggedIn={Boolean(viewerId)}
         />
       );
     }
@@ -80,6 +81,7 @@ async function PlayerLoader({ params }: PlayPageProps) {
       scenes={playableScenes}
       theme={project.theme}
       enableClock={project.enableClock}
+      canDebug={canDebug}
     />
   );
 }

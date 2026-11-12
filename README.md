@@ -28,6 +28,7 @@ Creators can toggle seamlessly between two synchronized editing views at any tim
   - Node `(x, y)` coordinates persist directly to SQLite.
 - **Live Stage Preview:** An embedded 16:9 mini-stage inside the editor updates in real time as blocks are selected, edited, or reordered—displaying active backgrounds, staged character sprites, emotions, themes, and dashed sandbox hotspot bounding boxes.
 - **Multi-Genre Scene Management:** Create new scenes, rename scenes, switch scene types (`TITLE`, `DIALOGUE`, `HOTSPOT`, `TOPDOWN`, `BATTLE`, `ENDING`), and delete scenes with a minimum one-scene safety guard.
+- **Dead-End & Broken-Link Validator (`Validate`):** Scans every scene and block across the project to detect missing destination scene IDs, empty choices, non-ending dead-end scenes, and unreachable orphan scenes—with one-click jump-to-fix navigation.
 
 ### 2. Multi-Genre Playable Block System
 Every scene is composed of strongly typed blocks validated with **Zod** (`src/lib/vn-schema.ts`):
@@ -70,6 +71,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
   - **Achievements & Endings Gallery (`Gallery`):** Tracks discovered `ENDING` scenes and unlocked trophy badges across replays in `localStorage`.
   - **Scrollable Dialogue Backlog (`Log`):** Review a chronological history of every spoken dialogue line and choice made during the current playthrough.
   - **Audio Mute Toggle & Instant Restart:** One-click mute/unmute for BGM/SFX and full state reset.
+ - **Creator Story Debugger (`Debug`):** Available to project owners during playtesting; allows warping straight to any scene or block index, editing global variables live, spawning or removing Backpack items, and adjusting character affinity scores on the fly.
 
 ### 4. Built-In Art, Synth Audio & Custom Asset Manager
 - **Zero-Setup Starter Artwork:** Pure HTML/CSS gradient and polygon backgrounds (*Starry Night*, *Sunset Coast*, *Emerald Woods*) and character sprites (*Explorer*, *Keeper*) render instantly with zero external dependencies and full immunity to browser extension SVG injection.
@@ -90,10 +92,13 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 
 
 ### 6. Built-In Playable Sample Games (`prisma/seed.ts`)
-Running `npx prisma db seed` populates the Homepage and Public Arcade (`/explore`) with **3 complete, remixable example projects** showcasing every genre and system:
+Running `npx prisma db seed` populates the Homepage and Public Arcade (`/explore`) with **5 complete, remixable example projects** showcasing every genre and system:
 1. **The Clockwork Lighthouse (Mystery & Point-and-Click Sandbox):** Demonstrates custom player name entry (`INPUT_TEXT`), character expressions & animations, relationship heart toasts (`AFFINITY`), a point-and-click forest sandbox (`HOTSPOT_ROOM`), inventory checks, and multiple endings.
 2. **Starship Orion: Escape Protocol (Sci-Fi Escape Room & Trivia):** Uses the **Sci-Fi Terminal** theme alongside a live 30-second reactor countdown (`TIMER`), a 4-digit airlock safe keypad (`KEYPAD_PUZZLE`), and a 5-question Sci-Fi Cinema trivia trial (`QUIZ_CHALLENGE`).
 3. **Chronicles of Eldoria: The Sunstone (2D Top-Down RPG & Turn-Based Battle):** Uses the **Fantasy Parchment** theme and **Day/Time-of-Day Clock** across a walkable 12×8 tile meadow (`TOPDOWN_ROOM`) with NPCs, treasure chests, and a turn-based RPG boss battle (`BATTLE_ENCOUNTER`).
+4. **Arcane Duelists: Academy of Cards (Card Duel & Riddles):** Uses the **8-Bit Arcade** theme to showcase a multi-round **Elemental Card Showdown (`CARD_DUEL`)** paired with the **5-Riddle Sphinx Trial (`QUIZ_CHALLENGE`)**.
+5. **Cyber Heist: Neon Vault (Quick-Time Reflex & Password Heist):** Combines a sweeping laser **Quick-Time Reaction Bar (`QTE_ACTION`)**, a secret password lock (`KEYPAD_PUZZLE`), and a live firewall trace timer (`TIMER`).
+
 
 ---
 

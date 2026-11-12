@@ -45,6 +45,7 @@ import {
     Trophy,
     History,
     Save,
+    Bug,
 } from 'lucide-react';
 import { advanceGameClock, GameClockState, TIME_DISPLAY } from '@/lib/vn-clock';
 import GalleryModal, { AchievementDef, EndingDef } from './GalleryModal';
@@ -64,6 +65,7 @@ import TopDownStageOverlay from './TopDownStageOverlay';
 import BattleStageOverlay from './BattleStageOverlay';
 import QteStageOverlay from './QteStageOverlay';
 import CardDuelStageOverlay from './CardDuelStageOverlay';
+import StoryDebuggerModal from './StoryDebuggerModal';
 
 export interface PlayableScene {
     id: string;
@@ -88,6 +90,7 @@ interface VNPlayerProps {
     scenes: PlayableScene[];
     theme?: string;
     enableClock?: boolean;
+    canDebug?: boolean;
 }
 
 export default function VNPlayer({
@@ -98,9 +101,10 @@ export default function VNPlayer({
     scenes,
     theme,
     enableClock = false,
+    canDebug = false,
 }: VNPlayerProps) {
     const activeTheme = getThemeConfig(theme);
-
+    const [showDebugger, setShowDebugger] = useState(false);
     const [currentSceneId, setCurrentSceneId] = useState<string>(startSceneId);
     const [blockIndex, setBlockIndex] = useState<number>(0);
     const [variables, setVariables] = useState<GameVariables>(initialVariables);
@@ -189,7 +193,8 @@ export default function VNPlayer({
         }
     }, [currentScene, currentBlock, isTypingDone, blockIndex, variables]);
     useEffect(() => {
-        const isModalOpen = showGallery || showBacklog || showSaveModal;
+        const isModalOpen =
+            showGallery || showBacklog || showSaveModal || showDebugger;
         const isTypingInput = currentBlock?.type === 'INPUT_TEXT';
         if (isModalOpen || isTypingInput) return;
 
@@ -220,6 +225,7 @@ export default function VNPlayer({
         showBacklog,
         showSaveModal,
         handleAdvanceDialogue,
+        showDebugger
     ]);
     const buildSnapshot = useCallback(
         (
@@ -667,6 +673,15 @@ export default function VNPlayer({
                     >
                         <Save className="h-3.5 w-3.5 text-emerald-400" /> Save / Load
                     </button>
+                    {canDebug && (
+                        <button
+                            type="button"
+                            onClick={() => setShowDebugger(true)}
+                            className="flex items-center gap-1 rounded border border-amber-500/40 bg-amber-950/50 px-2.5 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-900/60"
+                        >
+                            <Bug className="h-3.5 w-3.5" /> Debug
+                        </button>
+                    )}
                     <button
                         type="button"
                         onClick={() => {
@@ -889,7 +904,48 @@ export default function VNPlayer({
                         onClose={() => setShowSaveModal(false)}
                     />
                 )}
-
+                {showDebugger && (
+                    <StoryDebuggerModal
+                        scenes={scenes}
+                        currentSceneId={currentSceneId}
+                        currentBlockIndex={blockIndex}
+                        variables={variables}
+                        inventory={inventory}
+                        affinity={affinity}
+                        onJumpToScene={(sceneId, nextIdx) => {
+                            setActiveTimer(null);
+                            setIsTypingDone(false);
+                            setForceFinishKey(0);
+                            setCurrentSceneId(sceneId);
+                            setBlockIndex(nextIdx);
+                            setShowDebugger(false);
+                        }}
+                        onUpdateVariable={(key, value) =>
+                            setVariables((prev) => ({ ...prev, [key]: value }))
+                        }
+                        onDeleteVariable={(key) =>
+                            setVariables((prev) => {
+                                const copy = { ...prev };
+                                delete copy[key];
+                                return copy;
+                            })
+                        }
+                        onAddItem={(itemName) =>
+                            setInventory((prev) =>
+                                prev.includes(itemName) ? prev : [...prev, itemName]
+                            )
+                        }
+                        onRemoveItem={(itemName) =>
+                            setInventory((prev) => prev.filter((i) => i !== itemName))
+                        }
+                        onSetAffinity={(charName, score) => {
+                            const varKey = `affinity_${charName.replace(/\s+/g, '_')}`;
+                            setAffinity((prev) => ({ ...prev, [charName]: score }));
+                            setVariables((prev) => ({ ...prev, [varKey]: score }));
+                        }}
+                        onClose={() => setShowDebugger(false)}
+                    />
+                )}
                 {/* Sandbox Hotspot Room Overlay */}
                 {currentBlock?.type === 'HOTSPOT_ROOM' && (
                     <HotspotStageOverlay

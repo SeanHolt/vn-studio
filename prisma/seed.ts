@@ -4,6 +4,8 @@ import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { seedLighthouseDemo } from './seed-lighthouse';
 import { seedSciFiEscapeDemo } from './seed-scifi';
 import { seedFantasyRpgDemo } from './seed-fantasy';
+import { seedCardDuelDemo } from './seed-card-duel';
+import { seedCyberHeistDemo } from './seed-cyber-heist';
 
 const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL || 'file:./dev.db',
@@ -15,6 +17,8 @@ async function main() {
   await seedLighthouseDemo(prisma);
   await seedSciFiEscapeDemo(prisma);
   await seedFantasyRpgDemo(prisma);
+  await seedCardDuelDemo(prisma);
+  await seedCyberHeistDemo(prisma);
 }
 
 main()
