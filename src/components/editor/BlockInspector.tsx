@@ -21,6 +21,7 @@ import KeypadPuzzleInspector from './KeypadPuzzleInspector';
 import QuizChallengeInspector from './QuizChallengeInspector';
 import QteBlockInspector from './QteBlockInspector';
 import CardDuelInspector from './CardDuelInspector';
+import { VoiceStyleId, speakDialogueLine } from '@/lib/vn-tts';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -299,6 +300,37 @@ export default function BlockInspector({
                             className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-white"
                         />
                     </label>
+                    <div className="flex items-end gap-2">
+                        <label className="flex flex-1 flex-col gap-1">
+                            <span className="text-xs text-slate-400">TTS Voice Style</span>
+                            <select
+                                value={block.voiceStyle ?? 'AUTO'}
+                                onChange={(e) =>
+                                    onChange({
+                                        ...block,
+                                        voiceStyle: e.target.value as VoiceStyleId,
+                                    })
+                                }
+                                className="rounded border border-slate-700 bg-slate-950 px-2.5 py-1.5 text-xs text-white"
+                            >
+                                <option value="AUTO">Auto-Detect from Speaker</option>
+                                <option value="NARRATOR">Narrator (Deep &amp; Steady)</option>
+                                <option value="HERO">Hero / Companion (Bright)</option>
+                                <option value="MYSTIC">Mystic / Mage (Melodic)</option>
+                                <option value="ROBOT">A.I. / Robot (Crisp)</option>
+                            </select>
+                        </label>
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                speakDialogueLine(block.speaker, block.text, block.voiceStyle)
+                            }
+                            className="rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-indigo-300 hover:bg-indigo-600 hover:text-white"
+                        >
+                            Test Voice
+                        </button>
+                    </div>
                 </>
             )}
             {block.type === 'HOTSPOT_ROOM' && (

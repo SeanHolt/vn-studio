@@ -66,6 +66,7 @@ import BattleStageOverlay from './BattleStageOverlay';
 import QteStageOverlay from './QteStageOverlay';
 import CardDuelStageOverlay from './CardDuelStageOverlay';
 import StoryDebuggerModal from './StoryDebuggerModal';
+import { speakDialogueLine, stopSpeechNarration } from '@/lib/vn-tts';
 
 export interface PlayableScene {
     id: string;
@@ -128,6 +129,7 @@ export default function VNPlayer({
     const [isTypingDone, setIsTypingDone] = useState<boolean>(false);
     const [forceFinishKey, setForceFinishKey] = useState<number>(0);
     const [isMuted, setIsMuted] = useState<boolean>(false);
+    const [isTtsEnabled, setIsTtsEnabled] = useState(false);
     const bgmCleanupRef = useRef<(() => void) | null>(null);
 
     const [activeTimer, setActiveTimer] = useState<{
@@ -227,6 +229,24 @@ export default function VNPlayer({
         handleAdvanceDialogue,
         showDebugger
     ]);
+    useEffect(() => {
+        if (!isTtsEnabled || isMuted || currentBlock?.type !== 'DIALOGUE') {
+            stopSpeechNarration();
+            return;
+        }
+
+        const spokenSpeaker = interpolateVariables(
+            currentBlock.speaker,
+            variables
+        );
+        const spokenText = interpolateVariables(currentBlock.text, variables);
+        speakDialogueLine(spokenSpeaker, spokenText, currentBlock.voiceStyle);
+
+        return () => {
+            stopSpeechNarration();
+        };
+    }, [isTtsEnabled, isMuted, currentSceneId, blockIndex, currentBlock, variables]);
+
     const buildSnapshot = useCallback(
         (
             slotId: string,
@@ -568,6 +588,7 @@ export default function VNPlayer({
     const handleRestart = () => {
         bgmCleanupRef.current?.();
         bgmCleanupRef.current = null;
+        stopSpeechNarration();
         setVariables(initialVariables);
         setInventory([]);
         setAffinity({});
@@ -703,7 +724,20 @@ export default function VNPlayer({
                             <Volume2 className="h-3.5 w-3.5 text-indigo-400" />
                         )}
                     </button>
-
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const next = !isTtsEnabled;
+                            if (!next) stopSpeechNarration();
+                            setIsTtsEnabled(next);
+                        }}
+                        className={`flex items-center gap-1 rounded px-2.5 py-1 text-xs font-medium transition ${isTtsEnabled
+                                ? 'border border-indigo-400/50 bg-indigo-950/70 text-indigo-200'
+                                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                            }`}
+                    >
+                        {isTtsEnabled ? '🗣️ Voice On' : '🗣️ Voice Off'}
+                    </button>
                     <button
                         type="button"
                         onClick={handleRestart}

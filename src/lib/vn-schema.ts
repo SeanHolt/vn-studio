@@ -66,11 +66,13 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     assetUrl: z.string(),
     transition: z.enum(["none", "fade"]).default("fade"),
   }),
-   z.object({
+  z.object({
     id: z.string(),
-    type: z.literal('QTE_ACTION'),
-    promptText: z.string().default('Press SPACE or click inside the green zone!'),
-    speed: z.enum(['SLOW', 'NORMAL', 'FAST']).default('NORMAL'),
+    type: z.literal("QTE_ACTION"),
+    promptText: z
+      .string()
+      .default("Press SPACE or click inside the green zone!"),
+    speed: z.enum(["SLOW", "NORMAL", "FAST"]).default("NORMAL"),
     zoneStart: z.number().min(10).max(75).default(38),
     zoneWidth: z.number().min(10).max(50).default(24),
     successSceneId: z.string(),
@@ -78,9 +80,9 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     id: z.string(),
-    type: z.literal('CARD_DUEL'),
-    opponentName: z.string().min(1).default('Archmage Lyra'),
-    deckTheme: z.enum(['ELEMENTAL', 'SCIFI', 'KNIGHTS']).default('ELEMENTAL'),
+    type: z.literal("CARD_DUEL"),
+    opponentName: z.string().min(1).default("Archmage Lyra"),
+    deckTheme: z.enum(["ELEMENTAL", "SCIFI", "KNIGHTS"]).default("ELEMENTAL"),
     roundsToWin: z.number().min(1).max(5).default(2),
     victorySceneId: z.string(),
     defeatSceneId: z.string(),
@@ -102,8 +104,11 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
   z.object({
     id: z.string(),
     type: z.literal("DIALOGUE"),
-    speaker: z.string(),
+    speaker: z.string().default("Narrator"),
     text: z.string(),
+    voiceStyle: z
+      .enum(["AUTO", "NARRATOR", "HERO", "MYSTIC", "ROBOT"])
+      .optional(),
   }),
   z.object({
     id: z.string(),

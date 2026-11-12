@@ -72,6 +72,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
   - **Scrollable Dialogue Backlog (`Log`):** Review a chronological history of every spoken dialogue line and choice made during the current playthrough.
   - **Audio Mute Toggle & Instant Restart:** One-click mute/unmute for BGM/SFX and full state reset.
  - **Creator Story Debugger (`Debug`):** Available to project owners during playtesting; allows warping straight to any scene or block index, editing global variables live, spawning or removing Backpack items, and adjusting character affinity scores on the fly.
+- **Text-to-Speech (TTS) Voice Narration (`Voice On/Off`):** Uses the browser's built-in `speechSynthesis` API to read dialogue aloud with automatic speaker-aware pitch and pacing presets (`Auto`, `Narrator`, `Hero`, `Mystic`, `Robot`) and zero external API costs.
 
 ### 4. Built-In Art, Synth Audio & Custom Asset Manager
 - **Zero-Setup Starter Artwork:** Pure HTML/CSS gradient and polygon backgrounds (*Starry Night*, *Sunset Coast*, *Emerald Woods*) and character sprites (*Explorer*, *Keeper*) render instantly with zero external dependencies and full immunity to browser extension SVG injection.
@@ -84,7 +85,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **Public Arcade & Explore Gallery (`/explore`):** Searchable, filterable community showcase displaying all published games with automatic genre badges (`VISUAL NOVEL`, `SANDBOX`, `TOPDOWN`, `BATTLE`, `QUIZ`), live **Play Counts**, interactive **Like & Dislike Counters**, pricing badges, and creator names.
 - **Creator Distribution & Remix Controls:** Inside the Studio Editor, creators can toggle whether other users are permitted to **Remix** their game (`allowRemix`) and optionally set a one-time **Price to Play** (`$0.00` for free or custom USD pricing via Stripe Checkout + Webhook).
 - **One-Click "Remix This Game":** When enabled by the author, authenticated users can clone the public demo or any published community game into their own Dashboard (respecting their `maxProjects` limit) with all scene IDs, branching wires, and assets cleanly remapped.
-- **Creator Dashboard (`/dashboard`):** Authenticated creators can create new projects from a **Blank Canvas** or **2-Scene Starter Template**, monitor their project slot usage bar, and delete old projects.
+- **Creator Dashboard & Analytics (`/dashboard`):** Authenticated creators can create new projects from a **Blank Canvas** or **2-Scene Starter Template**, monitor their project slot usage bar, inspect a real-time **Creator Analytics & Earnings Summary** (total views, approval rating, game passes sold, and revenue breakdown), and delete old projects.
 - **Owner-Protected Editor & Publish Toggle:** `/editor/[projectId]` and `saveProjectScenes` enforce server-side ownership verification while keeping `/editor/demo` open for public experimentation. Creators can toggle their games between **Private** and **Published** right from the editor header.
 - **Free Tier & Stripe Upgrades (`/pricing`):**
   - **Starter (Free):** Up to **3** game projects per account.
