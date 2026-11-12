@@ -1,18 +1,18 @@
-'use server';
+"use server";
 
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
-import { auth } from '@/auth';
-import { prisma } from '@/lib/prisma';
-import { SceneBlock } from '@/lib/vn-schema';
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { SceneBlock } from "@/lib/vn-schema";
 
 function remapBlockSceneIds(
   blocks: SceneBlock[],
-  idMap: Map<string, string>
+  idMap: Map<string, string>,
 ): SceneBlock[] {
   return blocks.map((blk) => {
     const newId = `blk_${crypto.randomUUID()}`;
-    if (blk.type === 'CHOICE') {
+    if (blk.type === "CHOICE") {
       return {
         ...blk,
         id: newId,
@@ -23,7 +23,7 @@ function remapBlockSceneIds(
         })),
       };
     }
-    if (blk.type === 'BRANCH') {
+    if (blk.type === "BRANCH") {
       return {
         ...blk,
         id: newId,
@@ -31,14 +31,14 @@ function remapBlockSceneIds(
         falseSceneId: idMap.get(blk.falseSceneId) ?? blk.falseSceneId,
       };
     }
-    if (blk.type === 'TIMER') {
+    if (blk.type === "TIMER") {
       return {
         ...blk,
         id: newId,
         timeoutSceneId: idMap.get(blk.timeoutSceneId) ?? blk.timeoutSceneId,
       };
     }
-    if (blk.type === 'HOTSPOT_ROOM') {
+    if (blk.type === "HOTSPOT_ROOM") {
       return {
         ...blk,
         id: newId,
@@ -46,12 +46,12 @@ function remapBlockSceneIds(
           ...hz,
           id: `hz_${crypto.randomUUID()}`,
           targetSceneId: hz.targetSceneId
-            ? idMap.get(hz.targetSceneId) ?? hz.targetSceneId
+            ? (idMap.get(hz.targetSceneId) ?? hz.targetSceneId)
             : undefined,
         })),
       };
     }
-    if (blk.type === 'TOPDOWN_ROOM') {
+    if (blk.type === "TOPDOWN_ROOM") {
       return {
         ...blk,
         id: newId,
@@ -59,12 +59,12 @@ function remapBlockSceneIds(
           ...ent,
           id: `td_${crypto.randomUUID()}`,
           targetSceneId: ent.targetSceneId
-            ? idMap.get(ent.targetSceneId) ?? ent.targetSceneId
+            ? (idMap.get(ent.targetSceneId) ?? ent.targetSceneId)
             : undefined,
         })),
       };
     }
-    if (blk.type === 'BATTLE_ENCOUNTER') {
+    if (blk.type === "BATTLE_ENCOUNTER") {
       return {
         ...blk,
         id: newId,
@@ -72,11 +72,19 @@ function remapBlockSceneIds(
         defeatSceneId: idMap.get(blk.defeatSceneId) ?? blk.defeatSceneId,
       };
     }
-    if (blk.type === 'QUIZ_CHALLENGE') {
+    if (blk.type === "QUIZ_CHALLENGE") {
       return {
         ...blk,
         id: newId,
         passSceneId: idMap.get(blk.passSceneId) ?? blk.passSceneId,
+        failSceneId: idMap.get(blk.failSceneId) ?? blk.failSceneId,
+      };
+    }
+    if (blk.type === "QTE_ACTION") {
+      return {
+        ...blk,
+        id: newId,
+        successSceneId: idMap.get(blk.successSceneId) ?? blk.successSceneId,
         failSceneId: idMap.get(blk.failSceneId) ?? blk.failSceneId,
       };
     }
@@ -87,7 +95,7 @@ function remapBlockSceneIds(
 export async function remixProject(sourceProjectId: string): Promise<void> {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect('/login');
+    redirect("/login");
   }
 
   const user = await prisma.user.findUnique({
@@ -96,26 +104,26 @@ export async function remixProject(sourceProjectId: string): Promise<void> {
   });
 
   if (!user) {
-    redirect('/login');
+    redirect("/login");
   }
 
   if (user._count.projects >= user.maxProjects) {
-    redirect('/pricing?reason=limit_reached');
+    redirect("/pricing?reason=limit_reached");
   }
 
   const source = await prisma.project.findUnique({
     where: { id: sourceProjectId },
     include: {
-      scenes: { orderBy: { order: 'asc' } },
+      scenes: { orderBy: { order: "asc" } },
       assets: true,
     },
   });
 
   if (!source || (!source.isPublished && source.userId !== null)) {
-    redirect('/explore');
+    redirect("/explore");
   }
-   if (!source.allowRemix) {
-    redirect('/explore?error=remix_disabled');
+  if (!source.allowRemix) {
+    redirect("/explore?error=remix_disabled");
   }
   const sceneIdMap = new Map<string, string>();
   source.scenes.forEach((sc) => {
@@ -123,7 +131,7 @@ export async function remixProject(sourceProjectId: string): Promise<void> {
   });
 
   const remappedStartId = source.startSceneId
-    ? sceneIdMap.get(source.startSceneId) ?? null
+    ? (sceneIdMap.get(source.startSceneId) ?? null)
     : null;
 
   const created = await prisma.project.create({
@@ -145,7 +153,7 @@ export async function remixProject(sourceProjectId: string): Promise<void> {
           nodePos: sc.nodePos as object,
           blocks: remapBlockSceneIds(
             sc.blocks as unknown as SceneBlock[],
-            sceneIdMap
+            sceneIdMap,
           ) as unknown as object,
         })),
       },
@@ -159,6 +167,6 @@ export async function remixProject(sourceProjectId: string): Promise<void> {
     },
   });
 
-  revalidatePath('/dashboard');
+  revalidatePath("/dashboard");
   redirect(`/editor/${created.id}`);
 }

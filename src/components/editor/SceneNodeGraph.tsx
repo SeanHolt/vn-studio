@@ -231,6 +231,33 @@ export default function SceneNodeGraph({
                             markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
                         });
                     }
+                } else if (block.type === 'QTE_ACTION') {
+                    if (block.successSceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_hit_${block.successSceneId}`,
+                            source: scene.id,
+                            target: block.successSceneId,
+                            label: 'QTE Hit',
+                            animated: true,
+                            style: { stroke: '#34d399', strokeWidth: 2 },
+                            labelStyle: { fill: '#6ee7b7', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#34d399' },
+                        });
+                    }
+                    if (block.failSceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_miss_${block.failSceneId}`,
+                            source: scene.id,
+                            target: block.failSceneId,
+                            label: 'QTE Miss',
+                            animated: true,
+                            style: { stroke: '#fb7185', strokeWidth: 2, strokeDasharray: '4,4' },
+                            labelStyle: { fill: '#fda4af', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
+                        });
+                    }
                 }
             });
         });

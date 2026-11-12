@@ -186,6 +186,17 @@ export default function SimpleEditorWorkspace({
                 targetVariable: 'playerName',
                 defaultValue: 'Alex',
             });
+        } else if (type === 'QTE_ACTION') {
+            store.addBlock({
+                id,
+                type,
+                promptText: 'Press SPACE or click inside the green zone!',
+                speed: 'NORMAL',
+                zoneStart: 38,
+                zoneWidth: 24,
+                successSceneId: fallbackScene,
+                failSceneId: fallbackScene,
+            });
         } else if (type === 'HOTSPOT_ROOM') {
             store.addBlock({
                 id,

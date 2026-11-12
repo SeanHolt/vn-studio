@@ -25,6 +25,7 @@ import {
     Swords,
     KeyRound,
     HelpCircle,
+    Zap,
 } from 'lucide-react';
 
 interface SortableBlockCardProps {
@@ -166,6 +167,12 @@ export default function SortableBlockCard({
                         Trivia/Riddles: <strong>{block.title}</strong> ({block.questions.length} Qs)
                     </span>
                 );
+            case 'QTE_ACTION':
+                return (
+                    <span className="text-amber-300">
+                        Quick-Time Bar ({block.speed}): {block.promptText}
+                    </span>
+                );
         }
     };
 
@@ -188,6 +195,7 @@ export default function SortableBlockCard({
         BATTLE_ENCOUNTER: <Swords className="h-4 w-4 text-rose-500" />,
         KEYPAD_PUZZLE: <KeyRound className="h-4 w-4 text-amber-400" />,
         QUIZ_CHALLENGE: <HelpCircle className="h-4 w-4 text-purple-400" />,
+        QTE_ACTION: <Zap className="h-4 w-4 text-amber-400" />,
     };
 
     return (

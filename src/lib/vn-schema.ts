@@ -66,6 +66,16 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     assetUrl: z.string(),
     transition: z.enum(["none", "fade"]).default("fade"),
   }),
+   z.object({
+    id: z.string(),
+    type: z.literal('QTE_ACTION'),
+    promptText: z.string().default('Press SPACE or click inside the green zone!'),
+    speed: z.enum(['SLOW', 'NORMAL', 'FAST']).default('NORMAL'),
+    zoneStart: z.number().min(10).max(75).default(38),
+    zoneWidth: z.number().min(10).max(50).default(24),
+    successSceneId: z.string(),
+    failSceneId: z.string(),
+  }),
   z.object({
     id: z.string(),
     type: z.literal("CHARACTER"),

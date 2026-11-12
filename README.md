@@ -45,6 +45,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`KEYPAD_PUZZLE` (Escape Room PIN & Safe Lock):** Embeds an interactive 0–9 digital safe keypad or secret password terminal with optional clue hints, configurable attempt limits (unlimited or lockout), shake feedback, synth chime/alert audio, and separate Unlock and Fail destination scenes.
 - **`TOPDOWN_ROOM` (2D Top-Down RPG / Adventure Map):** Embeds a playable 12×8 tile grid with 4 environment themes (**Forest Meadow**, **Stone Dungeon**, **Royal Hall**, **Starship Deck**), customizable player avatars, paintable walls/obstacles, and interactive **NPCs**, **Treasure Chests**, **Doors**, and **Signs**. Supports Arrow keys, WASD, and on-screen D-Pad controls.
 - **`BATTLE_ENCOUNTER` (Turn-Based RPG Combat):** Launches a JRPG-style encounter with customizable enemy sprites, HP/Attack stats, player stats, special skills (with cooldowns), and Backpack healing item consumption. Routes automatically to Victory or Defeat scenes and syncs `playerHP` into global variables.
+- **`QTE_ACTION` (Quick-Time Reaction Bar):** Presents an animated reflex timing bar with adjustable speed (`SLOW`, `NORMAL`, `FAST`) and target zone size. Players press `Space` or click inside the target window to trigger Success or Miss scene routes.
 
 #### Logic, Progression & World Systems
 - **`SET_VARIABLE`:** Modifies global project variables (`boolean`, `number`, `string`) using `set`, `add`, or `subtract` operations.

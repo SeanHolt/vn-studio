@@ -19,6 +19,7 @@ import TopDownRoomInspector from './TopDownRoomInspector';
 import BattleEncounterInspector from './BattleEncounterInspector';
 import KeypadPuzzleInspector from './KeypadPuzzleInspector';
 import QuizChallengeInspector from './QuizChallengeInspector';
+import QteBlockInspector from './QteBlockInspector';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -317,6 +318,13 @@ export default function BlockInspector({
             )}
             {block.type === 'KEYPAD_PUZZLE' && (
                 <KeypadPuzzleInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
+            )}
+            {block.type === 'QTE_ACTION' && (
+                <QteBlockInspector
                     block={block}
                     allScenes={allScenes}
                     onChange={onChange}

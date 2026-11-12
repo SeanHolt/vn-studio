@@ -62,6 +62,7 @@ import QuizStageOverlay from './QuizStageOverlay';
 import KeypadStageOverlay from './KeypadStageOverlay';
 import TopDownStageOverlay from './TopDownStageOverlay';
 import BattleStageOverlay from './BattleStageOverlay';
+import QteStageOverlay from './QteStageOverlay';
 
 export interface PlayableScene {
     id: string;
@@ -930,6 +931,25 @@ export default function VNPlayer({
                             setVariables((prev) => ({ ...prev, quizScore: score }));
                             const nextScene = passed
                                 ? currentBlock.passSceneId
+                                : currentBlock.failSceneId;
+                            if (nextScene) {
+                                goToScene(nextScene);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                    />
+                )}
+                {currentBlock?.type === 'QTE_ACTION' && (
+                    <QteStageOverlay
+                        promptText={interpolateVariables(currentBlock.promptText, variables)}
+                        speed={currentBlock.speed}
+                        zoneStart={currentBlock.zoneStart}
+                        zoneWidth={currentBlock.zoneWidth}
+                        isMuted={isMuted}
+                        onComplete={(succeeded) => {
+                            const nextScene = succeeded
+                                ? currentBlock.successSceneId
                                 : currentBlock.failSceneId;
                             if (nextScene) {
                                 goToScene(nextScene);
