@@ -64,6 +64,15 @@ function remapBlockSceneIds(
         })),
       };
     }
+    if (blk.type === "IDLE_TYCOON") {
+      return {
+        ...blk,
+        id: newId,
+        goalSceneId: blk.goalSceneId
+          ? (idMap.get(blk.goalSceneId) ?? blk.goalSceneId)
+          : undefined,
+      };
+    }
     if (blk.type === "BATTLE_ENCOUNTER") {
       return {
         ...blk,

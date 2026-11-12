@@ -51,6 +51,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`QTE_ACTION` (Quick-Time Reaction Bar):** Presents an animated reflex timing bar with adjustable speed (`SLOW`, `NORMAL`, `FAST`) and target zone size. Players press `Space` or click inside the target window to trigger Success or Miss scene routes.
 - **`EVIDENCE_CHECK` (Dialogue Interrogation & "Present Evidence"):** Challenges players to inspect a witness's testimony and present the matching contradictory item from their Backpack—complete with strike counters, clue hints, synth feedback, and branching confession/failure routes.
 - **`CIRCUIT_PUZZLE` (Wire-Connecting Circuit Puzzle):** Embeds an interactive 4×4, 5×5, 6×6, or 7×7 rotatable wire/pipe grid with live Breadth-First Search power flow, 3 visual themes (**Sci-Fi Neon Circuit**, **Steampunk Brass Pipes**, **Arcane Mana Channels**), optional move limits, and a one-click **Generate Solvable Board** builder.
+- **`IDLE_TYCOON` (Idle / Incremental Tycoon):** Embeds a cookie-clicker/tycoon generator game with unlimited upgrade tiers (`+X/sec` auto-generators and `+X/click` power boosters), `1x / 10x / MAX` geometric bulk-buy controls, big-number formatting (`K`, `M`, `B`, `T`, `Qa`), 3 deep 10-tier preset packs, global variable currency syncing, and optional story goal milestones.
 
 #### Logic, Progression & World Systems
 - **`SET_VARIABLE`:** Modifies global project variables (`boolean`, `number`, `string`) using `set`, `add`, or `subtract` operations.

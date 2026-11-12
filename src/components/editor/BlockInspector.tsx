@@ -24,6 +24,7 @@ import CardDuelInspector from './CardDuelInspector';
 import { VoiceStyleId, speakDialogueLine } from '@/lib/vn-tts';
 import EvidenceCheckInspector from './EvidenceCheckInspector';
 import CircuitPuzzleInspector from './CircuitPuzzleInspector';
+import IdleTycoonInspector from './IdleTycoonInspector';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -351,6 +352,13 @@ export default function BlockInspector({
             )}
             {block.type === 'HOTSPOT_ROOM' && (
                 <HotspotRoomInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
+            )}
+            {block.type === 'IDLE_TYCOON' && (
+                <IdleTycoonInspector
                     block={block}
                     allScenes={allScenes}
                     onChange={onChange}

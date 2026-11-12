@@ -29,6 +29,7 @@ import {
     Spade,
     Scale,
     Cpu,
+    Coins,
 } from 'lucide-react';
 
 interface SortableBlockCardProps {
@@ -196,6 +197,13 @@ export default function SortableBlockCard({
                         <strong>{block.title}</strong>
                     </span>
                 );
+            case 'IDLE_TYCOON':
+                return (
+                    <span className="text-amber-300">
+                        Idle Tycoon: <strong>{block.title}</strong> ({block.upgrades.length}{' '}
+                        tiers)
+                    </span>
+                );
         }
     };
 
@@ -222,6 +230,7 @@ export default function SortableBlockCard({
         CARD_DUEL: <Spade className="h-4 w-4 text-indigo-400" />,
         EVIDENCE_CHECK: <Scale className="h-4 w-4 text-amber-400" />,
         CIRCUIT_PUZZLE: <Cpu className="h-4 w-4 text-cyan-400" />,
+        IDLE_TYCOON: <Coins className="h-4 w-4 text-amber-400" />,
     };
 
     return (

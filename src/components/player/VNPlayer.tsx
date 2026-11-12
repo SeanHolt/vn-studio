@@ -69,6 +69,7 @@ import StoryDebuggerModal from './StoryDebuggerModal';
 import { speakDialogueLine, stopSpeechNarration } from '@/lib/vn-tts';
 import EvidenceStageOverlay from './EvidenceStageOverlay';
 import CircuitStageOverlay from './CircuitStageOverlay';
+import IdleStageOverlay from './IdleStageOverlay';
 
 export interface PlayableScene {
     id: string;
@@ -1018,6 +1019,30 @@ export default function VNPlayer({
                                 setBlockIndex(0);
                             }
                             return null;
+                        }}
+                    />
+                )}
+                {currentBlock?.type === 'IDLE_TYCOON' && (
+                    <IdleStageOverlay
+                        title={interpolateVariables(currentBlock.title, variables)}
+                        currencyName={currentBlock.currencyName}
+                        clickerLabel={currentBlock.clickerLabel}
+                        clickerIcon={currentBlock.clickerIcon}
+                        baseClickPower={currentBlock.baseClickPower}
+                        goalAmount={currentBlock.goalAmount}
+                        initialCurrency={Number(variables[currentBlock.variableKey] ?? 0)}
+                        upgrades={currentBlock.upgrades}
+                        isMuted={isMuted}
+                        onCompleteGoal={(finalCurrency) => {
+                            setVariables((prev) => ({
+                                ...prev,
+                                [currentBlock.variableKey]: finalCurrency,
+                            }));
+                            if (currentBlock.goalSceneId) {
+                                goToScene(currentBlock.goalSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
                         }}
                     />
                 )}

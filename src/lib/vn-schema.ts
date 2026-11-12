@@ -7,6 +7,7 @@ export type SceneType =
   | "TOPDOWN"
   | "BATTLE"
   | "QUIZ"
+  | "IDLE"
   | "ENDING";
 
 export const TopDownEntitySchema = z.object({
@@ -67,6 +68,15 @@ export const QuizQuestionSchema = z.object({
   options: z.array(z.string().min(1)).min(2).max(4),
   correctIndex: z.number().min(0).max(3),
   explanation: z.string().optional(),
+});
+export const IdleUpgradeSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  icon: z.string().default("⚙️"),
+  kind: z.enum(["AUTO_CPS", "CLICK_POWER"]).default("AUTO_CPS"),
+  baseCost: z.number().min(1),
+  costMultiplier: z.number().min(1.01).max(5).default(1.15),
+  power: z.number().min(1),
 });
 
 export const SceneBlockSchema = z.discriminatedUnion("type", [
@@ -286,7 +296,22 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     passSceneId: z.string(),
     failSceneId: z.string(),
   }),
+  z.object({
+    id: z.string(),
+    type: z.literal("IDLE_TYCOON"),
+    title: z.string().default("Starlight Crystal Refinery"),
+    currencyName: z.string().default("Credits"),
+    clickerLabel: z.string().default("Mine Crystal"),
+    clickerIcon: z.string().default("💎"),
+    baseClickPower: z.number().min(1).default(1),
+    goalAmount: z.number().min(0).default(1000),
+    variableKey: z.string().default("credits"),
+    upgrades: z.array(IdleUpgradeSchema).min(1),
+    goalSceneId: z.string().optional(),
+  }),
 ]);
+
+export type IdleUpgrade = z.infer<typeof IdleUpgradeSchema>;
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 export type HotspotZone = z.infer<typeof HotspotZoneSchema>;
 export type ChoiceOption = z.infer<typeof ChoiceOptionSchema>;

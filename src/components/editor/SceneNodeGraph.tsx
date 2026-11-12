@@ -339,6 +339,18 @@ export default function SceneNodeGraph({
                             markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
                         });
                     }
+                } else if (block.type === 'IDLE_TYCOON' && block.goalSceneId) {
+                    result.push({
+                        id: `${scene.id}_${block.id}_goal_${block.goalSceneId}`,
+                        source: scene.id,
+                        target: block.goalSceneId,
+                        label: `Goal: ${block.goalAmount} ${block.currencyName}`,
+                        animated: true,
+                        style: { stroke: '#fbbf24', strokeWidth: 2 },
+                        labelStyle: { fill: '#fde68a', fontSize: 10, fontWeight: 600 },
+                        labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                        markerEnd: { type: MarkerType.ArrowClosed, color: '#fbbf24' },
+                    });
                 }
             });
         });

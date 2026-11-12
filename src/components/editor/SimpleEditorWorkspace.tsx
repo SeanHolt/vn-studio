@@ -48,6 +48,7 @@ import DistributionPanel from './DistributionPanel';
 import { validateProjectStory } from '@/lib/vn-validator';
 import StoryValidatorModal from './StoryValidatorModal';
 import { generateSolvableBoard } from '@/lib/vn-circuit';
+import { instantiateIdlePreset } from '@/lib/vn-idle';
 
 function createUniqueId(prefix: string): string {
     return `${prefix}_${crypto.randomUUID()}`;
@@ -133,6 +134,15 @@ export default function SimpleEditorWorkspace({
                 action: 'enter',
                 emotion: 'neutral',
                 animation: 'slide-in',
+            });
+        } else if (type === 'IDLE_TYCOON') {
+            const preset = instantiateIdlePreset('SPACE_MINING');
+            store.addBlock({
+                id,
+                type,
+                ...preset,
+                baseClickPower: 1,
+                goalSceneId: fallbackScene,
             });
         } else if (type === 'EVIDENCE_CHECK') {
             store.addBlock({
