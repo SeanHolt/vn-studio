@@ -188,7 +188,39 @@ export default function VNPlayer({
             }
         }
     }, [currentScene, currentBlock, isTypingDone, blockIndex, variables]);
+    useEffect(() => {
+        const isModalOpen = showGallery || showBacklog || showSaveModal;
+        const isTypingInput = currentBlock?.type === 'INPUT_TEXT';
+        if (isModalOpen || isTypingInput) return;
 
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Control' || e.ctrlKey) {
+                if (currentBlock?.type === 'DIALOGUE') {
+                    e.preventDefault();
+                    handleAdvanceDialogue();
+                }
+                return;
+            }
+
+            if (
+                (e.key === 'Enter' || e.code === 'Space') &&
+                !e.repeat &&
+                currentBlock?.type === 'DIALOGUE'
+            ) {
+                e.preventDefault();
+                handleAdvanceDialogue();
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [
+        currentBlock,
+        showGallery,
+        showBacklog,
+        showSaveModal,
+        handleAdvanceDialogue,
+    ]);
     const buildSnapshot = useCallback(
         (
             slotId: string,
@@ -1099,8 +1131,13 @@ export default function VNPlayer({
                                 />
                             )}
                         </p>
-                        <div className="mt-2 text-right text-xs text-slate-500">
-                            {isTypingDone ? 'Click to continue ▾' : 'Click to skip ▸'}
+                        <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+                            <span>Hold Ctrl to fast-forward</span>
+                            <span>
+                                {isTypingDone
+                                    ? 'Click or press Space to continue ▾'
+                                    : 'Click to skip ▸'}
+                            </span>
                         </div>
                     </div>
                 )}

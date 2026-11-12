@@ -60,7 +60,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`UNLOCK_ACHIEVEMENT`:** Unlocks a custom trophy badge with an emoji icon, title, and description, displaying a celebratory toast and persisting progress to `localStorage`.
 
 ### 3. Playable Runtime (`VNPlayer` at `/play/[projectId]`)
-- **Typewriter Text Engine:** Reveals dialogue character-by-character; clicking once finishes the current sentence immediately and clicking again advances to the next block.
+- **Typewriter Text & Keyboard Fast-Forward Engine:** Reveals dialogue character-by-character; clicking or pressing `Space`/`Enter` finishes the current sentence or advances to the next block, while holding `Ctrl` fast-forwards through dialogue sequences until a choice or mini-game appears.
 - **In-Game Save/Load Slots & Auto-Save (`Save / Load`):** Persists full playthrough snapshots (active scene, block position, variables, inventory, relationship scores, clock state, staged characters, and dialogue history) to `localStorage` across **3 manual save slots** plus an automatic scene-transition **Auto-Save** checkpoint.
 - **Custom Visual Themes & Typography:** Supports 4 built-in UI themes (**Modern Studio**, **Sci-Fi Terminal**, **Fantasy Parchment**, and **8-Bit Arcade**) that style dialogue boxes, speaker tags, choice buttons, and fonts.
 - **Toggleable Day & Time-of-Day Clock:** When enabled by the author, displays a live `Day X • Morning/Afternoon/Evening/Night` HUD badge and applies smooth atmospheric lighting tints across the stage.
