@@ -47,6 +47,7 @@ import { buildPresetQuestions } from '@/lib/vn-trivia-presets';
 import DistributionPanel from './DistributionPanel';
 import { validateProjectStory } from '@/lib/vn-validator';
 import StoryValidatorModal from './StoryValidatorModal';
+import { generateSolvableBoard } from '@/lib/vn-circuit';
 
 function createUniqueId(prefix: string): string {
     return `${prefix}_${crypto.randomUUID()}`;
@@ -133,6 +134,18 @@ export default function SimpleEditorWorkspace({
                 emotion: 'neutral',
                 animation: 'slide-in',
             });
+        } else if (type === 'EVIDENCE_CHECK') {
+            store.addBlock({
+                id,
+                type,
+                speaker: 'Suspect',
+                statement: 'I never went near the lighthouse tonight!',
+                requiredItem: 'Brass Key',
+                hintText: 'Check the item you found in the woods.',
+                wrongItemReply: 'That does not prove anything!',
+                maxStrikes: 3,
+                successSceneId: fallbackScene,
+            });
         } else if (type === 'SET_VARIABLE') {
             const firstVar = Object.keys(store.variables).at(0) ?? 'score';
             store.addBlock({ id, type, variableKey: firstVar, operation: 'set', value: true });
@@ -145,6 +158,19 @@ export default function SimpleEditorWorkspace({
                 characterName: 'Keeper Clara',
                 delta: 1,
                 reason: 'Appreciated your help',
+            });
+        } else if (type === 'CIRCUIT_PUZZLE') {
+            store.addBlock({
+                id,
+                type,
+                title: 'Bypass Security Relay',
+                theme: 'SCIFI_CIRCUIT',
+                gridSize: 5,
+                sourceRow: 1,
+                targetRow: 3,
+                maxMoves: 0,
+                tiles: generateSolvableBoard(5, 1, 3),
+                unlockSceneId: fallbackScene,
             });
         } else if (type === 'BRANCH') {
             store.addBlock({

@@ -67,6 +67,8 @@ import QteStageOverlay from './QteStageOverlay';
 import CardDuelStageOverlay from './CardDuelStageOverlay';
 import StoryDebuggerModal from './StoryDebuggerModal';
 import { speakDialogueLine, stopSpeechNarration } from '@/lib/vn-tts';
+import EvidenceStageOverlay from './EvidenceStageOverlay';
+import CircuitStageOverlay from './CircuitStageOverlay';
 
 export interface PlayableScene {
     id: string;
@@ -732,8 +734,8 @@ export default function VNPlayer({
                             setIsTtsEnabled(next);
                         }}
                         className={`flex items-center gap-1 rounded px-2.5 py-1 text-xs font-medium transition ${isTtsEnabled
-                                ? 'border border-indigo-400/50 bg-indigo-950/70 text-indigo-200'
-                                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                            ? 'border border-indigo-400/50 bg-indigo-950/70 text-indigo-200'
+                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                             }`}
                     >
                         {isTtsEnabled ? '🗣️ Voice On' : '🗣️ Voice Off'}
@@ -1019,6 +1021,32 @@ export default function VNPlayer({
                         }}
                     />
                 )}
+                {currentBlock?.type === 'CIRCUIT_PUZZLE' && (
+                    <CircuitStageOverlay
+                        title={interpolateVariables(currentBlock.title, variables)}
+                        theme={currentBlock.theme}
+                        gridSize={currentBlock.gridSize}
+                        sourceRow={currentBlock.sourceRow}
+                        targetRow={currentBlock.targetRow}
+                        maxMoves={currentBlock.maxMoves}
+                        initialTiles={currentBlock.tiles}
+                        isMuted={isMuted}
+                        onUnlock={() => {
+                            if (currentBlock.unlockSceneId) {
+                                goToScene(currentBlock.unlockSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                        onFailOut={() => {
+                            if (currentBlock.failSceneId) {
+                                goToScene(currentBlock.failSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                    />
+                )}
                 {/* Escape Room Keypad / Password Lock Overlay */}
                 {currentBlock?.type === 'KEYPAD_PUZZLE' && (
                     <KeypadStageOverlay
@@ -1118,6 +1146,35 @@ export default function VNPlayer({
                             )
                         }
                         onJumpScene={(targetId) => goToScene(targetId)}
+                    />
+                )}
+                {currentBlock?.type === 'EVIDENCE_CHECK' && (
+                    <EvidenceStageOverlay
+                        speaker={interpolateVariables(currentBlock.speaker, variables)}
+                        statement={interpolateVariables(currentBlock.statement, variables)}
+                        requiredItem={currentBlock.requiredItem}
+                        hintText={currentBlock.hintText}
+                        wrongItemReply={interpolateVariables(
+                            currentBlock.wrongItemReply,
+                            variables
+                        )}
+                        maxStrikes={currentBlock.maxStrikes}
+                        inventory={inventory}
+                        isMuted={isMuted}
+                        onSuccess={() => {
+                            if (currentBlock.successSceneId) {
+                                goToScene(currentBlock.successSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                        onFailOut={() => {
+                            if (currentBlock.failSceneId) {
+                                goToScene(currentBlock.failSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
                     />
                 )}
                 {currentBlock?.type === 'BATTLE_ENCOUNTER' && (

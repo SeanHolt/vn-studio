@@ -27,6 +27,8 @@ import {
     HelpCircle,
     Zap,
     Spade,
+    Scale,
+    Cpu,
 } from 'lucide-react';
 
 interface SortableBlockCardProps {
@@ -180,6 +182,20 @@ export default function SortableBlockCard({
                         Card Duel vs <strong>{block.opponentName}</strong> (First to {block.roundsToWin})
                     </span>
                 );
+            case 'EVIDENCE_CHECK':
+                return (
+                    <span className="text-amber-300">
+                        Interrogation ({block.speaker}): Present{' '}
+                        <strong>{block.requiredItem}</strong>
+                    </span>
+                );
+            case 'CIRCUIT_PUZZLE':
+                return (
+                    <span className="text-cyan-300">
+                        Circuit Puzzle ({block.gridSize}×{block.gridSize}):{' '}
+                        <strong>{block.title}</strong>
+                    </span>
+                );
         }
     };
 
@@ -204,6 +220,8 @@ export default function SortableBlockCard({
         QUIZ_CHALLENGE: <HelpCircle className="h-4 w-4 text-purple-400" />,
         QTE_ACTION: <Zap className="h-4 w-4 text-amber-400" />,
         CARD_DUEL: <Spade className="h-4 w-4 text-indigo-400" />,
+        EVIDENCE_CHECK: <Scale className="h-4 w-4 text-amber-400" />,
+        CIRCUIT_PUZZLE: <Cpu className="h-4 w-4 text-cyan-400" />,
     };
 
     return (

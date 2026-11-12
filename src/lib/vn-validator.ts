@@ -49,6 +49,9 @@ function extractOutgoingSceneIds(block: SceneBlock): string[] {
   } else if (block.type === 'CARD_DUEL') {
     if (block.victorySceneId) targets.push(block.victorySceneId);
     if (block.defeatSceneId) targets.push(block.defeatSceneId);
+  } else if (block.type === 'CIRCUIT_PUZZLE') {
+    if (block.unlockSceneId) targets.push(block.unlockSceneId);
+    if (block.failSceneId) targets.push(block.failSceneId);
   }
 
   return targets;

@@ -22,6 +22,8 @@ import QuizChallengeInspector from './QuizChallengeInspector';
 import QteBlockInspector from './QteBlockInspector';
 import CardDuelInspector from './CardDuelInspector';
 import { VoiceStyleId, speakDialogueLine } from '@/lib/vn-tts';
+import EvidenceCheckInspector from './EvidenceCheckInspector';
+import CircuitPuzzleInspector from './CircuitPuzzleInspector';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -59,6 +61,13 @@ export default function BlockInspector({
             )}
             {block.type === 'ADVANCE_TIME' && (
                 <TimeBlockInspector block={block} onChange={onChange} />
+            )}
+            {block.type === 'CIRCUIT_PUZZLE' && (
+                <CircuitPuzzleInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
             )}
             {block.type === 'BACKGROUND' && (
                 <label className="flex flex-col gap-1.5">
@@ -332,6 +341,13 @@ export default function BlockInspector({
                         </button>
                     </div>
                 </>
+            )}
+            {block.type === 'EVIDENCE_CHECK' && (
+                <EvidenceCheckInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
             )}
             {block.type === 'HOTSPOT_ROOM' && (
                 <HotspotRoomInspector

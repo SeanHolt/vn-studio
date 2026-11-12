@@ -72,6 +72,26 @@ function remapBlockSceneIds(
         defeatSceneId: idMap.get(blk.defeatSceneId) ?? blk.defeatSceneId,
       };
     }
+    if (blk.type === "EVIDENCE_CHECK") {
+      return {
+        ...blk,
+        id: newId,
+        successSceneId: idMap.get(blk.successSceneId) ?? blk.successSceneId,
+        failSceneId: blk.failSceneId
+          ? (idMap.get(blk.failSceneId) ?? blk.failSceneId)
+          : undefined,
+      };
+    }
+    if (blk.type === "CIRCUIT_PUZZLE") {
+      return {
+        ...blk,
+        id: newId,
+        unlockSceneId: idMap.get(blk.unlockSceneId) ?? blk.unlockSceneId,
+        failSceneId: blk.failSceneId
+          ? (idMap.get(blk.failSceneId) ?? blk.failSceneId)
+          : undefined,
+      };
+    }
     if (blk.type === "QUIZ_CHALLENGE") {
       return {
         ...blk,

@@ -21,7 +21,17 @@ export const TopDownEntitySchema = z.object({
   targetSceneId: z.string().optional(),
   requiredItem: z.string().optional(),
 });
+export const CircuitTileSchema = z.object({
+  kind: z.enum(["STRAIGHT", "CORNER", "TEE", "CROSS", "BLOCKER"]),
+  rotation: z.union([
+    z.literal(0),
+    z.literal(90),
+    z.literal(180),
+    z.literal(270),
+  ]),
+});
 
+export type CircuitTile = z.infer<typeof CircuitTileSchema>;
 export type TopDownEntity = z.infer<typeof TopDownEntitySchema>;
 export const ChoiceOptionSchema = z.object({
   id: z.string(),
@@ -80,6 +90,23 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     id: z.string(),
+    type: z.literal("CIRCUIT_PUZZLE"),
+    title: z.string().default("Bypass Security Relay"),
+    theme: z
+      .enum(["SCIFI_CIRCUIT", "STEAMPUNK_PIPES", "ARCANE_RUNES"])
+      .default("SCIFI_CIRCUIT"),
+    gridSize: z
+      .union([z.literal(4), z.literal(5), z.literal(6), z.literal(7)])
+      .default(5),
+    sourceRow: z.number().min(0).max(6).default(1),
+    targetRow: z.number().min(0).max(6).default(3),
+    maxMoves: z.number().min(0).max(200).default(0),
+    tiles: z.array(CircuitTileSchema),
+    unlockSceneId: z.string(),
+    failSceneId: z.string().optional(),
+  }),
+  z.object({
+    id: z.string(),
     type: z.literal("CARD_DUEL"),
     opponentName: z.string().min(1).default("Archmage Lyra"),
     deckTheme: z.enum(["ELEMENTAL", "SCIFI", "KNIGHTS"]).default("ELEMENTAL"),
@@ -100,6 +127,23 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     animation: z
       .enum(["none", "bounce", "shake", "pulse", "slide-in"])
       .default("none"),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("EVIDENCE_CHECK"),
+    speaker: z.string().min(1).default("Suspect"),
+    statement: z
+      .string()
+      .min(1)
+      .default("I never left the harbor all evening!"),
+    requiredItem: z.string().min(1).default("Brass Key"),
+    hintText: z.string().optional(),
+    wrongItemReply: z
+      .string()
+      .default("That proves nothing! Look closer at your evidence."),
+    maxStrikes: z.number().min(0).max(10).default(3),
+    successSceneId: z.string(),
+    failSceneId: z.string().optional(),
   }),
   z.object({
     id: z.string(),

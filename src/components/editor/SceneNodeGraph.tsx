@@ -285,6 +285,60 @@ export default function SceneNodeGraph({
                             markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
                         });
                     }
+                } else if (block.type === 'EVIDENCE_CHECK') {
+                    if (block.successSceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_proven_${block.successSceneId}`,
+                            source: scene.id,
+                            target: block.successSceneId,
+                            label: `Present: ${block.requiredItem}`,
+                            animated: true,
+                            style: { stroke: '#34d399', strokeWidth: 2 },
+                            labelStyle: { fill: '#6ee7b7', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#34d399' },
+                        });
+                    }
+                    if (block.failSceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_fail_${block.failSceneId}`,
+                            source: scene.id,
+                            target: block.failSceneId,
+                            label: 'Evidence Failed',
+                            animated: true,
+                            style: { stroke: '#fb7185', strokeWidth: 2, strokeDasharray: '4,4' },
+                            labelStyle: { fill: '#fda4af', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
+                        });
+                    }
+                } else if (block.type === 'CIRCUIT_PUZZLE') {
+                    if (block.unlockSceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_unlock_${block.unlockSceneId}`,
+                            source: scene.id,
+                            target: block.unlockSceneId,
+                            label: `Circuit Unlocked`,
+                            animated: true,
+                            style: { stroke: '#22d3ee', strokeWidth: 2 },
+                            labelStyle: { fill: '#67e8f9', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#22d3ee' },
+                        });
+                    }
+                    if (block.failSceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_fail_${block.failSceneId}`,
+                            source: scene.id,
+                            target: block.failSceneId,
+                            label: 'Circuit Failed',
+                            animated: true,
+                            style: { stroke: '#fb7185', strokeWidth: 2, strokeDasharray: '4,4' },
+                            labelStyle: { fill: '#fda4af', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
+                        });
+                    }
                 }
             });
         });
