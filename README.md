@@ -77,6 +77,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **Zero-Setup Starter Artwork:** Pure HTML/CSS gradient and polygon backgrounds (*Starry Night*, *Sunset Coast*, *Emerald Woods*) and character sprites (*Explorer*, *Keeper*) render instantly with zero external dependencies and full immunity to browser extension SVG injection.
 - **Built-In Web Audio Synthesizer:** Generates retro chimes, pickup sounds, mystery alerts, and ambient loops in-browser with no audio files required.
 - **Project Asset Manager (`/api/upload`):** Creators can upload custom images (`PNG`, `JPG`, `WebP`, `GIF`) and audio (`MP3`, `WAV`, `OGG`) up to 5MB, rename assets inline, preview audio tracks, and reuse uploaded files across every scene in their project.
+- **In-Browser 16×16 Pixel & Doodle Sprite Pad (`Draw Sprite`):** Built right into the Asset Picker so creators can draw custom characters, props, or tiles with Pencil, Fill Bucket, and Eraser tools and export them directly as crisp PNG files into their Project Assets.
 
 ### 5. Community Arcade, Remixing, Creator Storefront & Monetization
 - **Landing Page (`/`):** Showcases platform highlights alongside live playable cards for the unowned public demo and community-published games.
