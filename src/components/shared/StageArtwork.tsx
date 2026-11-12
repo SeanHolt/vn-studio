@@ -1,130 +1,152 @@
 'use client';
 
 import React from 'react';
-import { CharacterEmotion, StageAnimation } from '@/lib/vn-schema';
 
 interface StageArtworkProps {
   assetUrl: string;
   alt: string;
   className?: string;
-  emotion?: CharacterEmotion;
-  animation?: StageAnimation;
 }
 
-const ANIMATION_CLASS: Record<StageAnimation, string> = {
-  none: '',
-  bounce: 'animate-bounce',
-  shake: 'animate-vn-shake',
-  pulse: 'animate-pulse',
-  'slide-in': 'animate-vn-slide-in',
+const BG_STYLES: Record<string, string> = {
+  'css:starry-night':
+    'bg-[radial-gradient(circle_at_25%_20%,#312e81_0%,#0f172a_55%,#020617_100%)]',
+  'css:sunset-coast':
+    'bg-gradient-to-b from-amber-500 via-rose-600 to-indigo-950',
+  'css:emerald-woods':
+    'bg-gradient-to-b from-emerald-800 via-teal-950 to-slate-950',
+  'css:cyber-grid':
+    'bg-[linear-gradient(to_right,#06b6d422_1px,transparent_1px),linear-gradient(to_bottom,#06b6d422_1px,transparent_1px),radial-gradient(circle_at_50%_30%,#164e63_0%,#020617_85%)] bg-[size:24px_24px,24px_24px,100%_100%]',
+  'css:starship-bridge':
+    'bg-gradient-to-b from-slate-800 via-sky-950 to-slate-950',
+  'css:volcano-forge':
+    'bg-gradient-to-t from-orange-600 via-red-950 to-stone-950',
+  'css:crystal-cove':
+    'bg-gradient-to-b from-cyan-600 via-blue-900 to-slate-950',
+  'css:royal-throne':
+    'bg-gradient-to-b from-purple-900 via-indigo-950 to-amber-950',
+  'css:stormy-moor':
+    'bg-gradient-to-b from-slate-600 via-slate-800 to-zinc-950',
+  'css:alchemy-lab':
+    'bg-gradient-to-br from-emerald-900 via-purple-950 to-slate-950',
 };
 
-const EMOTION_BADGE: Record<CharacterEmotion, { icon: string; ring: string }> = {
-  neutral: { icon: '', ring: '' },
-  happy: { icon: '✨', ring: 'ring-2 ring-amber-300/70' },
-  angry: { icon: '💢', ring: 'ring-2 ring-rose-500/80' },
-  shocked: { icon: '❗', ring: 'ring-2 ring-yellow-300/90' },
-  sad: { icon: '💧', ring: 'ring-2 ring-sky-400/70' },
-};
+interface CharTheme {
+  coat: string;
+  hair: string;
+  accent: string;
+  isMonster?: boolean;
+}
 
+const CHAR_THEMES: Record<string, CharTheme> = {
+  'css:char-explorer': {
+    coat: 'bg-sky-600 border-sky-300',
+    hair: 'bg-amber-800',
+    accent: 'bg-amber-300',
+  },
+  'css:char-keeper': {
+    coat: 'bg-purple-700 border-purple-300',
+    hair: 'bg-slate-200',
+    accent: 'bg-fuchsia-400',
+  },
+  'css:char-cyborg': {
+    coat: 'bg-slate-700 border-cyan-400',
+    hair: 'bg-cyan-500',
+    accent: 'bg-cyan-300',
+  },
+  'css:char-knight': {
+    coat: 'bg-amber-600 border-yellow-200',
+    hair: 'bg-yellow-400',
+    accent: 'bg-red-500',
+  },
+  'css:char-shadow': {
+    coat: 'bg-zinc-900 border-rose-500',
+    hair: 'bg-indigo-950',
+    accent: 'bg-rose-500',
+  },
+  'css:char-alchemist': {
+    coat: 'bg-emerald-700 border-lime-300',
+    hair: 'bg-orange-700',
+    accent: 'bg-lime-300',
+  },
+  'css:char-captain': {
+    coat: 'bg-indigo-700 border-amber-300',
+    hair: 'bg-stone-900',
+    accent: 'bg-amber-400',
+  },
+  'css:char-slime': {
+    coat: 'bg-emerald-500 border-emerald-200',
+    hair: 'bg-emerald-400',
+    accent: 'bg-white',
+    isMonster: true,
+  },
+};
 
 export default function StageArtwork({
   assetUrl,
   alt,
   className = '',
-  emotion = 'neutral',
-  animation = 'none',
 }: StageArtworkProps) {
-  const animCls = ANIMATION_CLASS[animation];
-  const badge = EMOTION_BADGE[emotion];
+  const cleanUrl = assetUrl.trim();
 
-  if (assetUrl.includes('bg-night-sky')) {
+  if (cleanUrl in BG_STYLES) {
     return (
       <div
+        role="img"
         aria-label={alt}
-        className={`relative overflow-hidden bg-gradient-to-b from-[#090d16] to-[#1e1b4b] ${className}`}
+        className={`relative overflow-hidden ${BG_STYLES[cleanUrl]} ${className}`}
       >
-        <div className="absolute top-[14%] right-[16%] h-12 w-12 rounded-full bg-yellow-200/90 shadow-[0_0_24px_rgba(254,240,138,0.6)]" />
-        <div className="absolute top-[18%] left-[18%] h-1 w-1 rounded-full bg-white" />
-        <div className="absolute top-[26%] left-[40%] h-1.5 w-1.5 rounded-full bg-white" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" />
       </div>
     );
   }
 
-  if (assetUrl.includes('bg-sunset-bay')) {
-    return (
-      <div
-        aria-label={alt}
-        className={`relative overflow-hidden bg-gradient-to-b from-[#4c1d95] via-[#db2777] to-[#f59e0b] ${className}`}
-      >
-        <div className="absolute bottom-[28%] left-1/2 h-24 w-24 -translate-x-1/2 rounded-full bg-yellow-300 shadow-[0_0_32px_rgba(253,224,71,0.7)]" />
-        <div className="absolute inset-x-0 bottom-0 h-[31%] bg-slate-900" />
-      </div>
-    );
-  }
-
-  if (assetUrl.includes('bg-forest-mist')) {
-    return (
-      <div
-        aria-label={alt}
-        className={`relative overflow-hidden bg-emerald-950 ${className}`}
-      >
+  if (cleanUrl in CHAR_THEMES) {
+    const style = CHAR_THEMES[cleanUrl];
+    if (style.isMonster) {
+      return (
         <div
-          style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}
-          className="absolute bottom-0 left-[12%] h-[68%] w-[24%] bg-emerald-900"
-        />
-        <div
-          style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}
-          className="absolute bottom-0 left-[38%] h-[76%] w-[26%] bg-emerald-800"
-        />
-      </div>
-    );
-  }
-
-  if (assetUrl.includes('char-hero-blue') || assetUrl.includes('char-mage-violet')) {
-    const isMage = assetUrl.includes('char-mage-violet');
-    return (
-      <div
-        aria-label={alt}
-        className={`relative flex flex-col items-center justify-end ${animCls} ${className}`}
-      >
-        {badge.icon && (
-          <span className="absolute -top-2 right-1 z-10 rounded-full bg-slate-950/90 px-1.5 py-0.5 text-sm shadow">
-            {badge.icon}
-          </span>
-        )}
-        {isMage && (
-          <div
-            style={{ clipPath: 'polygon(50% 0%, 10% 100%, 90% 100%)' }}
-            className="-mb-2 h-[22%] w-[56%] bg-violet-700"
-          />
-        )}
-        <div
-          className={`relative h-[25%] aspect-square rounded-full shadow-md ${
-            isMage ? 'bg-amber-200' : 'bg-orange-200'
-          } ${badge.ring}`}
+          role="img"
+          aria-label={alt}
+          className={`flex flex-col items-center justify-end pb-2 ${className}`}
         >
-          {!isMage && (
-            <div className="absolute inset-x-0 top-0 h-1/2 rounded-t-full bg-slate-800" />
-          )}
+          <div
+            className={`relative flex h-24 w-28 items-center justify-center rounded-t-full rounded-b-2xl border-2 shadow-xl ${style.coat}`}
+          >
+            <div className="flex gap-4">
+              <span className="h-3.5 w-3.5 rounded-full bg-slate-950 ring-2 ring-white" />
+              <span className="h-3.5 w-3.5 rounded-full bg-slate-950 ring-2 ring-white" />
+            </div>
+          </div>
         </div>
-        <div
-          className={`mt-1 h-[56%] w-[58%] rounded-t-3xl shadow-lg ${
-            isMage ? 'bg-violet-600' : 'bg-blue-500'
-          }`}
-        />
+      );
+    }
+
+    return (
+      <div
+        role="img"
+        aria-label={alt}
+        className={`flex flex-col items-center justify-end ${className}`}
+      >
+        <div className="relative flex flex-col items-center">
+          <div
+            className={`h-6 w-14 rounded-t-full ${style.hair}`}
+          />
+          <div className="flex h-12 w-12 items-center justify-center rounded-b-2xl border border-amber-200/40 bg-amber-100 shadow-md">
+            <div className="flex gap-2.5">
+              <span className="h-2 w-2 rounded-full bg-slate-900" />
+              <span className="h-2 w-2 rounded-full bg-slate-900" />
+            </div>
+          </div>
+          <div
+            className={`mt-1 flex h-28 w-20 flex-col items-center rounded-t-2xl border-2 pt-3 shadow-xl ${style.coat}`}
+          >
+            <span className={`h-2.5 w-8 rounded-full ${style.accent}`} />
+          </div>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className={`relative ${animCls}`}>
-      {badge.icon && (
-        <span className="absolute -top-2 right-1 z-10 rounded-full bg-slate-950/90 px-1.5 py-0.5 text-sm shadow">
-          {badge.icon}
-        </span>
-      )}
-      <img src={assetUrl} alt={alt} className={className} />
-    </div>
-  );
+  return <img src={cleanUrl} alt={alt} className={className} />;
 }
