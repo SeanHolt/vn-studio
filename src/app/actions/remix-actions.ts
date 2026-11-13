@@ -108,7 +108,9 @@ function remapBlockSceneIds(
         ...blk,
         id: newId,
         victorySceneId: idMap.get(blk.victorySceneId) ?? blk.victorySceneId,
-        defeatSceneId: idMap.get(blk.defeatSceneId) ?? blk.defeatSceneId,
+        defeatSceneId: blk.defeatSceneId
+          ? (idMap.get(blk.defeatSceneId) ?? blk.defeatSceneId)
+          : undefined,
       };
     }
     if (blk.type === "EVIDENCE_CHECK") {

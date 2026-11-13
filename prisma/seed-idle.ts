@@ -12,7 +12,7 @@ export async function seedIdleTycoonDemo(prisma: PrismaClient) {
     data: {
       title: 'Asteroid Belt Tycoon: 10-Tier Idle',
       description:
-        'Mine Star Credits, buy 10 escalating tiers of drones and Dyson Swarms with 1x/10x/MAX bulk-buy, and fund your Warp Cruiser!',
+        'Mine Star Credits, catch floating 10x Golden Frenzy Orbs, Prestige Ascend for permanent Star Shards, and fund your Warp Cruiser!',
       theme: 'ARCADE',
       enableClock: false,
       isPublished: true,
@@ -37,9 +37,9 @@ export async function seedIdleTycoonDemo(prisma: PrismaClient) {
         order: 0,
         nodePos: { x: 40, y: 180 },
         blocks: [
-          { id: 'id_b1', type: 'BACKGROUND', assetUrl: '/assets/bg-sunset-bay.svg', transition: 'fade' },
-          { id: 'id_b2', type: 'CHARACTER', name: 'Commander Nova', spriteUrl: '/assets/char-hero-blue.svg', position: 'center', action: 'enter', emotion: 'happy', animation: 'bounce', voiceStyle: 'HERO' },
-          { id: 'id_b3', type: 'DIALOGUE', speaker: 'Commander Nova', text: 'Your outpost starts with zero Star Credits! Click to extract ore, automate with 10 generator tiers, and reach 10,000 Credits to launch!', voiceStyle: 'HERO' },
+          { id: 'id_b1', type: 'BACKGROUND', assetUrl: 'css:starship-bridge', transition: 'fade' },
+          { id: 'id_b2', type: 'CHARACTER', name: 'Commander Nova', spriteUrl: 'css:char-captain', position: 'center', action: 'enter', emotion: 'happy', animation: 'bounce', voiceStyle: 'HERO' },
+          { id: 'id_b3', type: 'DIALOGUE', speaker: 'Commander Nova', text: 'Your outpost starts with zero Star Credits! Catch floating Golden Orbs for a 10x Frenzy, or Prestige Ascend for permanent Star Shards on your way to 10,000 Credits!', voiceStyle: 'HERO' },
           {
             id: 'id_b4',
             type: 'CHOICE',
@@ -68,6 +68,9 @@ export async function seedIdleTycoonDemo(prisma: PrismaClient) {
             baseClickPower: 1,
             goalAmount: 10000,
             variableKey: 'credits',
+            enablePrestige: true,
+            prestigeThreshold: 2500,
+            enableGoldenOrbs: true,
             upgrades: preset.upgrades,
             goalSceneId: sVictory,
           },

@@ -142,6 +142,9 @@ export default function SimpleEditorWorkspace({
                 type,
                 ...preset,
                 baseClickPower: 1,
+                enablePrestige: true,
+                prestigeThreshold: 5000,
+                enableGoldenOrbs: true,
                 goalSceneId: fallbackScene,
             });
         } else if (type === 'EVIDENCE_CHECK') {
@@ -359,17 +362,20 @@ export default function SimpleEditorWorkspace({
             store.addBlock({
                 id,
                 type,
-                backgroundUrl: '/assets/bg-night-sky.svg',
-                enemyName: 'Clockwork Golem',
-                enemySpriteUrl: '/assets/char-mage-violet.svg',
-                enemyMaxHp: 50,
-                enemyAttack: 8,
+                backgroundUrl: 'css:starry-night',
+                enemyName: 'Shadow Sentinel',
+                enemySpriteUrl: 'css:char-shadow',
+                enemyMaxHp: 45,
+                enemyAttack: 7,
+                enemyWeakness: 'FIRE',
+                extraWaves: [],
                 playerMaxHp: 40,
                 playerAttack: 12,
-                skillName: 'Starlight Strike',
+                skillName: 'Sunblade Slash',
+                skillElement: 'FIRE',
+                skillStatusEffect: 'BURN',
                 healItemName: 'Health Potion',
                 victorySceneId: fallbackScene,
-                defeatSceneId: fallbackScene,
             });
         } else if (type === 'KEYPAD_PUZZLE') {
             store.addBlock({

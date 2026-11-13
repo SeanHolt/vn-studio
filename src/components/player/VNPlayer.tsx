@@ -1188,6 +1188,9 @@ export default function VNPlayer({
                         baseClickPower={currentBlock.baseClickPower}
                         goalAmount={currentBlock.goalAmount}
                         initialCurrency={Number(variables[currentBlock.variableKey] ?? 0)}
+                        enablePrestige={currentBlock.enablePrestige ?? true}
+                        prestigeThreshold={currentBlock.prestigeThreshold ?? 5000}
+                        enableGoldenOrbs={currentBlock.enableGoldenOrbs ?? true}
                         upgrades={currentBlock.upgrades}
                         isMuted={isMuted}
                         onCompleteGoal={(finalCurrency) => {
@@ -1366,27 +1369,31 @@ export default function VNPlayer({
                         enemySpriteUrl={currentBlock.enemySpriteUrl}
                         enemyMaxHp={currentBlock.enemyMaxHp}
                         enemyAttack={currentBlock.enemyAttack}
+                        enemyWeakness={currentBlock.enemyWeakness ?? 'NEUTRAL'}
+                        extraWaves={currentBlock.extraWaves ?? []}
                         playerMaxHp={currentBlock.playerMaxHp}
                         playerAttack={currentBlock.playerAttack}
                         skillName={currentBlock.skillName}
+                        skillElement={currentBlock.skillElement ?? 'FIRE'}
+                        skillStatusEffect={currentBlock.skillStatusEffect ?? 'BURN'}
                         healItemName={currentBlock.healItemName}
-                        inventory={inventory}
-                        onConsumeItem={(itemName) =>
-                            setInventory((prev) => {
-                                const idx = prev.indexOf(itemName);
-                                if (idx === -1) return prev;
-                                const copy = [...prev];
-                                copy.splice(idx, 1);
-                                return copy;
-                            })
+                        hasHealItem={inventory.includes(currentBlock.healItemName)}
+                        isMuted={isMuted}
+                        onConsumeHealItem={() =>
+                            setInventory((prev) =>
+                                prev.filter((i) => i !== currentBlock.healItemName)
+                            )
                         }
-                        onBattleEnd={(won, remainingHp) => {
-                            setVariables((prev) => ({ ...prev, playerHP: remainingHp }));
-                            const nextScene = won
-                                ? currentBlock.victorySceneId
-                                : currentBlock.defeatSceneId;
-                            if (nextScene) {
-                                goToScene(nextScene);
+                        onVictory={() => {
+                            if (currentBlock.victorySceneId) {
+                                goToScene(currentBlock.victorySceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                        onDefeat={() => {
+                            if (currentBlock.defeatSceneId) {
+                                goToScene(currentBlock.defeatSceneId);
                             } else {
                                 setBlockIndex((prev) => prev + 1);
                             }

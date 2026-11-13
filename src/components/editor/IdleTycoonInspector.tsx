@@ -23,10 +23,7 @@ export default function IdleTycoonInspector({
 }: IdleTycoonInspectorProps) {
   const handleLoadPreset = (presetId: IdlePresetId) => {
     const data = instantiateIdlePreset(presetId);
-    onChange({
-      ...block,
-      ...data,
-    });
+    onChange({ ...block, ...data });
   };
 
   const handleAddTier = () => {
@@ -56,7 +53,6 @@ export default function IdleTycoonInspector({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* One-Click 10-Tier Presets */}
       <div className="flex flex-col gap-1.5 rounded-lg border border-amber-500/30 bg-amber-950/20 p-2.5">
         <span className="flex items-center gap-1 text-[11px] font-semibold text-amber-300">
           <Sparkles className="h-3 w-3" /> Load 10-Tier Preset Pack:
@@ -152,8 +148,54 @@ export default function IdleTycoonInspector({
           />
         </label>
       </div>
+      <div className="flex flex-col gap-2 rounded-lg border border-purple-500/30 bg-purple-950/20 p-2.5 text-xs">
+        <label className="flex items-center justify-between gap-2">
+          <span className="text-purple-200">
+            ✨ Enable Prestige Rebirth (+25% / Shard)
+          </span>
+          <input
+            type="checkbox"
+            checked={block.enablePrestige ?? true}
+            onChange={(e) =>
+              onChange({ ...block, enablePrestige: e.target.checked })
+            }
+            className="accent-purple-500"
+          />
+        </label>
 
-      {/* Unlimited Upgrades List */}
+        {(block.enablePrestige ?? true) && (
+          <label className="flex items-center justify-between gap-2 text-slate-300">
+            <span>Prestige Threshold:</span>
+            <input
+              type="number"
+              min={100}
+              value={block.prestigeThreshold ?? 5000}
+              onChange={(e) =>
+                onChange({
+                  ...block,
+                  prestigeThreshold: Math.max(100, Number(e.target.value)),
+                })
+              }
+              className="w-28 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-right font-mono text-purple-300"
+            />
+          </label>
+        )}
+
+        <label className="flex items-center justify-between gap-2">
+          <span className="text-amber-200">
+            🌟 Spawn Floating 10× Frenzy Orbs
+          </span>
+          <input
+            type="checkbox"
+            checked={block.enableGoldenOrbs ?? true}
+            onChange={(e) =>
+              onChange({ ...block, enableGoldenOrbs: e.target.checked })
+            }
+            className="accent-amber-500"
+          />
+        </label>
+      </div>
+
       <div className="flex items-center justify-between pt-1">
         <span className="text-xs font-semibold text-slate-300">
           Upgrade Tiers ({block.upgrades.length})
@@ -167,7 +209,7 @@ export default function IdleTycoonInspector({
         </button>
       </div>
 
-      <div className="flex max-h-60 flex-col gap-2 overflow-y-auto pr-1">
+      <div className="flex max-h-56 flex-col gap-2 overflow-y-auto pr-1">
         {block.upgrades.map((tier, idx) => (
           <div
             key={tier.id}

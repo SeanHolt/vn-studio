@@ -9,7 +9,7 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
     data: {
       title: 'Chronicles of Eldoria: The Sunstone',
       description:
-        'Explore a 2D top-down fantasy meadow, loot a Health Potion from a chest, watch day turn to night, and battle the Shadow Sentinel!',
+        'Explore a 2D top-down fantasy meadow, loot a Health Potion from a chest, and fight a 2-wave Elemental Boss Battle!',
       theme: 'FANTASY',
       enableClock: true,
       isPublished: true,
@@ -42,7 +42,7 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
             spawnY: 4,
             walls: ['4,1', '4,2', '4,5', '4,6', '8,2', '8,3', '8,4'],
             entities: [
-              { id: 'fn_e1', label: 'Elder Rowan', kind: 'NPC', icon: '🧙', x: 3, y: 4, dialogueText: 'Grab the Health Potion from the chest before stepping through the East Portal!' },
+              { id: 'fn_e1', label: 'Elder Rowan', kind: 'NPC', icon: '🧙', x: 3, y: 4, dialogueText: 'Grab the Health Potion from the chest—your Fire skill deals 1.5x Super Effective damage to Shadow foes!' },
               { id: 'fn_e2', label: 'Supply Chest', kind: 'CHEST', icon: '🧰', x: 6, y: 2, itemName: 'Health Potion', dialogueText: 'You found a Health Potion! Use it during battle to heal!' },
               { id: 'fn_e3', label: 'Ruins Portal', kind: 'DOOR', icon: '🚪', x: 10, y: 4, targetSceneId: sDusk },
             ],
@@ -60,13 +60,13 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
           { id: 'fn_d1', type: 'BACKGROUND', assetUrl: 'css:emerald-woods', transition: 'dissolve' },
           { id: 'fn_d2', type: 'ADVANCE_TIME', mode: 'SET_EXACT', targetTime: 'NIGHT', dayDelta: 0 },
           { id: 'fn_d3', type: 'CHARACTER', name: 'Shadow Sentinel', spriteUrl: 'css:char-shadow', position: 'center', action: 'enter', emotion: 'angry', animation: 'pulse' },
-          { id: 'fn_d4', type: 'DIALOGUE', speaker: 'Shadow Sentinel', text: 'Night falls over Eldoria! Prove your strength in battle to claim the Sunstone!' },
+          { id: 'fn_d4', type: 'DIALOGUE', speaker: 'Shadow Sentinel', text: 'First defeat my Forest Slime vanguard, then face the Shadow Sentinel!' },
           {
             id: 'fn_d5',
             type: 'CHOICE',
-            prompt: 'Prepare for turn-based combat:',
+            prompt: 'Prepare for multi-wave elemental combat:',
             options: [
-              { id: 'fn_o1', label: 'Draw Sword & Fight!', targetSceneId: sBattle },
+              { id: 'fn_o1', label: 'Draw Sunblade & Fight!', targetSceneId: sBattle },
             ],
           },
         ],
@@ -74,7 +74,7 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
       {
         id: sBattle,
         projectId: project.id,
-        name: '3. Shadow Sentinel Battle',
+        name: '3. 2-Wave Elemental Boss Battle',
         sceneType: 'BATTLE',
         order: 2,
         nodePos: { x: 720, y: 180 },
@@ -87,9 +87,22 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
             enemySpriteUrl: 'css:char-shadow',
             enemyMaxHp: 45,
             enemyAttack: 7,
-            playerMaxHp: 40,
+            enemyWeakness: 'FIRE',
+            extraWaves: [
+              {
+                id: 'fn_w_slime',
+                name: 'Forest Slime Vanguard',
+                spriteUrl: 'css:char-slime',
+                maxHp: 22,
+                attack: 5,
+                weakness: 'FIRE',
+              },
+            ],
+            playerMaxHp: 45,
             playerAttack: 13,
             skillName: 'Sunblade Slash',
+            skillElement: 'FIRE',
+            skillStatusEffect: 'BURN',
             healItemName: 'Health Potion',
             victorySceneId: sWin,
             defeatSceneId: sLose,
@@ -105,7 +118,7 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
         nodePos: { x: 1060, y: 80 },
         blocks: [
           { id: 'fn_w1', type: 'ADVANCE_TIME', mode: 'SET_EXACT', targetTime: 'MORNING', dayDelta: 1 },
-          { id: 'fn_w2', type: 'UNLOCK_ACHIEVEMENT', achievementId: 'fn_champion', title: 'Champion of Eldoria', description: 'Explored the meadow and defeated the Shadow Sentinel!', icon: '👑' },
+          { id: 'fn_w2', type: 'UNLOCK_ACHIEVEMENT', achievementId: 'fn_champion', title: 'Champion of Eldoria', description: 'Defeated the 2-wave Elemental Boss Battle!', icon: '👑' },
           { id: 'fn_w3', type: 'DIALOGUE', speaker: 'Narrator', text: 'Dawn breaks on Day 2 as the Sunstone shines across Eldoria once more!' },
         ],
       },
@@ -117,7 +130,7 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
         order: 4,
         nodePos: { x: 1060, y: 290 },
         blocks: [
-          { id: 'fn_l1', type: 'DIALOGUE', speaker: 'Narrator', text: 'Tip: Grab the Health Potion from the chest in the meadow and use Defend or Skills!' },
+          { id: 'fn_l1', type: 'DIALOGUE', speaker: 'Narrator', text: 'Tip: Use your Fire Sunblade Slash (2 SP) to deal 1.5x Super Effective damage and inflict Burn!' },
         ],
       },
     ],

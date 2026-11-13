@@ -41,7 +41,7 @@ export default function HomePage() {
             </nav>
 
             {/* Hero Section */}
-            <section className="relative overflow-hidden border-b border-slate-800/80 bg-gradient-to-b from-indigo-950/30 via-slate-950 to-slate-950 px-6 py-20 text-center">
+            <section className="relative overflow-hidden border-b border-slate-800/80 bg-linear-to-b from-indigo-950/30 via-slate-950 to-slate-950 px-6 py-20 text-center">
                 <div className="mx-auto max-w-3xl">
                     <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-950/60 px-3.5 py-1 text-xs font-medium text-indigo-300">
                         <Sparkles className="h-3.5 w-3.5" /> No-Code Game &amp; Story Creator

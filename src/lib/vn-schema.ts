@@ -11,6 +11,25 @@ export type SceneType =
   | "CRAFTING"
   | "ENDING";
 
+export const BattleElementSchema = z.enum([
+  "NEUTRAL",
+  "FIRE",
+  "ICE",
+  "LIGHTNING",
+]);
+export type BattleElement = z.infer<typeof BattleElementSchema>;
+
+export const BattleWaveEnemySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  spriteUrl: z.string().default("css:char-slime"),
+  maxHp: z.number().min(5).max(9999).default(30),
+  attack: z.number().min(1).max(999).default(6),
+  weakness: BattleElementSchema.default("NEUTRAL"),
+});
+
+export type BattleWaveEnemy = z.infer<typeof BattleWaveEnemySchema>;
+
 export const TopDownEntitySchema = z.object({
   id: z.string(),
   label: z.string().min(1),
@@ -323,17 +342,21 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
   z.object({
     id: z.string(),
     type: z.literal("BATTLE_ENCOUNTER"),
-    backgroundUrl: z.string().default("/assets/bg-night-sky.svg"),
-    enemyName: z.string().min(1).default("Clockwork Golem"),
-    enemySpriteUrl: z.string().default("/assets/char-mage-violet.svg"),
-    enemyMaxHp: z.number().min(1).max(9999).default(50),
-    enemyAttack: z.number().min(1).max(999).default(8),
-    playerMaxHp: z.number().min(1).max(9999).default(40),
+    backgroundUrl: z.string().default("css:starry-night"),
+    enemyName: z.string().default("Shadow Sentinel"),
+    enemySpriteUrl: z.string().default("css:char-shadow"),
+    enemyMaxHp: z.number().min(5).max(9999).default(45),
+    enemyAttack: z.number().min(1).max(999).default(7),
+    enemyWeakness: BattleElementSchema.default("NEUTRAL"),
+    extraWaves: z.array(BattleWaveEnemySchema).default([]),
+    playerMaxHp: z.number().min(10).max(9999).default(40),
     playerAttack: z.number().min(1).max(999).default(12),
-    skillName: z.string().default("Starlight Strike"),
+    skillName: z.string().default("Arcane Blast"),
+    skillElement: BattleElementSchema.default("FIRE"),
+    skillStatusEffect: z.enum(["NONE", "BURN", "FREEZE"]).default("BURN"),
     healItemName: z.string().default("Health Potion"),
     victorySceneId: z.string(),
-    defeatSceneId: z.string(),
+    defeatSceneId: z.string().optional(),
   }),
   z.object({
     id: z.string(),
@@ -365,6 +388,9 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     baseClickPower: z.number().min(1).default(1),
     goalAmount: z.number().min(0).default(1000),
     variableKey: z.string().default("credits"),
+    enablePrestige: z.boolean().default(true),
+    prestigeThreshold: z.number().min(100).default(5000),
+    enableGoldenOrbs: z.boolean().default(true),
     upgrades: z.array(IdleUpgradeSchema).min(1),
     goalSceneId: z.string().optional(),
   }),
