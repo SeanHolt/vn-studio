@@ -62,6 +62,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   theme: "MODERN",
   assets: [],
   enableClock: false,
+
   setAssets: (assets) => set({ assets }),
 
   addAsset: (asset) =>
@@ -78,6 +79,7 @@ export const useEditorStore = create<EditorState>((set) => ({
     set((state) => ({
       assets: state.assets.filter((a) => a.id !== assetId),
     })),
+
   initProject: (
     projectId,
     projectTitle,
@@ -99,7 +101,9 @@ export const useEditorStore = create<EditorState>((set) => ({
     }),
 
   setEnableClock: (enableClock) => set({ isDirty: true, enableClock }),
+
   setTheme: (theme) => set({ isDirty: true, theme }),
+
   setVariable: (key, value) =>
     set((state) => ({
       isDirty: true,
@@ -119,6 +123,51 @@ export const useEditorStore = create<EditorState>((set) => ({
       return {
         activeSceneId: sceneId,
         selectedBlockId: target?.blocks[0]?.id ?? null,
+      };
+    }),
+
+  addScene: () =>
+    set((state) => {
+      const newSceneId = `scene_${crypto.randomUUID()}`;
+      const newScene: ScenePayload = {
+        id: newSceneId,
+        name: `Scene ${state.scenes.length + 1}`,
+        sceneType: "DIALOGUE",
+        order: state.scenes.length,
+        nodePos: { x: state.scenes.length * 320, y: 150 },
+        blocks: [
+          {
+            id: `blk_${crypto.randomUUID()}`,
+            type: "DIALOGUE",
+            speaker: "Narrator",
+            text: "A new scene begins...",
+          },
+        ],
+      };
+
+      return {
+        isDirty: true,
+        scenes: [...state.scenes, newScene],
+        activeSceneId: newSceneId,
+        selectedBlockId: newScene.blocks[0]?.id ?? null,
+      };
+    }),
+
+  deleteScene: (sceneId) =>
+    set((state) => {
+      if (state.scenes.length <= 1) return state;
+
+      const remaining = state.scenes.filter((s) => s.id !== sceneId);
+      const nextActive =
+        state.activeSceneId === sceneId ? remaining[0] : undefined;
+
+      return {
+        isDirty: true,
+        scenes: remaining,
+        activeSceneId: nextActive ? nextActive.id : state.activeSceneId,
+        selectedBlockId: nextActive
+          ? (nextActive.blocks[0]?.id ?? null)
+          : state.selectedBlockId,
       };
     }),
 
@@ -181,50 +230,7 @@ export const useEditorStore = create<EditorState>((set) => ({
     })),
 
   markClean: () => set({ isDirty: false }),
-  addScene: () =>
-    set((state) => {
-      const newSceneId = `scene_${crypto.randomUUID()}`;
-      const newScene: ScenePayload = {
-        id: newSceneId,
-        name: `Scene ${state.scenes.length + 1}`,
-        sceneType: "DIALOGUE",
-        order: state.scenes.length,
-        nodePos: { x: state.scenes.length * 320, y: 150 },
-        blocks: [
-          {
-            id: `blk_${crypto.randomUUID()}`,
-            type: "DIALOGUE",
-            speaker: "Narrator",
-            text: "A new scene begins...",
-          },
-        ],
-      };
 
-      return {
-        isDirty: true,
-        scenes: [...state.scenes, newScene],
-        activeSceneId: newSceneId,
-        selectedBlockId: newScene.blocks[0]?.id ?? null,
-      };
-    }),
-
-  deleteScene: (sceneId) =>
-    set((state) => {
-      if (state.scenes.length <= 1) return state;
-
-      const remaining = state.scenes.filter((s) => s.id !== sceneId);
-      const nextActive =
-        state.activeSceneId === sceneId ? remaining[0] : undefined;
-
-      return {
-        isDirty: true,
-        scenes: remaining,
-        activeSceneId: nextActive ? nextActive.id : state.activeSceneId,
-        selectedBlockId: nextActive
-          ? (nextActive.blocks[0]?.id ?? null)
-          : state.selectedBlockId,
-      };
-    }),
   updateNodePos: (sceneId, nodePos) =>
     set((state) => ({
       isDirty: true,
