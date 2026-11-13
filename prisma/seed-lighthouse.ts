@@ -83,7 +83,7 @@ export async function seedLighthouseDemo(prisma: PrismaClient) {
         nodePos: { x: 720, y: 180 },
         blocks: [
           { id: 'lh_fx3', type: 'WEATHER_FX', weather: 'CLEAR', intensity: 'LIGHT' },
-          { id: 'lh_t1', type: 'BACKGROUND', assetUrl: 'css:starry-night', transition: 'fade' },
+          { id: 'lh_t1', type: 'BACKGROUND', assetUrl: 'css:starry-night', transition: 'fade-black' },
           { id: 'lh_t2', type: 'DIALOGUE', speaker: 'Narrator', text: 'At the top of the spiral stairs stands the heavy iron lantern room door.' },
           { id: 'lh_t3', type: 'BRANCH', checkType: 'HAS_ITEM', itemName: 'Brass Key', trueSceneId: sEndHero, falseSceneId: sEndQuiet },
         ],

@@ -57,9 +57,9 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
         order: 1,
         nodePos: { x: 380, y: 180 },
         blocks: [
-          { id: 'fn_d1', type: 'BACKGROUND', assetUrl: '/assets/bg-forest-mist.svg', transition: 'fade' },
+          { id: 'fn_d1', type: 'BACKGROUND', assetUrl: 'css:emerald-woods', transition: 'dissolve' },
           { id: 'fn_d2', type: 'ADVANCE_TIME', mode: 'SET_EXACT', targetTime: 'NIGHT', dayDelta: 0 },
-          { id: 'fn_d3', type: 'CHARACTER', name: 'Shadow Sentinel', spriteUrl: '/assets/char-mage-violet.svg', position: 'center', action: 'enter', emotion: 'angry', animation: 'pulse' },
+          { id: 'fn_d3', type: 'CHARACTER', name: 'Shadow Sentinel', spriteUrl: 'css:char-shadow', position: 'center', action: 'enter', emotion: 'angry', animation: 'pulse' },
           { id: 'fn_d4', type: 'DIALOGUE', speaker: 'Shadow Sentinel', text: 'Night falls over Eldoria! Prove your strength in battle to claim the Sunstone!' },
           {
             id: 'fn_d5',
@@ -82,9 +82,9 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
           {
             id: 'fn_bt1',
             type: 'BATTLE_ENCOUNTER',
-            backgroundUrl: '/assets/bg-night-sky.svg',
+            backgroundUrl: 'css:starry-night',
             enemyName: 'Shadow Sentinel',
-            enemySpriteUrl: '/assets/char-mage-violet.svg',
+            enemySpriteUrl: 'css:char-shadow',
             enemyMaxHp: 45,
             enemyAttack: 7,
             playerMaxHp: 40,

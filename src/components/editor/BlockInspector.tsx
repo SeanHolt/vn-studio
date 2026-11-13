@@ -68,14 +68,41 @@ export default function BlockInspector({
                 <TimeBlockInspector block={block} onChange={onChange} />
             )}
             {block.type === 'BACKGROUND' && (
-                <label className="flex flex-col gap-1.5">
-                    <span className="text-xs text-slate-400">Image URL</span>
-                    <AssetPicker
-                        category="BACKGROUND"
-                        currentUrl={block.assetUrl}
-                        onSelectUrl={(url) => onChange({ ...block, assetUrl: url })}
-                    />
-                </label>
+                <div>
+                    <label className="flex flex-col gap-1.5">
+                        <span className="text-xs text-slate-400">Image URL</span>
+                        <AssetPicker
+                            category="BACKGROUND"
+                            currentUrl={block.assetUrl}
+                            onSelectUrl={(url) => onChange({ ...block, assetUrl: url })}
+                        />
+                    </label>
+                    <label className="flex flex-col gap-1">
+                        <span className="text-xs text-slate-400">Screen Transition</span>
+                        <select
+                            value={block.transition ?? 'fade'}
+                            onChange={(e) =>
+                                onChange({
+                                    ...block,
+                                    transition: e.target.value as
+                                        | 'fade'
+                                        | 'fade-black'
+                                        | 'wipe-left'
+                                        | 'dissolve'
+                                        | 'cut',
+                                })
+                            }
+                            className="rounded border border-slate-700 bg-slate-950 px-2.5 py-1.5 text-xs text-white"
+                        >
+                            <option value="fade">Smooth Fade In</option>
+                            <option value="fade-black">Fade Through Black Curtain</option>
+                            <option value="wipe-left">Cinematic Wipe Left</option>
+                            <option value="dissolve">Dreamy Blur Dissolve</option>
+                            <option value="cut">Instant Hard Cut</option>
+                        </select>
+                    </label>
+                </div>
+
             )}
             {block.type === 'BATTLE_ENCOUNTER' && (
                 <BattleEncounterInspector

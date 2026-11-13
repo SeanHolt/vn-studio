@@ -120,6 +120,10 @@ export default function VNPlayer({
     const [blockIndex, setBlockIndex] = useState<number>(0);
     const [variables, setVariables] = useState<GameVariables>(initialVariables);
     const [backgroundUrl, setBackgroundUrl] = useState<string>('');
+    const [bgTransition, setBgTransition] = useState<{
+        style: 'fade' | 'fade-black' | 'wipe-left' | 'dissolve' | 'cut';
+        key: number;
+    }>({ style: 'fade', key: 0 });
     const [characters, setCharacters] = useState<Record<string, ActiveCharacter>>({});
     const [inventory, setInventory] = useState<string[]>([]);
     const [showBag, setShowBag] = useState<boolean>(false);
@@ -374,191 +378,199 @@ export default function VNPlayer({
     useEffect(() => {
         if (!currentScene || !currentBlock) return;
 
-        if (currentBlock.type === 'BACKGROUND') {
-            setBackgroundUrl(currentBlock.assetUrl);
-            setBlockIndex((prev) => prev + 1);
-        } else if (currentBlock.type === 'CHARACTER') {
-            setCharacters((prev) => {
-                const updated = { ...prev };
-                if (currentBlock.action === 'exit') {
-                    delete updated[currentBlock.name];
-                } else {
-                    updated[currentBlock.name] = {
-                        name: currentBlock.name,
-                        spriteUrl: currentBlock.spriteUrl,
-                        position: currentBlock.position,
-                        emotion: currentBlock.emotion ?? 'neutral',
-                        animation: currentBlock.animation ?? 'none',
-                    };
-                }
-                return updated;
-            });
-            setBlockIndex((prev) => prev + 1);
-        } else if (currentBlock.type === 'SET_VARIABLE') {
-            setVariables((prev) =>
-                applyVariableOperation(
-                    prev,
-                    currentBlock.variableKey,
-                    currentBlock.operation,
-                    currentBlock.value
-                )
-            );
-            setBlockIndex((prev) => prev + 1);
-        } else if (currentBlock.type === 'INVENTORY') {
-            setInventory((prev) => {
-                if (currentBlock.action === 'give') {
-                    return prev.includes(currentBlock.itemName)
-                        ? prev
-                        : [...prev, currentBlock.itemName];
-                }
-                return prev.filter((item) => item !== currentBlock.itemName);
-            });
-            setBlockIndex((prev) => prev + 1);
-        } else if (currentBlock.type === 'AFFINITY') {
-            const nextScore =
-                (affinity[currentBlock.characterName] ?? 0) + currentBlock.delta;
-            const varKey = `affinity_${currentBlock.characterName.replace(/\s+/g, '_')}`;
-
-            setAffinity((prev) => ({
-                ...prev,
-                [currentBlock.characterName]: nextScore,
-            }));
-            setVariables((prev) => ({
-                ...prev,
-                [varKey]: nextScore,
-            }));
-            setAffinityToast({
-                id: Date.now(),
-                characterName: currentBlock.characterName,
-                delta: currentBlock.delta,
-                reason: currentBlock.reason,
-            });
-            setBlockIndex((prev) => prev + 1);
-        } else if (currentBlock.type === 'BRANCH') {
-            const passed =
-                currentBlock.checkType === 'HAS_ITEM'
-                    ? Boolean(
-                        currentBlock.itemName && inventory.includes(currentBlock.itemName)
-                    )
-                    : evaluateCondition(
-                        currentBlock.variableKey &&
-                            currentBlock.operator &&
-                            currentBlock.value !== undefined
-                            ? {
-                                variableKey: currentBlock.variableKey,
-                                operator: currentBlock.operator,
-                                value: currentBlock.value,
-                            }
-                            : undefined,
-                        variables
-                    );
-
-            const nextScene = passed
-                ? currentBlock.trueSceneId
-                : currentBlock.falseSceneId;
-            if (nextScene) {
-                setCurrentSceneId(nextScene);
-                setBlockIndex(0);
-            } else {
+        const timerId = window.setTimeout(() => {
+            if (currentBlock.type === 'BACKGROUND') {
+                setBackgroundUrl(currentBlock.assetUrl);
+                setBgTransition((prev) => ({
+                    style: currentBlock.transition ?? 'fade',
+                    key: prev.key + 1,
+                }));
                 setBlockIndex((prev) => prev + 1);
-            }
-        } else if (currentBlock.type === 'TIMER') {
-            if (currentBlock.action === 'stop') {
-                setActiveTimer(null);
-            } else {
-                setActiveTimer({
-                    label: currentBlock.label,
-                    remaining: currentBlock.durationSeconds,
-                    total: currentBlock.durationSeconds,
-                    timeoutSceneId: currentBlock.timeoutSceneId,
-                });
-            }
-            setBlockIndex((prev) => prev + 1);
-        } else if (currentBlock.type === 'PLAY_AUDIO') {
-            if (currentBlock.audioType === 'BGM') {
-                bgmCleanupRef.current?.();
-                bgmCleanupRef.current = null;
-                if (currentBlock.action === 'play' && !isMuted && currentBlock.soundUrl) {
-                    if (currentBlock.soundUrl.startsWith('synth:')) {
-                        bgmCleanupRef.current = playSynthSound(currentBlock.soundUrl);
+            } else if (currentBlock.type === 'CHARACTER') {
+                setCharacters((prev) => {
+                    const updated = { ...prev };
+                    if (currentBlock.action === 'exit') {
+                        delete updated[currentBlock.name];
                     } else {
-                        const audio = new Audio(currentBlock.soundUrl);
-                        audio.loop = true;
-                        audio.volume = 0.4;
-                        void audio.play();
-                        bgmCleanupRef.current = () => {
-                            audio.pause();
-                            audio.currentTime = 0;
+                        updated[currentBlock.name] = {
+                            name: currentBlock.name,
+                            spriteUrl: currentBlock.spriteUrl,
+                            position: currentBlock.position,
+                            emotion: currentBlock.emotion ?? 'neutral',
+                            animation: currentBlock.animation ?? 'none',
                         };
                     }
-                }
-            } else if (
-                currentBlock.action === 'play' &&
-                !isMuted &&
-                currentBlock.soundUrl
-            ) {
-                if (currentBlock.soundUrl.startsWith('synth:')) {
-                    playSynthSound(currentBlock.soundUrl);
-                } else {
-                    const sfx = new Audio(currentBlock.soundUrl);
-                    sfx.volume = 0.6;
-                    void sfx.play();
-                }
-            }
-            setBlockIndex((prev) => prev + 1);
-        } else if (currentBlock.type === 'ADVANCE_TIME') {
-            const nextClock = advanceGameClock(
-                clock,
-                currentBlock.mode,
-                currentBlock.targetTime,
-                currentBlock.dayDelta
-            );
-            setClock(nextClock);
-            setVariables((prev) => ({
-                ...prev,
-                day: nextClock.day,
-                timeOfDay: nextClock.timeOfDay,
-            }));
-            setBlockIndex((prev) => prev + 1);
-        } else if (currentBlock.type === 'WEATHER_FX') {
-            setWeatherState({
-                weather: currentBlock.weather,
-                intensity: currentBlock.intensity,
-            });
-            setBlockIndex((prev) => prev + 1);
-            return;
-        } else if (currentBlock.type === 'CAMERA_FX') {
-            if (currentBlock.effect === 'SHAKE') {
-                setCameraAnimClass('animate-vn-cam-shake');
-                window.setTimeout(() => setCameraAnimClass(''), 480);
-            } else if (currentBlock.effect === 'ZOOM_PULSE') {
-                setCameraAnimClass('animate-vn-cam-zoom');
-                window.setTimeout(() => setCameraAnimClass(''), 520);
-            } else if (
-                currentBlock.effect === 'FLASH_WHITE' ||
-                currentBlock.effect === 'FLASH_RED'
-            ) {
-                const color = currentBlock.effect === 'FLASH_RED' ? 'RED' : 'WHITE';
-                setFlashState((prev) => ({ color, key: prev.key + 1 }));
-            }
-            setBlockIndex((prev) => prev + 1);
-            return;
-        } else if (currentBlock.type === 'UNLOCK_ACHIEVEMENT') {
-            const isNewlyUnlocked = saveAchievementToStorage(
-                storageKey,
-                currentBlock.achievementId
-            );
-            if (isNewlyUnlocked) {
-                setAchievementToast({
-                    achievementId: currentBlock.achievementId,
-                    title: currentBlock.title,
-                    description: currentBlock.description,
-                    icon: currentBlock.icon,
+                    return updated;
                 });
+                setBlockIndex((prev) => prev + 1);
+            } else if (currentBlock.type === 'SET_VARIABLE') {
+                setVariables((prev) =>
+                    applyVariableOperation(
+                        prev,
+                        currentBlock.variableKey,
+                        currentBlock.operation,
+                        currentBlock.value
+                    )
+                );
+                setBlockIndex((prev) => prev + 1);
+            } else if (currentBlock.type === 'INVENTORY') {
+                setInventory((prev) => {
+                    if (currentBlock.action === 'give') {
+                        return prev.includes(currentBlock.itemName)
+                            ? prev
+                            : [...prev, currentBlock.itemName];
+                    }
+                    return prev.filter((item) => item !== currentBlock.itemName);
+                });
+                setBlockIndex((prev) => prev + 1);
+            } else if (currentBlock.type === 'AFFINITY') {
+                const nextScore =
+                    (affinity[currentBlock.characterName] ?? 0) + currentBlock.delta;
+                const varKey = `affinity_${currentBlock.characterName.replace(/\s+/g, '_')}`;
+
+                setAffinity((prev) => ({
+                    ...prev,
+                    [currentBlock.characterName]: nextScore,
+                }));
+                setVariables((prev) => ({
+                    ...prev,
+                    [varKey]: nextScore,
+                }));
+                setAffinityToast({
+                    id: Date.now(),
+                    characterName: currentBlock.characterName,
+                    delta: currentBlock.delta,
+                    reason: currentBlock.reason,
+                });
+                setBlockIndex((prev) => prev + 1);
+            } else if (currentBlock.type === 'BRANCH') {
+                const passed =
+                    currentBlock.checkType === 'HAS_ITEM'
+                        ? Boolean(
+                            currentBlock.itemName && inventory.includes(currentBlock.itemName)
+                        )
+                        : evaluateCondition(
+                            currentBlock.variableKey &&
+                                currentBlock.operator &&
+                                currentBlock.value !== undefined
+                                ? {
+                                    variableKey: currentBlock.variableKey,
+                                    operator: currentBlock.operator,
+                                    value: currentBlock.value,
+                                }
+                                : undefined,
+                            variables
+                        );
+
+                const nextScene = passed
+                    ? currentBlock.trueSceneId
+                    : currentBlock.falseSceneId;
+                if (nextScene) {
+                    setCurrentSceneId(nextScene);
+                    setBlockIndex(0);
+                } else {
+                    setBlockIndex((prev) => prev + 1);
+                }
             }
-            setBlockIndex((prev) => prev + 1);
-        }
+            else if (currentBlock.type === 'TIMER') {
+                if (currentBlock.action === 'stop') {
+                    setActiveTimer(null);
+                } else {
+                    setActiveTimer({
+                        label: currentBlock.label,
+                        remaining: currentBlock.durationSeconds,
+                        total: currentBlock.durationSeconds,
+                        timeoutSceneId: currentBlock.timeoutSceneId,
+                    });
+                }
+                setBlockIndex((prev) => prev + 1);
+            } else if (currentBlock.type === 'PLAY_AUDIO') {
+                if (currentBlock.audioType === 'BGM') {
+                    bgmCleanupRef.current?.();
+                    bgmCleanupRef.current = null;
+                    if (currentBlock.action === 'play' && !isMuted && currentBlock.soundUrl) {
+                        if (currentBlock.soundUrl.startsWith('synth:')) {
+                            bgmCleanupRef.current = playSynthSound(currentBlock.soundUrl);
+                        } else {
+                            const audio = new Audio(currentBlock.soundUrl);
+                            audio.loop = true;
+                            audio.volume = 0.4;
+                            void audio.play();
+                            bgmCleanupRef.current = () => {
+                                audio.pause();
+                                audio.currentTime = 0;
+                            };
+                        }
+                    }
+                } else if (
+                    currentBlock.action === 'play' &&
+                    !isMuted &&
+                    currentBlock.soundUrl
+                ) {
+                    if (currentBlock.soundUrl.startsWith('synth:')) {
+                        playSynthSound(currentBlock.soundUrl);
+                    } else {
+                        const sfx = new Audio(currentBlock.soundUrl);
+                        sfx.volume = 0.6;
+                        void sfx.play();
+                    }
+                }
+                setBlockIndex((prev) => prev + 1);
+            } else if (currentBlock.type === 'ADVANCE_TIME') {
+                const nextClock = advanceGameClock(
+                    clock,
+                    currentBlock.mode,
+                    currentBlock.targetTime,
+                    currentBlock.dayDelta
+                );
+                setClock(nextClock);
+                setVariables((prev) => ({
+                    ...prev,
+                    day: nextClock.day,
+                    timeOfDay: nextClock.timeOfDay,
+                }));
+                setBlockIndex((prev) => prev + 1);
+            } else if (currentBlock.type === 'WEATHER_FX') {
+                setWeatherState({
+                    weather: currentBlock.weather,
+                    intensity: currentBlock.intensity,
+                });
+                setBlockIndex((prev) => prev + 1);
+            } else if (currentBlock.type === 'CAMERA_FX') {
+                if (currentBlock.effect === 'SHAKE') {
+                    setCameraAnimClass('animate-vn-cam-shake');
+                    window.setTimeout(() => setCameraAnimClass(''), 480);
+                } else if (currentBlock.effect === 'ZOOM_PULSE') {
+                    setCameraAnimClass('animate-vn-cam-zoom');
+                    window.setTimeout(() => setCameraAnimClass(''), 520);
+                } else if (
+                    currentBlock.effect === 'FLASH_WHITE' ||
+                    currentBlock.effect === 'FLASH_RED'
+                ) {
+                    const color = currentBlock.effect === 'FLASH_RED' ? 'RED' : 'WHITE';
+                    setFlashState((prev) => ({ color, key: prev.key + 1 }));
+                }
+                setBlockIndex((prev) => prev + 1);
+            } else if (currentBlock.type === 'UNLOCK_ACHIEVEMENT') {
+                const isNewlyUnlocked = saveAchievementToStorage(
+                    storageKey,
+                    currentBlock.achievementId
+                );
+                if (isNewlyUnlocked) {
+                    setAchievementToast({
+                        achievementId: currentBlock.achievementId,
+                        title: currentBlock.title,
+                        description: currentBlock.description,
+                        icon: currentBlock.icon,
+                    });
+                }
+                setBlockIndex((prev) => prev + 1);
+            }
+        }, 0);
+
+        return () => window.clearTimeout(timerId);
     }, [currentScene, currentBlock, affinity, inventory, variables, isMuted, clock, storageKey]);
+
     useEffect(() => {
         if (!activeTimer) return;
 
@@ -677,6 +689,12 @@ export default function VNPlayer({
         center: 'left-1/2 -translate-x-1/2',
         right: 'right-12',
     };
+    let bgAnimClass = '';
+    if (bgTransition.style === 'fade') bgAnimClass = 'animate-vn-bg-fade';
+    else if (bgTransition.style === 'dissolve')
+        bgAnimClass = 'animate-vn-bg-dissolve';
+    else if (bgTransition.style === 'wipe-left')
+        bgAnimClass = 'animate-vn-bg-wipe-left';
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 p-4 text-slate-100">
             {/* Top Header & HUD Controls */}
@@ -861,9 +879,17 @@ export default function VNPlayer({
                 {/* Background Layer */}
                 {backgroundUrl && (
                     <StageArtwork
+                        key={`bg_${bgTransition.key}`}
                         assetUrl={backgroundUrl}
-                        alt="Scene background"
-                        className="absolute inset-0 h-full w-full object-cover"
+                        alt={title}
+                        className={`absolute inset-0 h-full w-full object-cover ${bgAnimClass}`}
+                    />
+
+                )}
+                {bgTransition.style === 'fade-black' && bgTransition.key > 0 && (
+                    <div
+                        key={`curtain_${bgTransition.key}`}
+                        className="animate-vn-curtain-black pointer-events-none absolute inset-0 z-10 bg-black"
                     />
                 )}
                 {achievementToast && (

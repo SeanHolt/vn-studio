@@ -93,3 +93,29 @@ body {
 .animate-vn-cam-shake { animation: vn-cam-shake 0.45s ease-in-out; }
 .animate-vn-cam-flash { animation: vn-cam-flash 0.55s ease-out forwards; }
 .animate-vn-cam-zoom { animation: vn-cam-zoom 0.5s ease-out; }
+
+@keyframes vn-bg-fade {
+  0% { opacity: 0.15; }
+  100% { opacity: 1; }
+}
+
+@keyframes vn-bg-dissolve {
+  0% { opacity: 0; filter: blur(12px) brightness(1.3); transform: scale(1.04); }
+  100% { opacity: 1; filter: blur(0px) brightness(1); transform: scale(1); }
+}
+
+@keyframes vn-bg-wipe-left {
+  0% { clip-path: inset(0 0 0 100%); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes vn-curtain-black {
+  0% { opacity: 1; }
+  35% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animate-vn-bg-fade { animation: vn-bg-fade 0.55s ease-out; }
+.animate-vn-bg-dissolve { animation: vn-bg-dissolve 0.75s ease-out; }
+.animate-vn-bg-wipe-left { animation: vn-bg-wipe-left 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.animate-vn-curtain-black { animation: vn-curtain-black 0.85s ease-out forwards; }

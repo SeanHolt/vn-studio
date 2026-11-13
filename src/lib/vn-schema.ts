@@ -85,7 +85,9 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     id: z.string(),
     type: z.literal("BACKGROUND"),
     assetUrl: z.string(),
-    transition: z.enum(["none", "fade"]).default("fade"),
+    transition: z
+      .enum(["fade", "fade-black", "wipe-left", "dissolve", "cut"])
+      .default("fade"),
   }),
   z.object({
     id: z.string(),

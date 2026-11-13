@@ -26,7 +26,7 @@ Creators can toggle seamlessly between two synchronized editing views at any tim
   - Color-coded animated wires automatically render for **Choices** (indigo), **Conditional Choices** (amber), **`IF / ELSE` Branches** (emerald/rose), **Sandbox Doorways** (sky blue), **Keypad Unlock/Lockout Routes** (emerald/dashed rose), **2D Map Doors & NPCs** (teal), **Battle Victory/Defeat Outcomes** (emerald/dashed rose), and **Countdown Timeouts** (dashed orange).
   - Dragging a wire between two scene nodes automatically generates a linked choice option.
   - Node `(x, y)` coordinates persist directly to SQLite.
-- **Live Stage Preview:** An embedded 16:9 mini-stage inside the editor updates in real time as blocks are selected, edited, or reordered—displaying active backgrounds, staged character sprites, emotions, themes, and dashed sandbox hotspot bounding boxes.
+- **Live Stage Preview & Visual Hotspot Drawing:** An embedded 16:9 mini-stage inside the editor updates in real time as blocks are selected, edited, or reordered—displaying active backgrounds, weather particles, staged character sprites, themes, and interactive `HOTSPOT_ROOM` boxes that creators can **click and drag directly on the stage** to draw or reposition.
 - **Multi-Genre Scene Management:** Create new scenes, rename scenes, switch scene types (`TITLE`, `DIALOGUE`, `HOTSPOT`, `TOPDOWN`, `BATTLE`, `ENDING`), and delete scenes with a minimum one-scene safety guard.
 - **Dead-End & Broken-Link Validator (`Validate`):** Scans every scene and block across the project to detect missing destination scene IDs, empty choices, non-ending dead-end scenes, and unreachable orphan scenes—with one-click jump-to-fix navigation.
 
@@ -80,6 +80,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
   - **Audio Mute Toggle & Instant Restart:** One-click mute/unmute for BGM/SFX and full state reset.
  - **Creator Story Debugger (`Debug`):** Available to project owners during playtesting; allows warping straight to any scene or block index, editing global variables live, spawning or removing Backpack items, and adjusting character affinity scores on the fly.
 - **Text-to-Speech (TTS) Voice Narration (`Voice On/Off`):** Uses the browser's built-in `speechSynthesis` API to read dialogue aloud with automatic speaker-aware pitch and pacing presets (`Auto`, `Narrator`, `Hero`, `Mystic`, `Robot`) and zero external API costs.
+- **Cinematic Screen Transitions (`BACKGROUND`):** Supports 5 selectable scene transition effects (**Smooth Fade In**, **Fade Through Black Curtain**, **Cinematic Wipe Left**, **Dreamy Blur Dissolve**, and **Instant Hard Cut**) rendered via 60fps CSS animations.
 
 ### 4. Built-In Art, Synth Audio & Custom Asset Manager
 - **Zero-Setup Starter Artwork (18 Built-In Assets):** Includes **10 pure HTML/CSS backgrounds** (*Starry Night*, *Sunset Coast*, *Emerald Woods*, *Neon Cyber Grid*, *Starship Deck*, *Magma Cavern*, *Crystal Lagoon*, *Royal Hall*, *Stormy Moor*, *Potion Study*) and **8 character sprites** (*Explorer*, *Mystic Keeper*, *Cyber Android*, *Solar Knight*, *Shadow Wraith*, *Alchemist*, *Star Captain*, *Forest Slime*) that render offline with zero external dependencies.

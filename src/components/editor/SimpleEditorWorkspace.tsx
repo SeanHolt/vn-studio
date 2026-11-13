@@ -283,7 +283,7 @@ export default function SimpleEditorWorkspace({
             store.addBlock({
                 id,
                 type,
-                achievementId: `ach_${Date.now()}`,
+                achievementId: `ach_${crypto.randomUUID()}`,
                 title: 'Secret Finder',
                 description: 'Discovered a hidden clue!',
                 icon: '🏆',
@@ -647,6 +647,7 @@ export default function SimpleEditorWorkspace({
                                         blocks={activeScene.blocks}
                                         selectedBlockId={store.selectedBlockId}
                                         theme={store.theme}
+                                        onUpdateBlock={(updated) => store.updateBlock(updated.id, updated)}
                                     />
 
                                     <div className="mb-4 flex flex-wrap gap-2">
