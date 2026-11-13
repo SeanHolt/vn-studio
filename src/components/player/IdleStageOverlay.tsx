@@ -127,7 +127,7 @@ export default function IdleStageOverlay({
         <button
           type="button"
           onClick={handleManualClick}
-          className={`my-2 flex h-28 w-28 flex-col items-center justify-center rounded-full border-4 border-amber-400/60 bg-gradient-to-b from-amber-500/25 to-indigo-950/80 shadow-[0_0_25px_rgba(245,158,11,0.25)] transition-transform ${
+          className={`my-2 flex h-28 w-28 flex-col items-center justify-center rounded-full border-4 border-amber-400/60 bg-linear-to-b from-amber-500/25 to-indigo-950/80 shadow-[0_0_25px_rgba(245,158,11,0.25)] transition-transform ${
             clickPop ? 'scale-90' : 'hover:scale-105'
           }`}
         >

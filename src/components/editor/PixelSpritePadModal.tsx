@@ -211,7 +211,7 @@ export default function PixelSpritePadModal({
             gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
           }}
           onMouseDown={() => setIsDrawing(true)}
-          className="mx-auto grid aspect-square w-64 overflow-hidden rounded-lg border border-slate-700 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:12px_12px] bg-slate-950"
+          className="mx-auto grid aspect-square w-64 overflow-hidden rounded-lg border border-slate-700 bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-size-[12px_12px] bg-slate-950"
         >
           {grid.map((cellColor, idx) => (
             <div

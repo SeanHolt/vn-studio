@@ -874,7 +874,7 @@ export default function VNPlayer({
             {/* 16:9 Visual Novel Stage */}
             <div
                 onClick={handleAdvanceDialogue}
-                className={`relative aspect-video w-full max-w-4xl overflow-hidden rounded-xl border border-slate-800 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 shadow-2xl select-none ${activeTheme.fontClass} ${cameraAnimClass}`}
+                className={`relative aspect-video w-full max-w-4xl overflow-hidden rounded-xl border border-slate-800 bg-linear-to-b from-indigo-950 via-slate-900 to-slate-950 shadow-2xl select-none ${activeTheme.fontClass} ${cameraAnimClass}`}
             >
                 {/* Background Layer */}
                 {backgroundUrl && (
@@ -1449,7 +1449,7 @@ export default function VNPlayer({
                             {interpolateVariables(currentBlock.speaker, variables)}
                         </div>
                         <p
-                            className={`min-h-[3rem] text-base leading-relaxed ${activeTheme.dialogueTextClass}`}
+                            className={`min-h-12 text-base leading-relaxed ${activeTheme.dialogueTextClass}`}
                         >
                             {isTypingDone && forceFinishKey > 0 ? (
                                 interpolateVariables(currentBlock.text, variables)

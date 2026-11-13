@@ -61,7 +61,7 @@ export default function BattleStageOverlay({
       const dmg = Math.max(2, Math.round(playerAttack * 1.8));
       nextEnemyHp = Math.max(0, enemyHp - dmg);
       logLine = `You unleash ${skillName} for ${dmg} massive damage!`;
-      setEnemyHitAnim('shake');
+      setEnemyHitAnim('shake'); 
       window.setTimeout(() => setEnemyHitAnim('none'), 450);
       setSkillCooldown(2);
     } else if (action === 'DEFEND') {
