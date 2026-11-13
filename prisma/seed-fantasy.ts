@@ -33,21 +33,22 @@ export async function seedFantasyRpgDemo(prisma: PrismaClient) {
         order: 0,
         nodePos: { x: 40, y: 180 },
         blocks: [
-          {
+{
             id: 'fn_m1',
             type: 'TOPDOWN_ROOM',
             mapTheme: 'GRASSLAND',
             playerIcon: '🧝',
             spawnX: 1,
             spawnY: 4,
-            walls: ['4,1', '4,2', '4,5', '4,6', '8,2', '8,3', '8,4'],
+            walls: ['4,1', '4,2', '4,5', '4,6', '8,1', '8,2', '8,3', '8,4', '8,5', '8,6'],
             entities: [
-              { id: 'fn_e1', label: 'Elder Rowan', kind: 'NPC', icon: '🧙', x: 3, y: 4, dialogueText: 'Grab the Health Potion from the chest—your Fire skill deals 1.5x Super Effective damage to Shadow foes!' },
+              { id: 'fn_e1', label: 'Elder Rowan', kind: 'NPC', icon: '🧙', x: 3, y: 4, dialogueText: 'Step on the Floor Switch (🔘) to lower the stone barrier, grab the Health Potion & Ruins Key, and dodge the Shadow Guard!' },
+              { id: 'fn_sw1', label: 'Stone Pressure Switch', kind: 'SWITCH', icon: '🔘', x: 6, y: 5, switchTargetCoords: '8,3 8,4', dialogueText: 'Click! The central stone barrier slid open!' },
               { id: 'fn_e2', label: 'Supply Chest', kind: 'CHEST', icon: '🧰', x: 6, y: 2, itemName: 'Health Potion', dialogueText: 'You found a Health Potion! Use it during battle to heal!' },
+              { id: 'fn_pat1', label: 'Shadow Guard', kind: 'PATROL', icon: '👾', x: 9, y: 2, patrolAxis: 'V', patrolRange: 3, dialogueText: 'Caught by the Shadow Guard! Returning to camp...' },
               { id: 'fn_e3', label: 'Ruins Portal', kind: 'DOOR', icon: '🚪', x: 10, y: 4, targetSceneId: sDusk },
             ],
-          },
-        ],
+          },        ],
       },
       {
         id: sDusk,

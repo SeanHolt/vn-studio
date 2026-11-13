@@ -1325,12 +1325,13 @@ export default function VNPlayer({
                         walls={currentBlock.walls}
                         entities={currentBlock.entities}
                         inventory={inventory}
-                        onCollectItem={(itemName) =>
+                        isMuted={isMuted}
+                        onGiveItem={(itemName) =>
                             setInventory((prev) =>
                                 prev.includes(itemName) ? prev : [...prev, itemName]
                             )
                         }
-                        onJumpScene={(targetId) => goToScene(targetId)}
+                        onJumpScene={(targetSceneId) => goToScene(targetSceneId)}
                     />
                 )}
                 {currentBlock?.type === 'EVIDENCE_CHECK' && (

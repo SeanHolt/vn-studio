@@ -32,16 +32,22 @@ export type BattleWaveEnemy = z.infer<typeof BattleWaveEnemySchema>;
 
 export const TopDownEntitySchema = z.object({
   id: z.string(),
-  label: z.string().min(1),
-  kind: z.enum(["NPC", "CHEST", "DOOR", "SIGN"]),
-  icon: z.string().default("🧙"),
+  label: z.string(),
+  kind: z.enum(['NPC', 'CHEST', 'DOOR', 'SWITCH', 'PATROL']),
+  icon: z.string().default('🧑'),
   x: z.number().min(0).max(11),
   y: z.number().min(0).max(7),
   dialogueText: z.string().optional(),
   itemName: z.string().optional(),
-  targetSceneId: z.string().optional(),
   requiredItem: z.string().optional(),
+  targetSceneId: z.string().optional(),
+  switchTargetCoords: z.string().optional(),
+  patrolAxis: z.enum(['H', 'V']).optional(),
+  patrolRange: z.number().min(1).max(6).optional(),
 });
+
+export type TopDownEntity = z.infer<typeof TopDownEntitySchema>;
+
 export const CircuitTileSchema = z.object({
   kind: z.enum(["STRAIGHT", "CORNER", "TEE", "CROSS", "BLOCKER"]),
   rotation: z.union([
@@ -53,7 +59,6 @@ export const CircuitTileSchema = z.object({
 });
 
 export type CircuitTile = z.infer<typeof CircuitTileSchema>;
-export type TopDownEntity = z.infer<typeof TopDownEntitySchema>;
 export const ChoiceOptionSchema = z.object({
   id: z.string(),
   label: z.string().min(1, "Choice text is required"),
