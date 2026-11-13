@@ -366,6 +366,33 @@ export default function SceneNodeGraph({
                             markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
                         });
                     }
+                } else if (block.type === 'CIPHER_PUZZLE') {
+                    if (block.unlockSceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_decrypt_${block.unlockSceneId}`,
+                            source: scene.id,
+                            target: block.unlockSceneId,
+                            label: `Decrypted: ${block.secretPhrase}`,
+                            animated: true,
+                            style: { stroke: '#22d3ee', strokeWidth: 2 },
+                            labelStyle: { fill: '#67e8f9', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#22d3ee' },
+                        });
+                    }
+                    if (block.failSceneId) {
+                        result.push({
+                            id: `${scene.id}_${block.id}_fail_${block.failSceneId}`,
+                            source: scene.id,
+                            target: block.failSceneId,
+                            label: 'Cipher Lockout',
+                            animated: true,
+                            style: { stroke: '#fb7185', strokeWidth: 2, strokeDasharray: '4,4' },
+                            labelStyle: { fill: '#fda4af', fontSize: 10, fontWeight: 600 },
+                            labelBgStyle: { fill: '#020617', fillOpacity: 0.85 },
+                            markerEnd: { type: MarkerType.ArrowClosed, color: '#fb7185' },
+                        });
+                    }
                 } else if (block.type === 'CRAFTING_PUZZLE') {
                     if (block.successSceneId) {
                         result.push({

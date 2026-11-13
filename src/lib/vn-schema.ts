@@ -1,15 +1,15 @@
 import { z } from "zod";
 
 export type SceneType =
-  | 'TITLE'
-  | 'DIALOGUE'
-  | 'HOTSPOT'
-  | 'TOPDOWN'
-  | 'BATTLE'
-  | 'QUIZ'
-  | 'IDLE'
-  | 'CRAFTING'
-  | 'ENDING';
+  | "TITLE"
+  | "DIALOGUE"
+  | "HOTSPOT"
+  | "TOPDOWN"
+  | "BATTLE"
+  | "QUIZ"
+  | "IDLE"
+  | "CRAFTING"
+  | "ENDING";
 
 export const TopDownEntitySchema = z.object({
   id: z.string(),
@@ -87,20 +87,49 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     assetUrl: z.string(),
     transition: z.enum(["none", "fade"]).default("fade"),
   }),
-   z.object({
+  z.object({
     id: z.string(),
-    type: z.literal('CRAFTING_PUZZLE'),
-    title: z.string().default('Arcane Alchemy Cauldron'),
+    type: z.literal("CRAFTING_PUZZLE"),
+    title: z.string().default("Arcane Alchemy Cauldron"),
     recipePrompt: z
       .string()
-      .default('Combine 2 ingredients to brew the Elixir of True Sight!'),
+      .default("Combine 2 ingredients to brew the Elixir of True Sight!"),
     hintText: z.string().optional(),
     availableIngredients: z.array(z.string().min(1)).min(3).max(8),
     requiredIngredients: z.array(z.string().min(1)).min(2).max(4),
-    craftedItemName: z.string().min(1).default('Elixir of True Sight'),
+    craftedItemName: z.string().min(1).default("Elixir of True Sight"),
     maxAttempts: z.number().min(0).max(15).default(0),
     successSceneId: z.string(),
     failSceneId: z.string().optional(),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("CIPHER_PUZZLE"),
+    title: z.string().default("Decrypt Incoming Transmission"),
+    clueText: z
+      .string()
+      .default("The secret rendezvous planet in the outer rim."),
+    secretPhrase: z.string().min(2).default("ORION NEBULA"),
+    maxWrongGuesses: z.number().min(3).max(12).default(6),
+    theme: z.enum(["SCIFI", "ANCIENT", "CYBER"]).default("SCIFI"),
+    unlockSceneId: z.string(),
+    failSceneId: z.string().optional(),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("WEATHER_FX"),
+    weather: z
+      .enum(["CLEAR", "RAIN", "SNOW", "FIREFLIES", "EMBERS"])
+      .default("RAIN"),
+    intensity: z.enum(["LIGHT", "NORMAL", "HEAVY"]).default("NORMAL"),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal("CAMERA_FX"),
+    effect: z
+      .enum(["SHAKE", "FLASH_WHITE", "FLASH_RED", "ZOOM_PULSE"])
+      .default("SHAKE"),
+    intensity: z.enum(["SUBTLE", "STRONG"]).default("STRONG"),
   }),
   z.object({
     id: z.string(),

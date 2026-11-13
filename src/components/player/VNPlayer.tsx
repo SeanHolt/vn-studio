@@ -72,6 +72,11 @@ import CircuitStageOverlay from './CircuitStageOverlay';
 import IdleStageOverlay from './IdleStageOverlay';
 import SlidingPuzzleStageOverlay from './SlidingPuzzleStageOverlay';
 import CraftingStageOverlay from './CraftingStageOverlay';
+import StageFxOverlay, {
+    WeatherType,
+    WeatherIntensity,
+} from '@/components/shared/StageFxOverlay';
+import CipherStageOverlay from './CipherStageOverlay';
 
 export interface PlayableScene {
     id: string;
@@ -130,7 +135,15 @@ export default function VNPlayer({
         delta: number;
         reason?: string;
     } | null>(null);
-
+    const [weatherState, setWeatherState] = useState<{
+        weather: WeatherType;
+        intensity: WeatherIntensity;
+    }>({ weather: 'CLEAR', intensity: 'NORMAL' });
+    const [cameraAnimClass, setCameraAnimClass] = useState('');
+    const [flashState, setFlashState] = useState<{
+        color: 'WHITE' | 'RED' | null;
+        key: number;
+    }>({ color: null, key: 0 });
     const [isTypingDone, setIsTypingDone] = useState<boolean>(false);
     const [forceFinishKey, setForceFinishKey] = useState<number>(0);
     const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -507,6 +520,29 @@ export default function VNPlayer({
                 timeOfDay: nextClock.timeOfDay,
             }));
             setBlockIndex((prev) => prev + 1);
+        } else if (currentBlock.type === 'WEATHER_FX') {
+            setWeatherState({
+                weather: currentBlock.weather,
+                intensity: currentBlock.intensity,
+            });
+            setBlockIndex((prev) => prev + 1);
+            return;
+        } else if (currentBlock.type === 'CAMERA_FX') {
+            if (currentBlock.effect === 'SHAKE') {
+                setCameraAnimClass('animate-vn-cam-shake');
+                window.setTimeout(() => setCameraAnimClass(''), 480);
+            } else if (currentBlock.effect === 'ZOOM_PULSE') {
+                setCameraAnimClass('animate-vn-cam-zoom');
+                window.setTimeout(() => setCameraAnimClass(''), 520);
+            } else if (
+                currentBlock.effect === 'FLASH_WHITE' ||
+                currentBlock.effect === 'FLASH_RED'
+            ) {
+                const color = currentBlock.effect === 'FLASH_RED' ? 'RED' : 'WHITE';
+                setFlashState((prev) => ({ color, key: prev.key + 1 }));
+            }
+            setBlockIndex((prev) => prev + 1);
+            return;
         } else if (currentBlock.type === 'UNLOCK_ACHIEVEMENT') {
             const isNewlyUnlocked = saveAchievementToStorage(
                 storageKey,
@@ -606,6 +642,7 @@ export default function VNPlayer({
         setBlockIndex(0);
         setIsTypingDone(false);
         setForceFinishKey(0);
+        setWeatherState({ weather: 'CLEAR', intensity: 'NORMAL' });
     };
     const visibleBacklog: BacklogEntry[] = useMemo(() => {
         if (!currentScene || currentBlock?.type !== 'DIALOGUE') {
@@ -819,7 +856,7 @@ export default function VNPlayer({
             {/* 16:9 Visual Novel Stage */}
             <div
                 onClick={handleAdvanceDialogue}
-                className={`relative aspect-video w-full max-w-4xl overflow-hidden rounded-xl border border-slate-800 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 shadow-2xl select-none ${activeTheme.fontClass}`}
+                className={`relative aspect-video w-full max-w-4xl overflow-hidden rounded-xl border border-slate-800 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 shadow-2xl select-none ${activeTheme.fontClass} ${cameraAnimClass}`}
             >
                 {/* Background Layer */}
                 {backgroundUrl && (
@@ -863,6 +900,12 @@ export default function VNPlayer({
                         className={`pointer-events-none absolute inset-0 transition-colors duration-700 ${TIME_DISPLAY[clock.timeOfDay].tintClass}`}
                     />
                 )}
+                <StageFxOverlay
+                    weather={weatherState.weather}
+                    intensity={weatherState.intensity}
+                    flashColor={flashState.color}
+                    flashKey={flashState.key}
+                />
                 {/* Character Layer */}
                 {Object.values(characters).map((char) => (
                     <div
@@ -1021,6 +1064,34 @@ export default function VNPlayer({
                                 setBlockIndex(0);
                             }
                             return null;
+                        }}
+                    />
+                )}
+                {/* Word Cipher & Decryption Terminal Overlay */}
+                {currentBlock?.type === 'CIPHER_PUZZLE' && (
+                    <CipherStageOverlay
+                        title={interpolateVariables(currentBlock.title, variables)}
+                        clueText={interpolateVariables(currentBlock.clueText, variables)}
+                        secretPhrase={interpolateVariables(
+                            currentBlock.secretPhrase,
+                            variables
+                        )}
+                        maxWrongGuesses={currentBlock.maxWrongGuesses}
+                        theme={currentBlock.theme}
+                        isMuted={isMuted}
+                        onUnlock={() => {
+                            if (currentBlock.unlockSceneId) {
+                                goToScene(currentBlock.unlockSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                        onFailOut={() => {
+                            if (currentBlock.failSceneId) {
+                                goToScene(currentBlock.failSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
                         }}
                     />
                 )}

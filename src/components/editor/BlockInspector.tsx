@@ -27,6 +27,8 @@ import CircuitPuzzleInspector from './CircuitPuzzleInspector';
 import IdleTycoonInspector from './IdleTycoonInspector';
 import SlidingPuzzleInspector from './SlidingPuzzleInspector';
 import CraftingPuzzleInspector from './CraftingPuzzleInspector';
+import StageFxInspector from './StageFxInspector';
+import CipherPuzzleInspector from './CipherPuzzleInspector';
 
 interface BlockInspectorProps {
     block: SceneBlock | undefined;
@@ -285,6 +287,13 @@ export default function BlockInspector({
                     ))}
                 </div>
             )}
+            {block.type === 'CIPHER_PUZZLE' && (
+                <CipherPuzzleInspector
+                    block={block}
+                    allScenes={allScenes}
+                    onChange={onChange}
+                />
+            )}
             {block.type === 'CIRCUIT_PUZZLE' && (
                 <CircuitPuzzleInspector
                     block={block}
@@ -506,6 +515,9 @@ export default function BlockInspector({
             )}
             {block.type === 'UNLOCK_ACHIEVEMENT' && (
                 <AchievementBlockInspector block={block} onChange={onChange} />
+            )}
+            {(block.type === 'WEATHER_FX' || block.type === 'CAMERA_FX') && (
+                <StageFxInspector block={block} onChange={onChange} />
             )}
         </div>
     );

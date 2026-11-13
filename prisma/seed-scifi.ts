@@ -10,7 +10,7 @@ export async function seedSciFiEscapeDemo(prisma: PrismaClient) {
     data: {
       title: 'Starship Orion: Escape Protocol',
       description:
-        'Beat the 25-second reactor countdown! Crack the airlock PIN code and pass the AI security trivia to launch the escape pod.',
+        'Beat the 30-second reactor countdown! Crack the airlock PIN code and pass the AI security trivia to launch the escape pod.',
       theme: 'SCIFI',
       enableClock: false,
       isPublished: true,
@@ -34,9 +34,11 @@ export async function seedSciFiEscapeDemo(prisma: PrismaClient) {
         order: 0,
         nodePos: { x: 40, y: 180 },
         blocks: [
-          { id: 'sf_b1', type: 'BACKGROUND', assetUrl: '/assets/bg-night-sky.svg', transition: 'fade' },
+          { id: 'sf_b1', type: 'BACKGROUND', assetUrl: 'css:starship-bridge', transition: 'fade' },
           { id: 'sf_b2', type: 'PLAY_AUDIO', audioType: 'SFX', soundUrl: 'synth:alert', loop: false, action: 'play' },
-          { id: 'sf_b3', type: 'CHARACTER', name: 'A.I. Unit VEX', spriteUrl: '/assets/char-hero-blue.svg', position: 'center', action: 'enter', emotion: 'shocked', animation: 'shake' },
+          { id: 'sf_fx1', type: 'CAMERA_FX', effect: 'FLASH_RED', intensity: 'STRONG' },
+          { id: 'sf_fx2', type: 'CAMERA_FX', effect: 'SHAKE', intensity: 'STRONG' },
+          { id: 'sf_b3', type: 'CHARACTER', name: 'A.I. Unit VEX', spriteUrl: 'css:char-cyborg', position: 'center', action: 'enter', emotion: 'shocked', animation: 'shake' },
           { id: 'sf_b4', type: 'DIALOGUE', speaker: 'A.I. Unit VEX', text: 'WARNING: Hull breach detected! Bulkhead override PIN is 1984. You have 30 seconds!' },
           { id: 'sf_b5', type: 'TIMER', action: 'start', label: 'Reactor Overload', durationSeconds: 30, timeoutSceneId: sTimeout },
           {

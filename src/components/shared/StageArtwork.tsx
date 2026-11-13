@@ -1,12 +1,31 @@
 'use client';
 
 import React from 'react';
+import { CharacterEmotion, StageAnimation } from '@/lib/vn-schema';
 
 interface StageArtworkProps {
   assetUrl: string;
   alt: string;
   className?: string;
+  emotion?: CharacterEmotion;
+  animation?: StageAnimation;
 }
+
+const ANIM_CLASSES: Record<StageAnimation, string> = {
+  none: '',
+  'slide-in': 'animate-vn-slide-in',
+  bounce: 'animate-vn-bounce',
+  shake: 'animate-vn-shake',
+  pulse: 'animate-vn-pulse',
+};
+
+const EMOTION_BADGES: Record<CharacterEmotion, string> = {
+  neutral: '',
+  happy: '😊',
+  angry: '😠',
+  shocked: '😲',
+  sad: '😢',
+};
 
 const BG_STYLES: Record<string, string> = {
   'css:starry-night':
@@ -86,15 +105,19 @@ export default function StageArtwork({
   assetUrl,
   alt,
   className = '',
+  emotion = 'neutral',
+  animation = 'none',
 }: StageArtworkProps) {
   const cleanUrl = assetUrl.trim();
+  const animClass = ANIM_CLASSES[animation] ?? '';
+  const emotionIcon = EMOTION_BADGES[emotion] ?? '';
 
   if (cleanUrl in BG_STYLES) {
     return (
       <div
         role="img"
         aria-label={alt}
-        className={`relative overflow-hidden ${BG_STYLES[cleanUrl]} ${className}`}
+        className={`relative overflow-hidden ${BG_STYLES[cleanUrl]} ${animClass} ${className}`}
       >
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" />
       </div>
@@ -108,8 +131,13 @@ export default function StageArtwork({
         <div
           role="img"
           aria-label={alt}
-          className={`flex flex-col items-center justify-end pb-2 ${className}`}
+          className={`relative flex flex-col items-center justify-end pb-2 ${animClass} ${className}`}
         >
+          {emotionIcon && (
+            <span className="mb-1 rounded-full bg-slate-950/80 px-1.5 py-0.5 text-sm shadow">
+              {emotionIcon}
+            </span>
+          )}
           <div
             className={`relative flex h-24 w-28 items-center justify-center rounded-t-full rounded-b-2xl border-2 shadow-xl ${style.coat}`}
           >
@@ -126,12 +154,15 @@ export default function StageArtwork({
       <div
         role="img"
         aria-label={alt}
-        className={`flex flex-col items-center justify-end ${className}`}
+        className={`relative flex flex-col items-center justify-end ${animClass} ${className}`}
       >
+        {emotionIcon && (
+          <span className="mb-1 rounded-full bg-slate-950/80 px-1.5 py-0.5 text-sm shadow">
+            {emotionIcon}
+          </span>
+        )}
         <div className="relative flex flex-col items-center">
-          <div
-            className={`h-6 w-14 rounded-t-full ${style.hair}`}
-          />
+          <div className={`h-6 w-14 rounded-t-full ${style.hair}`} />
           <div className="flex h-12 w-12 items-center justify-center rounded-b-2xl border border-amber-200/40 bg-amber-100 shadow-md">
             <div className="flex gap-2.5">
               <span className="h-2 w-2 rounded-full bg-slate-900" />
@@ -148,5 +179,14 @@ export default function StageArtwork({
     );
   }
 
-  return <img src={cleanUrl} alt={alt} className={className} />;
+  return (
+    <div className={`relative inline-flex items-center justify-center ${animClass} ${className}`}>
+      {emotionIcon && (
+        <span className="absolute -top-6 rounded-full bg-slate-950/80 px-1.5 py-0.5 text-sm shadow">
+          {emotionIcon}
+        </span>
+      )}
+      <img src={cleanUrl} alt={alt} className="h-full w-full object-contain" />
+    </div>
+  );
 }

@@ -54,6 +54,8 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`IDLE_TYCOON` (Idle / Incremental Tycoon):** Embeds a cookie-clicker/tycoon generator game with unlimited upgrade tiers (`+X/sec` auto-generators and `+X/click` power boosters), `1x / 10x / MAX` geometric bulk-buy controls, big-number formatting (`K`, `M`, `B`, `T`, `Qa`), 3 deep 10-tier preset packs, global variable currency syncing, and optional story goal milestones.
 - **`SLIDING_PUZZLE` (Sliding Image & Rune Tile Puzzle):** Slices any built-in or uploaded artwork into a scrambled 3×3, 4×4, or 5×5 sliding tile puzzle—or switches to **Elder Arcane Runes**, **Numbers**, or **Cyber Glyphs**—with guaranteed-solvable shuffling, hold-to-peek goal preview, and optional move limits.
 - **`CRAFTING_PUZZLE` (Alchemy & Potion Mixing Lab):** Lets players select ingredients from an apothecary shelf, drop them into a cauldron, and brew secret 2-to-4 ingredient formulas—automatically adding the crafted item to their Backpack upon success and routing to Pass/Fail scenes.
+- **`CIPHER_PUZZLE` (Word Cipher & Decryption Terminal):** Challenges players to decode secret words or phrases letter-by-letter using an on-screen QWERTY keyboard or physical keys, complete with clue prompts, integrity attempt counters, 3 visual themes, and one-click cipher presets.
+
 
 #### Logic, Progression & World Systems
 - **`SET_VARIABLE`:** Modifies global project variables (`boolean`, `number`, `string`) using `set`, `add`, or `subtract` operations.
@@ -109,6 +111,7 @@ Running `npx prisma db seed` populates the Homepage and Public Arcade (`/explore
 7. **Asteroid Belt Tycoon: 10-Tier Idle (Idle / Incremental Tycoon):** Showcases the **10-Tier Space Mining Idle Tycoon (`IDLE_TYCOON`)** with `1x / 10x / MAX` bulk-buying, passive per-second income, and a 10,000 Star Credit goal milestone.
 8. **The Sunken Temple: Rune Vault (Sliding Image & Rune Puzzle):** Uses the **Fantasy Parchment** theme to challenge players with both a 3×3 **Image Slice Mosaic (`SLIDING_PUZZLE`)** and an **Elder Arcane Rune** tile lock.
 9. **The Alchemist's Apprentice: Potion Trial (Alchemy & Potion Mixing Lab):** Uses the **Fantasy Parchment** theme to challenge players to decipher a grimoire riddle, combine ingredients in the **Alchemy Cauldron (`CRAFTING_PUZZLE`)** to brew the *Elixir of True Sight*, and reveal a hidden doorway.
+10. **Signal Zero: Deep Space Cipher (Word Cipher & Decryption):** Uses the **Sci-Fi Terminal** theme to task players with decrypting an encrypted colony distress beacon on the **Quantum Decryptor (`CIPHER_PUZZLE`)**.
 
 
 ---

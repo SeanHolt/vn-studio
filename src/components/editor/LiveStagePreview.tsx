@@ -1,23 +1,25 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { SceneBlock, HotspotZone, CharacterEmotion, StageAnimation } from '@/lib/vn-schema';
+import { SceneBlock, HotspotZone } from '@/lib/vn-schema';
+import { VN_THEMES, VNThemeId } from '@/lib/vn-themes';
 import StageArtwork from '@/components/shared/StageArtwork';
-import { Eye } from 'lucide-react';
-import { getThemeConfig, VNThemeId } from '@/lib/vn-themes';
+import StageFxOverlay, {
+    WeatherType,
+    WeatherIntensity,
+} from '@/components/shared/StageFxOverlay';
+import { Eye, Sparkles } from 'lucide-react';
 
 interface LiveStagePreviewProps {
     blocks: SceneBlock[];
     selectedBlockId: string | null;
-    theme?: VNThemeId;
+    theme: VNThemeId;
 }
 
-interface PreviewChar {
+interface StagedChar {
     name: string;
     spriteUrl: string;
     position: 'left' | 'center' | 'right';
-    emotion: CharacterEmotion;
-    animation: StageAnimation;
 }
 
 export default function LiveStagePreview({
@@ -25,25 +27,31 @@ export default function LiveStagePreview({
     selectedBlockId,
     theme,
 }: LiveStagePreviewProps) {
-    const activeTheme = getThemeConfig(theme);
-    const stageState = useMemo(() => {
-        const selectedIndex = blocks.findIndex((b) => b.id === selectedBlockId);
-        const limitIndex = selectedIndex === -1 ? blocks.length - 1 : selectedIndex;
+    const themeCfg = VN_THEMES[theme] ?? VN_THEMES.MODERN;
 
-        let bgUrl = '';
-        const chars: Record<string, PreviewChar> = {};
-        let activeDialogue: { speaker: string; text: string } | null = null;
-        let activeChoice: { prompt?: string; labels: string[] } | null = null;
-        let activeHotspots: { promptText: string; zones: HotspotZone[] } | null = null;
+    const previewState = useMemo(() => {
+        let bgUrl = 'css:starry-night';
+        let speaker = '';
+        let dialogueText = '';
+        let activeHotspots: HotspotZone[] = [];
+        let weather: WeatherType = 'CLEAR';
+        let intensity: WeatherIntensity = 'NORMAL';
+        const chars: Record<string, StagedChar> = {};
 
-        for (let i = 0; i <= limitIndex && i < blocks.length; i++) {
-            const blk = blocks[i];
+        const stopIndex = selectedBlockId
+            ? blocks.findIndex((b) => b.id === selectedBlockId)
+            : blocks.length - 1;
+        const limit = stopIndex >= 0 ? stopIndex : blocks.length - 1;
+
+        for (let i = 0; i <= limit; i += 1) {
+            const blk = blocks.at(i);
             if (!blk) continue;
 
             if (blk.type === 'BACKGROUND') {
                 bgUrl = blk.assetUrl;
-            } else if (blk.type === 'HOTSPOT_ROOM') {
-                bgUrl = blk.backgroundUrl;
+            } else if (blk.type === 'WEATHER_FX') {
+                weather = blk.weather;
+                intensity = blk.intensity;
             } else if (blk.type === 'CHARACTER') {
                 if (blk.action === 'exit') {
                     delete chars[blk.name];
@@ -52,125 +60,102 @@ export default function LiveStagePreview({
                         name: blk.name,
                         spriteUrl: blk.spriteUrl,
                         position: blk.position,
-                        emotion: blk.emotion,
-                        animation: blk.animation,
                     };
                 }
-            }
-
-            if (i === limitIndex) {
-                if (blk.type === 'DIALOGUE') {
-                    activeDialogue = { speaker: blk.speaker, text: blk.text };
-                } else if (blk.type === 'CHOICE') {
-                    activeChoice = {
-                        prompt: blk.prompt,
-                        labels: blk.options.map((o) => o.label),
-                    };
-                } else if (blk.type === 'HOTSPOT_ROOM') {
-                    activeHotspots = {
-                        promptText: blk.promptText,
-                        zones: blk.hotspots,
-                    };
-                }
+            } else if (blk.type === 'DIALOGUE') {
+                speaker = blk.speaker;
+                dialogueText = blk.text;
+            } else if (blk.type === 'HOTSPOT_ROOM') {
+                bgUrl = blk.backgroundUrl;
+                activeHotspots = blk.hotspots;
             }
         }
 
         return {
             bgUrl,
-            chars: Object.values(chars),
-            activeDialogue,
-            activeChoice,
+            speaker,
+            dialogueText,
             activeHotspots,
+            weather,
+            intensity,
+            chars: Object.values(chars),
         };
     }, [blocks, selectedBlockId]);
-    const posMap: Record<'left' | 'center' | 'right', string> = {
-        left: 'left-6',
-        center: 'left-1/2 -translate-x-1/2',
-        right: 'right-6',
+
+    const posClass = (pos: 'left' | 'center' | 'right') => {
+        if (pos === 'left') return 'left-6';
+        if (pos === 'right') return 'right-6';
+        return 'left-1/2 -translate-x-1/2';
     };
 
     return (
-        <div className="mb-5 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-lg">
-            <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-3 py-1.5 text-[11px] font-medium text-slate-400">
-                <span className="flex items-center gap-1.5 text-indigo-400">
+        <div className="mb-4 rounded-xl border border-slate-800 bg-slate-950 p-3 shadow-inner">
+            <div className="mb-2 flex items-center justify-between text-[11px] text-slate-400">
+                <span className="flex items-center gap-1.5 font-semibold text-indigo-400">
                     <Eye className="h-3.5 w-3.5" /> Live Stage Preview
                 </span>
-                <span>Updates as you select or edit blocks</span>
+                <span className="flex items-center gap-1 font-mono text-[10px] text-slate-500">
+                    <Sparkles className="h-3 w-3 text-indigo-400" /> {themeCfg.label}
+                </span>
             </div>
 
-            <div className={`relative aspect-video w-full overflow-hidden bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 ${activeTheme.fontClass}`}>
-                {stageState.bgUrl && (
-                    <StageArtwork
-                        assetUrl={stageState.bgUrl}
-                        alt="Preview background"
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
-                )}
+            <div
+                className={`relative aspect-video w-full overflow-hidden rounded-lg border border-slate-800 ${themeCfg.fontClass}`}
+            >
+                <StageArtwork
+                    assetUrl={previewState.bgUrl}
+                    alt="Stage Preview"
+                    className="absolute inset-0 h-full w-full object-cover"
+                />
 
-                {stageState.chars.map((c) => (
+                <StageFxOverlay
+                    weather={previewState.weather}
+                    intensity={previewState.intensity}
+                />
+
+                {previewState.chars.map((char) => (
                     <div
-                        key={c.name}
-                        className={`absolute bottom-14 transition-all duration-200 ${posMap[c.position]}`}
+                        key={char.name}
+                        className={`absolute bottom-14 z-10 h-28 w-20 transition-all ${posClass(
+                            char.position
+                        )}`}
                     >
                         <StageArtwork
-                            assetUrl={c.spriteUrl}
-                            alt={c.name}
-                            className="h-32 w-20 object-contain drop-shadow-md"
-                            emotion={c.emotion}
-                            animation={c.animation}
+                            assetUrl={char.spriteUrl}
+                            alt={char.name}
+                            className="h-full w-full object-contain"
                         />
                     </div>
                 ))}
 
-                {stageState.activeHotspots && (
-                    <div className="absolute inset-0 z-10">
-                        <div className="absolute top-2 left-1/2 -translate-x-1/2 rounded-full border border-slate-700/80 bg-slate-950/85 px-3 py-0.5 text-[10px] font-medium text-slate-200">
-                            {stageState.activeHotspots.promptText}
-                        </div>
-
-                        {stageState.activeHotspots.zones.map((zone) => (
-                            <div
-                                key={zone.id}
-                                style={{
-                                    left: `${zone.x}%`,
-                                    top: `${zone.y}%`,
-                                    width: `${zone.width}%`,
-                                    height: `${zone.height}%`,
-                                }}
-                                className="absolute flex items-center justify-center rounded border-2 border-dashed border-amber-400 bg-amber-400/20"
-                            >
-                                <span className="truncate rounded bg-slate-950/90 px-1.5 py-0.5 text-[9px] font-semibold text-amber-200">
-                                    {zone.label}
-                                </span>
-                            </div>
-                        ))}
+                {previewState.activeHotspots.map((hz) => (
+                    <div
+                        key={hz.id}
+                        style={{
+                            left: `${hz.x}%`,
+                            top: `${hz.y}%`,
+                            width: `${hz.width}%`,
+                            height: `${hz.height}%`,
+                        }}
+                        className="absolute z-10 flex items-center justify-center rounded border border-dashed border-amber-400/80 bg-amber-500/15 text-[9px] font-bold text-amber-200"
+                    >
+                        {hz.label}
                     </div>
-                )}
+                ))}
 
-                {stageState.activeChoice && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-1.5 bg-slate-950/70 p-4">
-                        {stageState.activeChoice.prompt && (
-                            <div className="text-xs font-semibold text-white">
-                                {stageState.activeChoice.prompt}
+                {previewState.dialogueText && (
+                    <div
+                        className={`absolute inset-x-3 bottom-2 z-20 rounded-lg border p-2.5 backdrop-blur-md ${themeCfg.dialogueBoxClass}`}
+                    >
+                        {previewState.speaker && (
+                            <div
+                                className={`mb-0.5 text-[10px] font-bold ${themeCfg.speakerClass}`}
+                            >
+                                {previewState.speaker}
                             </div>
                         )}
-                        {stageState.activeChoice.labels.map((lbl, idx) => (
-                            <div
-                                key={idx}
-                                className={`w-full max-w-xs px-3 py-1.5 text-center text-[11px] ${activeTheme.choiceButtonClass}`}
-                            >
-                                {lbl}
-                            </div>
-                        ))}                    </div>
-                )}
-
-                {stageState.activeDialogue && (
-                    <div className={`absolute inset-x-3 bottom-3 z-10 p-3 ${activeTheme.dialogueBoxClass}`}>
-                        <div className={`text-[11px] ${activeTheme.speakerClass}`}>
-                            {stageState.activeDialogue.speaker}
-                        </div>
-                        <p className={`mt-0.5 line-clamp-2 text-xs ${activeTheme.dialogueTextClass}`}>
-                            {stageState.activeDialogue.text}
+                        <p className="line-clamp-2 text-xs leading-snug text-slate-100">
+                            {previewState.dialogueText}
                         </p>
                     </div>
                 )}

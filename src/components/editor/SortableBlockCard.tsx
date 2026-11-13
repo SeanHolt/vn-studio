@@ -32,6 +32,9 @@ import {
     Coins,
     Grid,
     FlaskConical,
+    Camera,
+    CloudRain,
+    Terminal,
 } from 'lucide-react';
 
 interface SortableBlockCardProps {
@@ -219,6 +222,24 @@ export default function SortableBlockCard({
                         Alchemy Lab: Brew <strong>{block.craftedItemName}</strong>
                     </span>
                 );
+            case 'WEATHER_FX':
+                return (
+                    <span className="text-sky-300">
+                        Weather: <strong>{block.weather}</strong> ({block.intensity})
+                    </span>
+                );
+            case 'CAMERA_FX':
+                return (
+                    <span className="text-amber-300">
+                        Camera FX: <strong>{block.effect}</strong>
+                    </span>
+                );
+            case 'CIPHER_PUZZLE':
+                return (
+                    <span className="text-cyan-300">
+                        Word Cipher: <strong>{block.secretPhrase}</strong>
+                    </span>
+                );
         }
     };
 
@@ -248,6 +269,9 @@ export default function SortableBlockCard({
         IDLE_TYCOON: <Coins className="h-4 w-4 text-amber-400" />,
         SLIDING_PUZZLE: <Grid className="h-4 w-4 text-purple-400" />,
         CRAFTING_PUZZLE: <FlaskConical className="h-4 w-4 text-emerald-400" />,
+        WEATHER_FX: <CloudRain className="h-4 w-4 text-sky-400" />,
+        CAMERA_FX: <Camera className="h-4 w-4 text-amber-400" />,
+        CIPHER_PUZZLE: <Terminal className="h-4 w-4 text-cyan-400" />,
     };
 
     return (

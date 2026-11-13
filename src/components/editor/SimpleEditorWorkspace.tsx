@@ -288,6 +288,31 @@ export default function SimpleEditorWorkspace({
                 description: 'Discovered a hidden clue!',
                 icon: '🏆',
             });
+        } else if (type === 'WEATHER_FX') {
+            store.addBlock({
+                id,
+                type,
+                weather: 'RAIN',
+                intensity: 'NORMAL',
+            });
+        } else if (type === 'CAMERA_FX') {
+            store.addBlock({
+                id,
+                type,
+                effect: 'SHAKE',
+                intensity: 'STRONG',
+            });
+        } else if (type === 'CIPHER_PUZZLE') {
+            store.addBlock({
+                id,
+                type,
+                title: 'Starfleet Quantum Decryptor',
+                clueText: 'Hidden rendezvous sector beyond the asteroid belt.',
+                secretPhrase: 'ORION NEBULA',
+                maxWrongGuesses: 6,
+                theme: 'SCIFI',
+                unlockSceneId: fallbackScene,
+            });
         } else if (type === 'SLIDING_PUZZLE') {
             store.addBlock({
                 id,
