@@ -1,3 +1,4 @@
+
 import React, { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
@@ -5,12 +6,14 @@ import { auth } from '@/auth';
 import { SceneBlockSchema, SceneType } from '@/lib/vn-schema';
 import { VNThemeId } from '@/lib/vn-themes';
 import VNPlayer from '@/components/player/VNPlayer';
+import { connection } from 'next/server';
 
 interface PlayPageProps {
   params: Promise<{ projectId: string }>;
 }
 
 async function PlayProjectLoader({ params }: PlayPageProps) {
+  await connection();
   const { projectId } = await params;
   const session = await auth();
   const userId = session?.user?.id ?? null;

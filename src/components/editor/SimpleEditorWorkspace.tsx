@@ -38,6 +38,7 @@ import {
     Layers,
     Trash2,
     ListTree,
+    Search,
     Copy,
     Workflow,
     Globe,
@@ -51,6 +52,7 @@ import StoryValidatorModal from './StoryValidatorModal';
 import { generateSolvableBoard } from '@/lib/vn-circuit';
 import { instantiateIdlePreset } from '@/lib/vn-idle';
 import { CRAFTING_PRESETS } from '@/lib/vn-crafting';
+import { detectSceneGenreBadge } from '@/lib/vn-scene-badge';
 
 function createUniqueId(prefix: string): string {
     return `${prefix}_${crypto.randomUUID()}`;
@@ -88,6 +90,7 @@ export default function SimpleEditorWorkspace({
     const [isPublishing, startPublishTransition] = useTransition();
     const store = useEditorStore();
     const [showValidator, setShowValidator] = useState(false);
+    const [sceneSearch, setSceneSearch] = useState('');
     const validationIssues = validateProjectStory(store.scenes);
     useEffect(() => {
         store.initProject(
@@ -101,7 +104,15 @@ export default function SimpleEditorWorkspace({
         store.setAssets(initialAssets);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projectId]);
-
+    const filteredScenes = store.scenes.filter((scene) => {
+        const query = sceneSearch.trim().toLowerCase();
+        if (!query) return true;
+        const badge = detectSceneGenreBadge(scene.blocks, scene.sceneType);
+        return (
+            scene.name.toLowerCase().includes(query) ||
+            badge.label.toLowerCase().includes(query)
+        );
+    });
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
     );
@@ -588,10 +599,24 @@ export default function SimpleEditorWorkspace({
                             <Plus className="h-3.5 w-3.5" /> New
                         </button>
                     </div>
-
+                    <div className="relative mb-2">
+                        <Search className="pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+                        <input
+                            type="text"
+                            placeholder="Filter scenes or genres..."
+                            value={sceneSearch}
+                            onChange={(e) => setSceneSearch(e.target.value)}
+                            className="w-full rounded-lg border border-slate-800 bg-slate-950 py-1.5 pr-2.5 pl-8 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                        />
+                    </div>
                     <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto">
-                        {store.scenes.map((scene) => {
+                        {filteredScenes.map((scene) => {
                             const isActive = scene.id === store.activeSceneId;
+                            const badge = detectSceneGenreBadge(
+                                scene.blocks,
+                                scene.sceneType
+                            );
+
                             return (
                                 <div
                                     key={scene.id}
@@ -604,8 +629,10 @@ export default function SimpleEditorWorkspace({
                                     <span className="truncate pr-2">{scene.name}</span>
 
                                     <div className="flex shrink-0 items-center gap-1.5">
-                                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">
-                                            {scene.sceneType}
+                                        <span
+                                            className={`rounded border px-1.5 py-0.5 font-mono text-[10px] font-extrabold ${badge.badgeClass}`}
+                                        >
+                                            {badge.label}
                                         </span>
                                         <button
                                             type="button"
@@ -637,6 +664,7 @@ export default function SimpleEditorWorkspace({
                         })}
                     </div>
                 </aside>
+
                 <main className="col-span-6 flex flex-col overflow-hidden">
                     {editorMode === 'ADVANCED' ? (
                         <SceneNodeGraph

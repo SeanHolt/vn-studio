@@ -18,6 +18,11 @@ export default function TypewriterText({
   const [visibleCount, setVisibleCount] = useState(0);
   const [prevText, setPrevText] = useState(text);
   const completedTextRef = useRef('');
+  const onCompleteRef = useRef(onCompleteChange);
+
+  useEffect(() => {
+    onCompleteRef.current = onCompleteChange;
+  });
 
   if (text !== prevText) {
     setPrevText(text);
@@ -26,31 +31,31 @@ export default function TypewriterText({
 
   useEffect(() => {
     completedTextRef.current = '';
-    onCompleteChange?.(false);
+    onCompleteRef.current?.(false);
 
     if (!text) {
       completedTextRef.current = text;
-      onCompleteChange?.(true);
+      onCompleteRef.current?.(true);
       return;
     }
 
+    let current = 0;
     const timer = window.setInterval(() => {
-      setVisibleCount((prev) => {
-        const next = prev + 1;
-        if (next >= text.length) {
-          window.clearInterval(timer);
-          if (completedTextRef.current !== text) {
-            completedTextRef.current = text;
-            onCompleteChange?.(true);
-          }
-          return text.length;
+      current += 1;
+      if (current >= text.length) {
+        window.clearInterval(timer);
+        setVisibleCount(text.length);
+        if (completedTextRef.current !== text) {
+          completedTextRef.current = text;
+          onCompleteRef.current?.(true);
         }
-        return next;
-      });
+      } else {
+        setVisibleCount(current);
+      }
     }, speedMs);
 
     return () => window.clearInterval(timer);
-  }, [text, speedMs, onCompleteChange]);
+  }, [text, speedMs]);
 
   useEffect(() => {
     if (forceFinishKey <= 0) return;
@@ -58,11 +63,11 @@ export default function TypewriterText({
       setVisibleCount(text.length);
       if (completedTextRef.current !== text) {
         completedTextRef.current = text;
-        onCompleteChange?.(true);
+        onCompleteRef.current?.(true);
       }
     }, 0);
     return () => window.clearTimeout(finishTimer);
-  }, [forceFinishKey, text, onCompleteChange]);
+  }, [forceFinishKey, text]);
 
   return <span>{text.slice(0, visibleCount)}</span>;
 }

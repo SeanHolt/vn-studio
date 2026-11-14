@@ -13,7 +13,6 @@ import {
     getGallerySnapshot,
     getGalleryServerSnapshot,
     saveAchievementToStorage,
-    saveEndingToStorage,
 } from '@/lib/vn-gallery-storage';
 import {
     SceneBlock,
@@ -22,6 +21,8 @@ import {
     CharacterEmotion,
     StageAnimation,
 } from '@/lib/vn-schema';
+import Link from 'next/link';
+import { ArrowLeft, Compass } from 'lucide-react';
 import {
     GameVariables,
     evaluateCondition,
@@ -55,7 +56,6 @@ import {
     getSaveSlotsSnapshot,
     getServerSaveSlotsSnapshot,
     writeSaveSlot,
-    deleteSaveSlot,
     SaveSlotSnapshot,
 } from '@/lib/vn-save-storage';
 import SaveLoadModal from './SaveLoadModal';
@@ -100,27 +100,27 @@ interface ActiveCharacter {
 }
 
 interface VNPlayerProps {
-  projectId: string;
-  title: string;
-  theme?: VNThemeId;
-  enableClock?: boolean;
-  canDebug?: boolean;
-  isSignedIn?: boolean;
-  startSceneId: string;
-  initialVariables: Record<string, string | number | boolean>;
-  scenes: PlayableScene[];
+    projectId: string;
+    title: string;
+    theme?: VNThemeId;
+    enableClock?: boolean;
+    canDebug?: boolean;
+    isSignedIn?: boolean;
+    startSceneId: string;
+    initialVariables: Record<string, string | number | boolean>;
+    scenes: PlayableScene[];
 }
 
 export default function VNPlayer({
-  projectId,
-  title,
-  theme = 'MODERN',
-  enableClock = false,
-  canDebug = false,
-  isSignedIn = false,
-  startSceneId,
-  initialVariables,
-  scenes,
+    projectId,
+    title,
+    theme = 'MODERN',
+    enableClock = false,
+    canDebug = false,
+    isSignedIn = false,
+    startSceneId,
+    initialVariables,
+    scenes,
 }: VNPlayerProps) {
     const activeTheme = getThemeConfig(theme);
     const [showDebugger, setShowDebugger] = useState(false);
@@ -737,7 +737,18 @@ export default function VNPlayer({
         <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 p-4 text-slate-100">
             {/* Top Header & HUD Controls */}
             <div className="mb-3 flex w-full max-w-4xl flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-800 bg-slate-900 px-4 py-2 text-sm">
-                <div className="flex items-center gap-2 font-semibold text-indigo-400">
+                <div className="flex items-center gap-2.5 font-semibold text-indigo-400">
+                    <Link
+                        href="/explore"
+                        onClick={() => {
+                            bgmCleanupRef.current?.();
+                            bgmCleanupRef.current = null;
+                        }}
+                        className="inline-flex items-center gap-1 rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200 transition hover:border-indigo-500/60 hover:bg-indigo-600 hover:text-white"
+                    >
+                        <ArrowLeft className="h-3.5 w-3.5" />
+                        <span>Arcade</span>
+                    </Link>
                     <Sparkles className="h-4 w-4" />
                     <span>{title}</span>
                     <span className="text-slate-500">/ {currentScene.name}</span>
@@ -768,6 +779,7 @@ export default function VNPlayer({
                         <Heart className="h-3.5 w-3.5 text-rose-400" /> Bonds (
                         {Object.keys(affinity).length})
                     </button>
+
                     <button
                         type="button"
                         onClick={() => setShowGallery(true)}

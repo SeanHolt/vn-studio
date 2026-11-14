@@ -32,6 +32,7 @@ Creators can toggle seamlessly between two synchronized editing views at any tim
 - **Multi-Genre Scene Management:** Create new scenes, rename scenes, switch scene types (`TITLE`, `DIALOGUE`, `HOTSPOT`, `TOPDOWN`, `BATTLE`, `ENDING`), and delete scenes with a minimum one-scene safety guard.
 - **Dead-End & Broken-Link Validator (`Validate`):** Scans every scene and block across the project to detect missing destination scene IDs, empty choices, non-ending dead-end scenes, and unreachable orphan scenes—with one-click jump-to-fix navigation.
 - **One-Click Block Duplication & Scene Cloning:** Every block card and scene row includes a **Duplicate** button that deep-clones the block or entire scene with fresh unique IDs right below the original.
+- **Scene Genre Badges & Quick Search Sidebar:** Automatically labels every scene in the editor sidebar with color-coded genre pills (`RPG`, `BATTLE`, `IDLE`, `CRAFT`, `CIPHER`, `DUEL`, `QUIZ`, `ROOM`, `PUZZLE`, `END`, `STORY`) paired with an instant search filter by title or genre.
 
 ### 2. Multi-Genre Playable Block System
 
