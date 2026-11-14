@@ -138,7 +138,7 @@ function remapBlockSceneIds(
         ...blk,
         id: newId,
         passSceneId: idMap.get(blk.passSceneId) ?? blk.passSceneId,
-        failSceneId: idMap.get(blk.failSceneId) ?? blk.failSceneId,
+        failSceneId: blk.failSceneId ? idMap.get(blk.failSceneId) ?? blk.failSceneId : undefined,
       };
     }
     if (blk.type === "QTE_ACTION") {

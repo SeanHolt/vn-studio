@@ -391,11 +391,13 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
   z.object({
     id: z.string(),
     type: z.literal("QUIZ_CHALLENGE"),
-    title: z.string().default("Knowledge Trial"),
-    passingScore: z.number().min(1).max(50).default(3),
+    title: z.string().default("Knowledge Challenge"),
+    passingScore: z.number().min(1).default(3),
+    enableFiftyFifty: z.boolean().default(true),
+    secondsPerQuestion: z.number().min(0).max(120).default(0),
     questions: z.array(QuizQuestionSchema).min(1),
     passSceneId: z.string(),
-    failSceneId: z.string(),
+    failSceneId: z.string().optional(),
   }),
   z.object({
     id: z.string(),

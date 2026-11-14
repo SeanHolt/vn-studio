@@ -43,7 +43,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`CHARACTER`:** Stages characters at `left`, `center`, or `right` positions with `enter`/`exit` actions, **5 expressions** (`neutral`, `happy`, `angry`, `shocked`, `sad`), and **5 stage animations** (`none`, `slide-in`, `bounce`, `shake`, `pulse`).
 - **`CHOICE`:** Presents branching player decisions with optional **variable condition rules** (`==`, `!=`, `>`, `<`, `>=`, `<=`) and **required inventory item** locks.
 - **`INPUT_TEXT`:** Prompts the player to type their name or a secret password and saves their response directly into a game variable.
-- **`QUIZ_CHALLENGE` (Trivia & Riddle Trials):** Embeds a multi-question multiple-choice quiz or riddle challenge with instant answer explanations, synth audio feedback, score tracking (`quizScore`), Pass/Fail scene routing, and a built-in **20-question preset bank** covering **Sci-Fi Movies**, **Fantasy Movies**, **Sci-Fi & Fantasy TV**, and **Classic Riddles**.
+- **`QUIZ_CHALLENGE` (Trivia & Riddles Mini-Game):** Presents interactive multi-question trivia or riddles with **50/50 Lifeline hints**, optional **Per-Question Countdown Timers**, 5 built-in pop-culture/riddle question packs, passing score thresholds, and Pass/Fail branching.
 - **`CARD_DUEL` (Tactical Card Clash):** Lets players face off in multi-round elemental card battles (**Elemental Sorcery**, **Cyber Netrunner**, **Sky Pirate Fleet**, or a **Custom Card Builder** deck) with a **Mana Charge Ultimate Surge (+4 Power)** ability and rock-paper-scissors elemental bonuses.
 
 #### Interactive Game Genres & Mini-Games

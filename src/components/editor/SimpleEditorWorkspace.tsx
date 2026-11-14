@@ -395,11 +395,12 @@ export default function SimpleEditorWorkspace({
             store.addBlock({
                 id,
                 type,
-                title: 'Sci-Fi & Fantasy Trial',
+                title: 'Knowledge Challenge',
                 passingScore: 3,
+                enableFiftyFifty: true,
+                secondsPerQuestion: 0,
                 questions: buildPresetQuestions('MIXED'),
                 passSceneId: fallbackScene,
-                failSceneId: fallbackScene,
             });
         }
     };

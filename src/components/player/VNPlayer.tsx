@@ -1261,15 +1261,20 @@ export default function VNPlayer({
                     <QuizStageOverlay
                         title={interpolateVariables(currentBlock.title, variables)}
                         passingScore={currentBlock.passingScore}
+                        enableFiftyFifty={currentBlock.enableFiftyFifty ?? true}
+                        secondsPerQuestion={currentBlock.secondsPerQuestion ?? 0}
                         questions={currentBlock.questions}
                         isMuted={isMuted}
-                        onQuizComplete={(passed, score) => {
-                            setVariables((prev) => ({ ...prev, quizScore: score }));
-                            const nextScene = passed
-                                ? currentBlock.passSceneId
-                                : currentBlock.failSceneId;
-                            if (nextScene) {
-                                goToScene(nextScene);
+                        onPass={() => {
+                            if (currentBlock.passSceneId) {
+                                goToScene(currentBlock.passSceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                        onFail={() => {
+                            if (currentBlock.failSceneId) {
+                                goToScene(currentBlock.failSceneId);
                             } else {
                                 setBlockIndex((prev) => prev + 1);
                             }
