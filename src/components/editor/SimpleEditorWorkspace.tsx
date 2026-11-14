@@ -49,6 +49,7 @@ import { validateProjectStory } from '@/lib/vn-validator';
 import StoryValidatorModal from './StoryValidatorModal';
 import { generateSolvableBoard } from '@/lib/vn-circuit';
 import { instantiateIdlePreset } from '@/lib/vn-idle';
+import { CRAFTING_PRESETS } from '@/lib/vn-crafting';
 
 function createUniqueId(prefix: string): string {
     return `${prefix}_${crypto.randomUUID()}`;
@@ -390,6 +391,24 @@ export default function SimpleEditorWorkspace({
                 secretCode: '1984',
                 maxAttempts: 0,
                 unlockSceneId: fallbackScene,
+            });
+        } else if (type === 'CRAFTING_PUZZLE') {
+            const preset = CRAFTING_PRESETS.TRUE_SIGHT;
+            store.addBlock({
+                id,
+                type,
+                title: preset.title,
+                recipePrompt: preset.recipePrompt,
+                hintText: preset.hintText,
+                availableIngredients: [...preset.availableIngredients],
+                requiredIngredients: [...preset.requiredIngredients],
+                craftedItemName: preset.craftedItemName,
+                bonusRecipes: preset.bonusRecipes.map((b) => ({
+                    ...b,
+                    id: `br_${crypto.randomUUID()}`,
+                })),
+                maxAttempts: 0,
+                successSceneId: fallbackScene,
             });
         } else if (type === 'QUIZ_CHALLENGE') {
             store.addBlock({

@@ -12,7 +12,7 @@ export async function seedCraftingDemo(prisma: PrismaClient) {
     data: {
       title: "The Alchemist's Apprentice: Potion Trial",
       description:
-        'Read the Master Alchemist’s riddle, combine magical ingredients in the cauldron to brew the Elixir of True Sight, and reveal the hidden doorway!',
+        'Discover secret bonus elixirs in your Potion Grimoire, then brew the Elixir of True Sight to reveal the hidden doorway!',
       theme: 'FANTASY',
       enableClock: false,
       isPublished: true,
@@ -39,9 +39,9 @@ export async function seedCraftingDemo(prisma: PrismaClient) {
         order: 0,
         nodePos: { x: 40, y: 180 },
         blocks: [
-          { id: 'cr_b1', type: 'BACKGROUND', assetUrl: '/assets/bg-forest-mist.svg', transition: 'fade' },
-          { id: 'cr_b2', type: 'CHARACTER', name: 'Master Aurelia', spriteUrl: '/assets/char-mage-violet.svg', position: 'center', action: 'enter', emotion: 'happy', animation: 'slide-in', voiceStyle: 'MYSTIC' },
-          { id: 'cr_b3', type: 'DIALOGUE', speaker: 'Master Aurelia', text: 'To pass your final exam, brew the Elixir of True Sight! Remember: pair the flower that blooms under moonlight with the ashes of a reborn phoenix.', voiceStyle: 'MYSTIC' },
+          { id: 'cr_b1', type: 'BACKGROUND', assetUrl: 'css:alchemy-lab', transition: 'fade' },
+          { id: 'cr_b2', type: 'CHARACTER', name: 'Master Aurelia', spriteUrl: 'css:char-alchemist', position: 'center', action: 'enter', emotion: 'happy', animation: 'slide-in', voiceStyle: 'MYSTIC' },
+          { id: 'cr_b3', type: 'DIALOGUE', speaker: 'Master Aurelia', text: 'Check your Potion Grimoire on the right! You can discover bonus tonics for your Backpack before brewing the Elixir of True Sight!', voiceStyle: 'MYSTIC' },
           {
             id: 'cr_b4',
             type: 'CHOICE',
@@ -69,7 +69,11 @@ export async function seedCraftingDemo(prisma: PrismaClient) {
             availableIngredients: [...preset.availableIngredients],
             requiredIngredients: [...preset.requiredIngredients],
             craftedItemName: preset.craftedItemName,
-            maxAttempts: 4,
+            bonusRecipes: preset.bonusRecipes.map((b, idx) => ({
+              ...b,
+              id: `cr_bonus_${idx}`,
+            })),
+            maxAttempts: 5,
             successSceneId: sHiddenDoor,
             failSceneId: sSmoke,
           },

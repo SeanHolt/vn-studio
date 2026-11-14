@@ -1133,8 +1133,14 @@ export default function VNPlayer({
                         availableIngredients={currentBlock.availableIngredients}
                         requiredIngredients={currentBlock.requiredIngredients}
                         craftedItemName={currentBlock.craftedItemName}
+                        bonusRecipes={currentBlock.bonusRecipes ?? []}
                         maxAttempts={currentBlock.maxAttempts}
                         isMuted={isMuted}
+                        onBonusCrafted={(bonusItem) => {
+                            setInventory((prev) =>
+                                prev.includes(bonusItem) ? prev : [...prev, bonusItem]
+                            );
+                        }}
                         onCraftSuccess={(craftedItem) => {
                             setInventory((prev) =>
                                 prev.includes(craftedItem) ? prev : [...prev, craftedItem]

@@ -18,6 +18,14 @@ export const BattleElementSchema = z.enum([
   "LIGHTNING",
 ]);
 export type BattleElement = z.infer<typeof BattleElementSchema>;
+export const BonusPotionRecipeSchema = z.object({
+  id: z.string(),
+  potionName: z.string().min(1),
+  ingredients: z.array(z.string().min(1)).min(2).max(4),
+  clue: z.string().optional(),
+});
+
+export type BonusPotionRecipe = z.infer<typeof BonusPotionRecipeSchema>;
 export const CustomDuelCardSchema = z.object({
   id: z.string(),
   name: z.string().min(1),
@@ -132,6 +140,7 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
     availableIngredients: z.array(z.string().min(1)).min(3).max(8),
     requiredIngredients: z.array(z.string().min(1)).min(2).max(4),
     craftedItemName: z.string().min(1).default("Elixir of True Sight"),
+    bonusRecipes: z.array(BonusPotionRecipeSchema).default([]),
     maxAttempts: z.number().min(0).max(15).default(0),
     successSceneId: z.string(),
     failSceneId: z.string().optional(),

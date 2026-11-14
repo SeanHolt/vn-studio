@@ -1,3 +1,5 @@
+import { BonusPotionRecipe } from './vn-schema';
+
 export interface CraftingPreset {
   label: string;
   title: string;
@@ -6,6 +8,7 @@ export interface CraftingPreset {
   availableIngredients: string[];
   requiredIngredients: string[];
   craftedItemName: string;
+  bonusRecipes: Omit<BonusPotionRecipe, 'id'>[];
 }
 
 const INGREDIENT_ICONS: Record<string, string> = {
@@ -43,12 +46,12 @@ export const CRAFTING_PRESETS: Record<
   CraftingPreset
 > = {
   TRUE_SIGHT: {
-    label: '🔮 Elixir of True Sight (Fantasy)',
+    label: '🔮 Elixir of True Sight + 2 Bonus Potions',
     title: 'Arcane Alchemy Cauldron',
     recipePrompt:
-      'Mix 2 glowing ingredients to brew the Elixir of True Sight!',
+      'Mix 2 ingredients to brew the Elixir of True Sight (or discover bonus potions in your Grimoire)!',
     hintText:
-      'Combine the flower that blooms at night with the dust of a blazing bird.',
+      'Main Formula: Pair the flower that blooms at night with the dust of a blazing bird.',
     availableIngredients: [
       'Moonpetal',
       'Phoenix Ash',
@@ -59,14 +62,26 @@ export const CRAFTING_PRESETS: Record<
     ],
     requiredIngredients: ['Moonpetal', 'Phoenix Ash'],
     craftedItemName: 'Elixir of True Sight',
+    bonusRecipes: [
+      {
+        potionName: 'Dragonfire Tonic',
+        ingredients: ['Dragon Scale', 'Phoenix Ash'],
+        clue: 'Combine the scales of a wyrm with blazing ashes.',
+      },
+      {
+        potionName: 'Forest Mist Salve',
+        ingredients: ['Crystal Dew', 'Glowing Moss'],
+        clue: 'Mix pure morning dew with luminous cavern moss.',
+      },
+    ],
   },
   ANTIDOTE: {
-    label: '🌿 Forest Starlight Antidote (Fantasy)',
+    label: '🌿 Forest Starlight Antidote + Bonus Tonic',
     title: 'Herbalist Mortar & Cauldron',
     recipePrompt:
       'Combine 3 purifying ingredients to cure the Whispering Curse!',
     hintText:
-      'You need pure water, forest moss, and stardust to neutralize the shadow.',
+      'Main Formula: Pure water, forest moss, and stardust neutralize the shadow.',
     availableIngredients: [
       'Crystal Dew',
       'Glowing Moss',
@@ -77,14 +92,21 @@ export const CRAFTING_PRESETS: Record<
     ],
     requiredIngredients: ['Crystal Dew', 'Glowing Moss', 'Stardust Vial'],
     craftedItemName: 'Starlight Antidote',
+    bonusRecipes: [
+      {
+        potionName: 'Solar Flare Draught',
+        ingredients: ['Sunstone Dust', 'Phoenix Ash'],
+        clue: 'Two fiery ingredients bottled together.',
+      },
+    ],
   },
   PLASMA_CELL: {
-    label: '⚡ Overcharged Plasma Cell (Sci-Fi)',
+    label: '⚡ Overcharged Plasma Cell + Bonus Coolant',
     title: 'Molecular Synthesis Bench',
     recipePrompt:
       'Synthesize 2 energy compounds to stabilize a Plasma Cell!',
     hintText:
-      'Pair raw plasma energy with cooling cryo gel so it does not overheat.',
+      'Main Formula: Pair raw plasma energy with cooling cryo gel.',
     availableIngredients: [
       'Plasma Core',
       'Cryo Gel',
@@ -95,5 +117,12 @@ export const CRAFTING_PRESETS: Record<
     ],
     requiredIngredients: ['Plasma Core', 'Cryo Gel'],
     craftedItemName: 'Overcharged Plasma Cell',
+    bonusRecipes: [
+      {
+        potionName: 'Magnetic Flux Relay',
+        ingredients: ['Copper Coil', 'Plasma Core'],
+        clue: 'Wrap copper coils around a live plasma core.',
+      },
+    ],
   },
 };
