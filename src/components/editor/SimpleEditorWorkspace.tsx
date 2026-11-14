@@ -263,11 +263,14 @@ export default function SimpleEditorWorkspace({
             store.addBlock({
                 id,
                 type,
+                title: 'Arcane Card Showdown',
                 opponentName: 'Archmage Lyra',
                 deckTheme: 'ELEMENTAL',
+                customCards: [],
+                enableManaUltimate: true,
+                ultimateName: 'Astral Overdrive',
                 roundsToWin: 2,
                 victorySceneId: fallbackScene,
-                defeatSceneId: fallbackScene,
             });
         } else if (type === 'CHOICE') {
             store.addBlock({

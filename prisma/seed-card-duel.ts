@@ -1,53 +1,76 @@
-import { PrismaClient } from '@prisma/client';
-import { buildPresetQuestions } from '../src/lib/vn-trivia-presets';
+import { PrismaClient } from "@prisma/client";
+import { buildPresetQuestions } from "../src/lib/vn-trivia-presets";
 
 export async function seedCardDuelDemo(prisma: PrismaClient) {
   await prisma.project.deleteMany({
-    where: { title: 'Arcane Duelists: Academy of Cards', userId: null },
+    where: { title: "Arcane Duelists: Academy of Cards", userId: null },
   });
 
   const project = await prisma.project.create({
     data: {
-      title: 'Arcane Duelists: Academy of Cards',
+      title: "Arcane Duelists: Academy of Cards",
       description:
-        'Challenge Archmage Lyra to an Elemental Card Showdown and solve the Sphinx Riddles to earn the Grand Duelist crown!',
-      theme: 'ARCADE',
+        "Challenge Archmage Lyra to a multi-round Elemental Card Showdown with Mana Ultimate Surges, then solve the Sphinx’s 5 ancient riddles!",
+      theme: "ARCADE",
       enableClock: false,
       isPublished: true,
       playCount: 42,
       likesCount: 19,
       dislikesCount: 1,
-      variables: { duelistRank: 'Apprentice' },
+      variables: { duelScore: 0 },
     },
   });
 
-  const sArena = `sc_cd_arena_${project.id}`;
+  const sHall = `sc_cd_hall_${project.id}`;
   const sDuel = `sc_cd_duel_${project.id}`;
-  const sRiddle = `sc_cd_riddle_${project.id}`;
+  const sRiddles = `sc_cd_rid_${project.id}`;
   const sWin = `sc_cd_win_${project.id}`;
   const sLose = `sc_cd_lose_${project.id}`;
 
   await prisma.scene.createMany({
     data: [
       {
-        id: sArena,
+        id: sHall,
         projectId: project.id,
-        name: '1. Grand Dueling Hall',
-        sceneType: 'DIALOGUE',
+        name: "1. Grand Dueling Hall",
+        sceneType: "DIALOGUE",
         order: 0,
         nodePos: { x: 40, y: 180 },
         blocks: [
-          { id: 'cd_b1', type: 'BACKGROUND', assetUrl: '/assets/bg-sunset-bay.svg', transition: 'fade' },
-          { id: 'cd_b2', type: 'CHARACTER', name: 'Archmage Lyra', spriteUrl: '/assets/char-mage-violet.svg', position: 'center', action: 'enter', emotion: 'happy', animation: 'bounce' },
-          { id: 'cd_b3', type: 'DIALOGUE', speaker: 'Archmage Lyra', text: 'Welcome to the Academy! Defeat me in an Elemental Card Duel—or test your wits against the Sphinx Riddles!' },
-          { id: 'cd_b4', type: 'AFFINITY', characterName: 'Archmage Lyra', delta: 1, reason: 'Accepted the Academy challenge' },
           {
-            id: 'cd_b5',
-            type: 'CHOICE',
-            prompt: 'How will you prove your mastery?',
+            id: "cd_b1",
+            type: "BACKGROUND",
+            assetUrl: "css:royal-throne",
+            transition: "fade",
+          },
+          {
+            id: "cd_b2",
+            type: "CHARACTER",
+            name: "Archmage Lyra",
+            spriteUrl: "css:char-keeper",
+            position: "center",
+            action: "enter",
+            emotion: "happy",
+            animation: "slide-in",
+            voiceStyle: "MYSTIC",
+          },
+          {
+            id: "cd_b3",
+            type: "DIALOGUE",
+            speaker: "Archmage Lyra",
+            text: "Welcome to the Academy! Play 2 cards to charge your Astral Overdrive (+4 Power) and defeat me in our Elemental Card Duel!",
+            voiceStyle: "MYSTIC",
+          },
+          {
+            id: "cd_b4",
+            type: "CHOICE",
+            prompt: "Accept Archmage Lyra’s challenge?",
             options: [
-              { id: 'cd_o1', label: 'Challenge Lyra to Elemental Card Duel', targetSceneId: sDuel },
-              { id: 'cd_o2', label: 'Enter the Chamber of Riddles', targetSceneId: sRiddle },
+              {
+                id: "cd_o1",
+                label: "Start Elemental Card Duel",
+                targetSceneId: sDuel,
+              },
             ],
           },
         ],
@@ -55,36 +78,40 @@ export async function seedCardDuelDemo(prisma: PrismaClient) {
       {
         id: sDuel,
         projectId: project.id,
-        name: '2. Elemental Card Showdown',
-        sceneType: 'DIALOGUE',
+        name: "2. Elemental Card Showdown",
+        sceneType: "DIALOGUE",
         order: 1,
-        nodePos: { x: 380, y: 60 },
+        nodePos: { x: 380, y: 180 },
         blocks: [
           {
-            id: 'cd_d1',
-            type: 'CARD_DUEL',
-            opponentName: 'Archmage Lyra',
-            deckTheme: 'ELEMENTAL',
+            id: "cd_d1",
+            type: "CARD_DUEL",
+            title: "Academy Entrance Duel",
+            opponentName: "Archmage Lyra",
+            deckTheme: "ELEMENTAL",
+            customCards: [],
+            enableManaUltimate: true,
+            ultimateName: "Astral Overdrive",
             roundsToWin: 2,
-            victorySceneId: sRiddle,
+            victorySceneId: sRiddles,
             defeatSceneId: sLose,
           },
         ],
       },
       {
-        id: sRiddle,
+        id: sRiddles,
         projectId: project.id,
-        name: '3. Sphinx Riddle Trial',
-        sceneType: 'QUIZ',
+        name: "3. Trial of the Sphinx",
+        sceneType: "QUIZ",
         order: 2,
         nodePos: { x: 720, y: 180 },
         blocks: [
           {
-            id: 'cd_q1',
-            type: 'QUIZ_CHALLENGE',
-            title: 'The Sphinx’s 5 Riddles',
+            id: "cd_q1",
+            type: "QUIZ_CHALLENGE",
+            title: "5 Riddles of the Ancient Sphinx",
             passingScore: 3,
-            questions: buildPresetQuestions('RIDDLES'),
+            questions: buildPresetQuestions("RIDDLES"),
             passSceneId: sWin,
             failSceneId: sLose,
           },
@@ -93,25 +120,44 @@ export async function seedCardDuelDemo(prisma: PrismaClient) {
       {
         id: sWin,
         projectId: project.id,
-        name: 'Ending 1: Grand Duelist Crown',
-        sceneType: 'ENDING',
+        name: "Ending 1: Grand Duelist",
+        sceneType: "ENDING",
         order: 3,
         nodePos: { x: 1060, y: 80 },
         blocks: [
-          { id: 'cd_w1', type: 'SET_VARIABLE', variableKey: 'duelistRank', operation: 'set', value: 'Grandmaster' },
-          { id: 'cd_w2', type: 'UNLOCK_ACHIEVEMENT', achievementId: 'cd_grandmaster', title: 'Elemental Grandmaster', description: 'Won the Elemental Card Duel and solved the Sphinx Riddles!', icon: '🃏' },
-          { id: 'cd_w3', type: 'DIALOGUE', speaker: 'Archmage Lyra', text: 'Brilliant strategy! You are officially promoted to Grandmaster!' },
+          {
+            id: "cd_w1",
+            type: "UNLOCK_ACHIEVEMENT",
+            achievementId: "cd_grand_duelist",
+            title: "Grand Duelist",
+            description:
+              "Won the Elemental Card Duel and passed the Sphinx’s Riddles!",
+            icon: "🃏",
+          },
+          {
+            id: "cd_w2",
+            type: "DIALOGUE",
+            speaker: "Archmage Lyra",
+            text: "Brilliant strategy! You are officially inducted into the Arcane Duelists Guild!",
+            voiceStyle: "MYSTIC",
+          },
         ],
       },
       {
         id: sLose,
         projectId: project.id,
-        name: 'Ending 2: Back to Training',
-        sceneType: 'ENDING',
+        name: "Ending 2: Outplayed",
+        sceneType: "ENDING",
         order: 4,
         nodePos: { x: 1060, y: 290 },
         blocks: [
-          { id: 'cd_l1', type: 'DIALOGUE', speaker: 'Archmage Lyra', text: 'Remember: Blaze beats Vine, Tidal beats Blaze, and Vine beats Tidal! Try again anytime.' },
+          {
+            id: "cd_f1",
+            type: "DIALOGUE",
+            speaker: "Archmage Lyra",
+            text: "A valiant effort! Hit Restart to shuffle your deck and try again.",
+            voiceStyle: "MYSTIC",
+          },
         ],
       },
     ],
@@ -119,6 +165,6 @@ export async function seedCardDuelDemo(prisma: PrismaClient) {
 
   await prisma.project.update({
     where: { id: project.id },
-    data: { startSceneId: sArena },
+    data: { startSceneId: sHall },
   });
 }

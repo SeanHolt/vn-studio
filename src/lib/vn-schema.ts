@@ -18,7 +18,15 @@ export const BattleElementSchema = z.enum([
   "LIGHTNING",
 ]);
 export type BattleElement = z.infer<typeof BattleElementSchema>;
+export const CustomDuelCardSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  icon: z.string().default("🃏"),
+  element: z.enum(["BLAZE", "TIDE", "VINE"]),
+  power: z.number().min(1).max(20).default(5),
+});
 
+export type CustomDuelCard = z.infer<typeof CustomDuelCardSchema>;
 export const BattleWaveEnemySchema = z.object({
   id: z.string(),
   name: z.string().min(1),
@@ -33,8 +41,8 @@ export type BattleWaveEnemy = z.infer<typeof BattleWaveEnemySchema>;
 export const TopDownEntitySchema = z.object({
   id: z.string(),
   label: z.string(),
-  kind: z.enum(['NPC', 'CHEST', 'DOOR', 'SWITCH', 'PATROL']),
-  icon: z.string().default('🧑'),
+  kind: z.enum(["NPC", "CHEST", "DOOR", "SWITCH", "PATROL"]),
+  icon: z.string().default("🧑"),
   x: z.number().min(0).max(11),
   y: z.number().min(0).max(7),
   dialogueText: z.string().optional(),
@@ -42,7 +50,7 @@ export const TopDownEntitySchema = z.object({
   requiredItem: z.string().optional(),
   targetSceneId: z.string().optional(),
   switchTargetCoords: z.string().optional(),
-  patrolAxis: z.enum(['H', 'V']).optional(),
+  patrolAxis: z.enum(["H", "V"]).optional(),
   patrolRange: z.number().min(1).max(6).optional(),
 });
 
@@ -201,11 +209,17 @@ export const SceneBlockSchema = z.discriminatedUnion("type", [
   z.object({
     id: z.string(),
     type: z.literal("CARD_DUEL"),
-    opponentName: z.string().min(1).default("Archmage Lyra"),
-    deckTheme: z.enum(["ELEMENTAL", "SCIFI", "KNIGHTS"]).default("ELEMENTAL"),
+    title: z.string().default("Arcane Card Showdown"),
+    opponentName: z.string().default("Archmage Lyra"),
+    deckTheme: z
+      .enum(["ELEMENTAL", "CYBER_HACK", "PIRATE_FLEET", "CUSTOM"])
+      .default("ELEMENTAL"),
+    customCards: z.array(CustomDuelCardSchema).default([]),
+    enableManaUltimate: z.boolean().default(true),
+    ultimateName: z.string().default("Astral Overdrive"),
     roundsToWin: z.number().min(1).max(5).default(2),
     victorySceneId: z.string(),
-    defeatSceneId: z.string(),
+    defeatSceneId: z.string().optional(),
   }),
   z.object({
     id: z.string(),

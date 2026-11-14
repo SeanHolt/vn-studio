@@ -1297,19 +1297,27 @@ export default function VNPlayer({
                 )}
                 {currentBlock?.type === 'CARD_DUEL' && (
                     <CardDuelStageOverlay
+                        title={interpolateVariables(currentBlock.title, variables)}
                         opponentName={interpolateVariables(
                             currentBlock.opponentName,
                             variables
                         )}
                         deckTheme={currentBlock.deckTheme}
+                        customCards={currentBlock.customCards ?? []}
+                        enableManaUltimate={currentBlock.enableManaUltimate ?? true}
+                        ultimateName={currentBlock.ultimateName ?? 'Astral Overdrive'}
                         roundsToWin={currentBlock.roundsToWin}
                         isMuted={isMuted}
-                        onDuelComplete={(playerWon) => {
-                            const nextScene = playerWon
-                                ? currentBlock.victorySceneId
-                                : currentBlock.defeatSceneId;
-                            if (nextScene) {
-                                goToScene(nextScene);
+                        onVictory={() => {
+                            if (currentBlock.victorySceneId) {
+                                goToScene(currentBlock.victorySceneId);
+                            } else {
+                                setBlockIndex((prev) => prev + 1);
+                            }
+                        }}
+                        onDefeat={() => {
+                            if (currentBlock.defeatSceneId) {
+                                goToScene(currentBlock.defeatSceneId);
                             } else {
                                 setBlockIndex((prev) => prev + 1);
                             }

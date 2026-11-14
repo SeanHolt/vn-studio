@@ -44,7 +44,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 - **`CHOICE`:** Presents branching player decisions with optional **variable condition rules** (`==`, `!=`, `>`, `<`, `>=`, `<=`) and **required inventory item** locks.
 - **`INPUT_TEXT`:** Prompts the player to type their name or a secret password and saves their response directly into a game variable.
 - **`QUIZ_CHALLENGE` (Trivia & Riddle Trials):** Embeds a multi-question multiple-choice quiz or riddle challenge with instant answer explanations, synth audio feedback, score tracking (`quizScore`), Pass/Fail scene routing, and a built-in **20-question preset bank** covering **Sci-Fi Movies**, **Fantasy Movies**, **Sci-Fi & Fantasy TV**, and **Classic Riddles**.
-- **`CARD_DUEL` (Card Duel & Elemental Showdown):** Launches a multi-round tactical card battle with 3 selectable deck themes (**Elemental Magic**, **Sci-Fi Systems**, and **Royal Arena**), live score tracking, synth audio feedback, and Victory/Defeat scene routing. - First Version - Expect much more later!
+- **`CARD_DUEL` (Tactical Card Clash):** Lets players face off in multi-round elemental card battles (**Elemental Sorcery**, **Cyber Netrunner**, **Sky Pirate Fleet**, or a **Custom Card Builder** deck) with a **Mana Charge Ultimate Surge (+4 Power)** ability and rock-paper-scissors elemental bonuses.
 
 #### Interactive Game Genres & Mini-Games
 

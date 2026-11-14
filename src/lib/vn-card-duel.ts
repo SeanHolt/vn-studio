@@ -1,102 +1,109 @@
-export type DeckThemeId = 'ELEMENTAL' | 'SCIFI' | 'KNIGHTS';
+import { CustomDuelCard } from './vn-schema';
+
+export type CardElement = 'BLAZE' | 'TIDE' | 'VINE';
+export type DeckThemeId = 'ELEMENTAL' | 'CYBER_HACK' | 'PIRATE_FLEET' | 'CUSTOM';
 
 export interface DuelCard {
-  index: number;
+  id: string;
   name: string;
   icon: string;
-  beatsIndex: number;
-  accentClass: string;
+  element: CardElement;
+  power: number;
 }
 
-export const DUEL_DECKS: Record<
-  DeckThemeId,
-  { label: string; cards: DuelCard[] }
-> = {
+export interface DeckConfig {
+  label: string;
+  cards: DuelCard[];
+}
+
+export const DUEL_DECKS: Record<Exclude<DeckThemeId, 'CUSTOM'>, DeckConfig> = {
   ELEMENTAL: {
-    label: 'Elemental Magic (Fire / Water / Leaf)',
+    label: '🔥 Elemental Sorcery',
     cards: [
-      {
-        index: 0,
-        name: 'Blaze Flare',
-        icon: '🔥',
-        beatsIndex: 2,
-        accentClass: 'border-rose-500/60 bg-rose-950/50 text-rose-200',
-      },
-      {
-        index: 1,
-        name: 'Tidal Wave',
-        icon: '💧',
-        beatsIndex: 0,
-        accentClass: 'border-sky-500/60 bg-sky-950/50 text-sky-200',
-      },
-      {
-        index: 2,
-        name: 'Vine Snare',
-        icon: '🌿',
-        beatsIndex: 1,
-        accentClass: 'border-emerald-500/60 bg-emerald-950/50 text-emerald-200',
-      },
+      { id: 'el_1', name: 'Phoenix Flare', icon: '🔥', element: 'BLAZE', power: 6 },
+      { id: 'el_2', name: 'Tidal Surge', icon: '🌊', element: 'TIDE', power: 6 },
+      { id: 'el_3', name: 'Thorn Tempest', icon: '🌿', element: 'VINE', power: 6 },
+      { id: 'el_4', name: 'Meteor Spark', icon: '☄️', element: 'BLAZE', power: 4 },
+      { id: 'el_5', name: 'Glacier Shield', icon: '❄️', element: 'TIDE', power: 4 },
     ],
   },
-  SCIFI: {
-    label: 'Sci-Fi Systems (Laser / Shield / Hack)',
+  CYBER_HACK: {
+    label: '💻 Cyber Netrunner',
     cards: [
-      {
-        index: 0,
-        name: 'Plasma Laser',
-        icon: '⚡',
-        beatsIndex: 2,
-        accentClass: 'border-amber-500/60 bg-amber-950/50 text-amber-200',
-      },
-      {
-        index: 1,
-        name: 'Aegis Shield',
-        icon: '🛡️',
-        beatsIndex: 0,
-        accentClass: 'border-cyan-500/60 bg-cyan-950/50 text-cyan-200',
-      },
-      {
-        index: 2,
-        name: 'Cyber Override',
-        icon: '👾',
-        beatsIndex: 1,
-        accentClass: 'border-purple-500/60 bg-purple-950/50 text-purple-200',
-      },
+      { id: 'cy_1', name: 'Overclock Virus', icon: '⚡', element: 'BLAZE', power: 6 },
+      { id: 'cy_2', name: 'Quantum Firewall', icon: '🛡️', element: 'TIDE', power: 6 },
+      { id: 'cy_3', name: 'Rootkit Worm', icon: '🦠', element: 'VINE', power: 6 },
+      { id: 'cy_4', name: 'Pulse Exploit', icon: '📡', element: 'BLAZE', power: 4 },
+      { id: 'cy_5', name: 'Ice Breaker', icon: '🧊', element: 'TIDE', power: 4 },
     ],
   },
-  KNIGHTS: {
-    label: 'Royal Arena (Sword / Shield / Bow)',
+  PIRATE_FLEET: {
+    label: '🏴‍☠️ Sky Pirate Fleet',
     cards: [
-      {
-        index: 0,
-        name: 'Heavy Strike',
-        icon: '⚔️',
-        beatsIndex: 2,
-        accentClass: 'border-rose-500/60 bg-rose-950/50 text-rose-200',
-      },
-      {
-        index: 1,
-        name: 'Iron Guard',
-        icon: '🛡️',
-        beatsIndex: 0,
-        accentClass: 'border-indigo-500/60 bg-indigo-950/50 text-indigo-200',
-      },
-      {
-        index: 2,
-        name: 'Swift Volley',
-        icon: '🏹',
-        beatsIndex: 1,
-        accentClass: 'border-emerald-500/60 bg-emerald-950/50 text-emerald-200',
-      },
+      { id: 'pi_1', name: 'Broadside Cannon', icon: '💣', element: 'BLAZE', power: 6 },
+      { id: 'pi_2', name: 'Kraken Whirlpool', icon: '🐙', element: 'TIDE', power: 6 },
+      { id: 'pi_3', name: 'Grapple Boarding', icon: '🪝', element: 'VINE', power: 6 },
+      { id: 'pi_4', name: 'Flintlock Volley', icon: '🔥', element: 'BLAZE', power: 4 },
+      { id: 'pi_5', name: 'Harpoon Net', icon: '🔱', element: 'VINE', power: 4 },
     ],
   },
 };
 
-export function resolveDuelRound(
+export function resolveDeckCards(
+  theme: DeckThemeId,
+  customCards?: CustomDuelCard[]
+): DuelCard[] {
+  if (theme === 'CUSTOM' && customCards && customCards.length >= 3) {
+    return customCards;
+  }
+  const safeTheme = theme === 'CUSTOM' ? 'ELEMENTAL' : theme;
+  return DUEL_DECKS[safeTheme].cards;
+}
+
+export function evaluateCardClash(
   playerCard: DuelCard,
-  enemyCard: DuelCard
-): 'PLAYER' | 'ENEMY' | 'TIE' {
-  if (playerCard.index === enemyCard.index) return 'TIE';
-  if (playerCard.beatsIndex === enemyCard.index) return 'PLAYER';
-  return 'ENEMY';
+  enemyCard: DuelCard,
+  manaBoostActive: boolean
+): {
+  outcome: 'WIN' | 'LOSE' | 'TIE';
+  playerEffective: number;
+  enemyEffective: number;
+  reason: string;
+} {
+  const playerBeatsEnemy =
+    (playerCard.element === 'BLAZE' && enemyCard.element === 'VINE') ||
+    (playerCard.element === 'VINE' && enemyCard.element === 'TIDE') ||
+    (playerCard.element === 'TIDE' && enemyCard.element === 'BLAZE');
+
+  const enemyBeatsPlayer =
+    (enemyCard.element === 'BLAZE' && playerCard.element === 'VINE') ||
+    (enemyCard.element === 'VINE' && playerCard.element === 'TIDE') ||
+    (enemyCard.element === 'TIDE' && playerCard.element === 'BLAZE');
+
+  const bonus = manaBoostActive ? 4 : 0;
+  const playerEffective = playerCard.power + (playerBeatsEnemy ? 3 : 0) + bonus;
+  const enemyEffective = enemyCard.power + (enemyBeatsPlayer ? 3 : 0);
+
+  if (playerEffective > enemyEffective) {
+    const tag = manaBoostActive
+      ? '✨ Ultimate Surge (+4)!'
+      : playerBeatsEnemy
+        ? 'Elemental Advantage (+3)!'
+        : 'Higher Power!';
+    return { outcome: 'WIN', playerEffective, enemyEffective, reason: tag };
+  }
+  if (enemyEffective > playerEffective) {
+    return {
+      outcome: 'LOSE',
+      playerEffective,
+      enemyEffective,
+      reason: enemyBeatsPlayer ? 'Countered by Enemy Element!' : 'Outpowered!',
+    };
+  }
+  return {
+    outcome: 'TIE',
+    playerEffective,
+    enemyEffective,
+    reason: 'Equal Clash — Draw!',
+  };
 }
