@@ -29,7 +29,7 @@ import {
     interpolateVariables,
 } from '@/lib/vn-engine';
 import { playSynthSound } from '@/lib/vn-audio';
-import { getThemeConfig } from '@/lib/vn-themes';
+import { getThemeConfig, VNThemeId } from '@/lib/vn-themes';
 import StageArtwork from '@/components/shared/StageArtwork';
 import TypewriterText from './TypewriterText';
 import TextInputOverlay from './TextInputOverlay';
@@ -77,6 +77,12 @@ import StageFxOverlay, {
     WeatherIntensity,
 } from '@/components/shared/StageFxOverlay';
 import CipherStageOverlay from './CipherStageOverlay';
+import {
+    resolveNewestSlot0OnStart,
+    syncSlot0DuringPlay,
+    resetAllSlot0,
+} from '@/lib/vn-autosave';
+import { SaveSlotData } from '@/lib/vn-saves';
 
 export interface PlayableScene {
     id: string;
@@ -94,25 +100,27 @@ interface ActiveCharacter {
 }
 
 interface VNPlayerProps {
-    projectId?: string;
-    title: string;
-    startSceneId: string;
-    initialVariables: GameVariables;
-    scenes: PlayableScene[];
-    theme?: string;
-    enableClock?: boolean;
-    canDebug?: boolean;
+  projectId: string;
+  title: string;
+  theme?: VNThemeId;
+  enableClock?: boolean;
+  canDebug?: boolean;
+  isSignedIn?: boolean;
+  startSceneId: string;
+  initialVariables: Record<string, string | number | boolean>;
+  scenes: PlayableScene[];
 }
 
 export default function VNPlayer({
-    projectId,
-    title,
-    startSceneId,
-    initialVariables,
-    scenes,
-    theme,
-    enableClock = false,
-    canDebug = false,
+  projectId,
+  title,
+  theme = 'MODERN',
+  enableClock = false,
+  canDebug = false,
+  isSignedIn = false,
+  startSceneId,
+  initialVariables,
+  scenes,
 }: VNPlayerProps) {
     const activeTheme = getThemeConfig(theme);
     const [showDebugger, setShowDebugger] = useState(false);
@@ -153,7 +161,7 @@ export default function VNPlayer({
     const [isMuted, setIsMuted] = useState<boolean>(false);
     const [isTtsEnabled, setIsTtsEnabled] = useState(false);
     const bgmCleanupRef = useRef<(() => void) | null>(null);
-
+    const [slot0Banner, setSlot0Banner] = useState<string | null>(null);
     const [activeTimer, setActiveTimer] = useState<{
         label: string;
         remaining: number;
@@ -216,6 +224,39 @@ export default function VNPlayer({
             }
         }
     }, [currentScene, currentBlock, isTypingDone, blockIndex, variables]);
+    useEffect(() => {
+        let cancelled = false;
+
+        async function hydrateNewestSlot0() {
+            const newest = await resolveNewestSlot0OnStart(projectId, isSignedIn);
+            if (cancelled || !newest) return;
+
+            const raw = newest.stateJson as Partial<SaveSlotData>;
+            if (!raw.currentSceneId) return;
+
+            const sceneExists = scenes.some((s) => s.id === raw.currentSceneId);
+            if (!sceneExists) return;
+
+            setCurrentSceneId(raw.currentSceneId);
+            setBlockIndex(typeof raw.blockIndex === 'number' ? raw.blockIndex : 0);
+            if (typeof raw.backgroundUrl === 'string') {
+                setBackgroundUrl(raw.backgroundUrl);
+            }
+            if (raw.variables) setVariables(raw.variables);
+            if (Array.isArray(raw.inventory)) setInventory(raw.inventory);
+            if (raw.affinity) setAffinity(raw.affinity);
+            if (raw.clock) setClock(raw.clock);
+            if (raw.characters) setCharacters(raw.characters);
+
+            setSlot0Banner(`Resumed Auto-Save: ${newest.sceneName}`);
+            window.setTimeout(() => setSlot0Banner(null), 3200);
+        }
+
+        void hydrateNewestSlot0();
+        return () => {
+            cancelled = true;
+        };
+    }, [projectId, isSignedIn, scenes]);
     useEffect(() => {
         const isModalOpen =
             showGallery || showBacklog || showSaveModal || showDebugger;
@@ -310,30 +351,30 @@ export default function VNPlayer({
         ]
     );
 
-    const goToScene = useCallback(
-        (targetId: string) => {
-            const targetScene = scenes.find((s) => s.id === targetId);
-            if (targetScene?.sceneType === 'ENDING') {
-                saveEndingToStorage(storageKey, targetScene.id);
-            }
-            if (targetScene) {
-                writeSaveSlot(
-                    saveStorageKey,
-                    buildSnapshot(
-                        'slot_auto',
-                        'Auto-Save Checkpoint',
-                        targetScene.id,
-                        targetScene.name,
-                        0
-                    )
-                );
-            }
-            setCurrentSceneId(targetId);
-            setBlockIndex(0);
-        },
-        [scenes, storageKey, saveStorageKey, buildSnapshot]
-    );
+    const goToScene = (targetSceneId: string) => {
+        const nextScene = scenes.find((s) => s.id === targetSceneId);
+        if (!nextScene) return;
 
+        setCurrentSceneId(nextScene.id);
+        setBlockIndex(0);
+
+        syncSlot0DuringPlay({
+            projectId,
+            isSignedIn,
+            sceneName: nextScene.name,
+            stateJson: {
+                sceneName: nextScene.name,
+                currentSceneId: nextScene.id,
+                blockIndex: 0,
+                backgroundUrl,
+                variables,
+                inventory,
+                affinity,
+                clock,
+                characters,
+            },
+        });
+    };
     const handleManualSave = (slotId: string, slotLabel: string) => {
         writeSaveSlot(saveStorageKey, buildSnapshot(slotId, slotLabel));
         setSaveToast(`Saved to ${slotLabel}!`);
@@ -641,20 +682,17 @@ export default function VNPlayer({
     const handleRestart = () => {
         bgmCleanupRef.current?.();
         bgmCleanupRef.current = null;
-        stopSpeechNarration();
-        setVariables(initialVariables);
-        setInventory([]);
-        setAffinity({});
-        setAffinityToast(null);
-        setActiveTimer(null);
-        setCharacters({});
-        setBacklog([]);
-        setBackgroundUrl('');
         setCurrentSceneId(startSceneId);
         setBlockIndex(0);
-        setIsTypingDone(false);
-        setForceFinishKey(0);
+        setVariables({ ...initialVariables });
+        setInventory([]);
+        setAffinity({});
+        setClock({ day: 1, timeOfDay: 'MORNING' });
+        setActiveTimer(null);
+        setBackgroundUrl('css:starry-night');
         setWeatherState({ weather: 'CLEAR', intensity: 'NORMAL' });
+        setCharacters({});
+        void resetAllSlot0(projectId, isSignedIn);
     };
     const visibleBacklog: BacklogEntry[] = useMemo(() => {
         if (!currentScene || currentBlock?.type !== 'DIALOGUE') {
@@ -1005,10 +1043,29 @@ export default function VNPlayer({
                 )}
                 {showSaveModal && (
                     <SaveLoadModal
-                        slots={saveSlots}
-                        onSaveToSlot={handleManualSave}
-                        onLoadFromSlot={handleLoadSnapshot}
-                        onDeleteSlot={(slotId) => deleteSaveSlot(saveStorageKey, slotId)}
+                        projectId={projectId}
+                        isSignedIn={isSignedIn}
+                        currentState={{
+                            sceneName: currentScene?.name ?? 'Unknown Scene',
+                            currentSceneId,
+                            blockIndex,
+                            backgroundUrl,
+                            variables,
+                            inventory,
+                            affinity,
+                            clock,
+                            characters,
+                        }}
+                        onLoadSlot={(slot) => {
+                            setCurrentSceneId(slot.currentSceneId);
+                            setBlockIndex(slot.blockIndex);
+                            setBackgroundUrl(slot.backgroundUrl);
+                            setVariables(slot.variables);
+                            setInventory(slot.inventory);
+                            setAffinity(slot.affinity);
+                            setClock(slot.clock);
+                            setCharacters(slot.characters);
+                        }}
                         onClose={() => setShowSaveModal(false)}
                     />
                 )}

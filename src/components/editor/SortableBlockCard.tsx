@@ -18,6 +18,7 @@ import {
     TextCursorInput,
     MousePointerClick,
     Timer,
+    Copy,
     Heart,
     Clock,
     Trophy,
@@ -38,10 +39,11 @@ import {
 } from 'lucide-react';
 
 interface SortableBlockCardProps {
-    block: SceneBlock;
-    isSelected: boolean;
-    onSelect: () => void;
-    onDelete: () => void;
+  block: SceneBlock;
+  isSelected: boolean;
+  onSelect: () => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
 }
 
 export default function SortableBlockCard({

@@ -5,6 +5,22 @@ generator client {
 datasource db {
   provider = "sqlite"
 }
+model PlayerAutoSave {
+  id             String   @id @default(cuid())
+  projectId      String
+  userId         String
+  sceneName      String
+  stateJson      Json
+  savedAtMs      BigInt
+  createdAt      DateTime @default(now())
+  lastAccessedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([lastAccessedAt])
+}
 
 model Project {
   id          String  @id @default(cuid())
@@ -27,6 +43,7 @@ model Project {
   priceCents   Int            @default(0)
   purchases    GamePurchase[]
   scenes       Scene[]
+  autoSaves PlayerAutoSave[]
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 }
@@ -74,6 +91,7 @@ model User {
   accounts         Account[]
   sessions         Session[]
   projects         Project[]
+  autoSaves PlayerAutoSave[]
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }

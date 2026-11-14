@@ -31,6 +31,7 @@ Creators can toggle seamlessly between two synchronized editing views at any tim
 - **Live Stage Preview & Visual Hotspot Drawing:** An embedded 16:9 mini-stage inside the editor updates in real time as blocks are selected, edited, or reordered—displaying active backgrounds, weather particles, staged character sprites, themes, and interactive `HOTSPOT_ROOM` boxes that creators can **click and drag directly on the stage** to draw or reposition.
 - **Multi-Genre Scene Management:** Create new scenes, rename scenes, switch scene types (`TITLE`, `DIALOGUE`, `HOTSPOT`, `TOPDOWN`, `BATTLE`, `ENDING`), and delete scenes with a minimum one-scene safety guard.
 - **Dead-End & Broken-Link Validator (`Validate`):** Scans every scene and block across the project to detect missing destination scene IDs, empty choices, non-ending dead-end scenes, and unreachable orphan scenes—with one-click jump-to-fix navigation.
+- **One-Click Block Duplication & Scene Cloning:** Every block card and scene row includes a **Duplicate** button that deep-clones the block or entire scene with fresh unique IDs right below the original.
 
 ### 2. Multi-Genre Playable Block System
 
@@ -74,7 +75,7 @@ Every scene is composed of strongly typed blocks validated with **Zod** (`src/li
 ### 3. Playable Runtime (`VNPlayer` at `/play/[projectId]`)
 
 - **Typewriter Text & Keyboard Fast-Forward Engine:** Reveals dialogue character-by-character; clicking or pressing `Space`/`Enter` finishes the current sentence or advances to the next block, while holding `Ctrl` fast-forwards through dialogue sequences until a choice or mini-game appears.
-- **In-Game Save/Load Slots & Auto-Save (`Save / Load`):** Persists full playthrough snapshots (active scene, block position, variables, inventory, relationship scores, clock state, staged characters, and dialogue history) to `localStorage` across **3 manual save slots** plus an automatic scene-transition **Auto-Save** checkpoint.
+- **Cloud + Local Slot 0 Auto-Save & Manual Save Slots:** Automatically checkpoints progress to **Slot 0** on every scene transition (syncing between `localStorage` and Prisma/SQLite for signed-in players, loading whichever timestamp is newer on launch, and pruning stale saves after 30 days) alongside 3 manual local save slots and persistent achievement trophies.
 - **Custom Visual Themes & Typography:** Supports 4 built-in UI themes (**Modern Studio**, **Sci-Fi Terminal**, **Fantasy Parchment**, and **8-Bit Arcade**) that style dialogue boxes, speaker tags, choice buttons, and fonts.
 - **Toggleable Day & Time-of-Day Clock:** When enabled by the author, displays a live `Day X • Morning/Afternoon/Evening/Night` HUD badge and applies smooth atmospheric lighting tints across the stage.
 - **Interactive HUD Drawers & Modals:**

@@ -38,6 +38,7 @@ import {
     Layers,
     Trash2,
     ListTree,
+    Copy,
     Workflow,
     Globe,
     Lock,
@@ -606,7 +607,17 @@ export default function SimpleEditorWorkspace({
                                         <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">
                                             {scene.sceneType}
                                         </span>
-
+                                        <button
+                                            type="button"
+                                            title="Clone Scene"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                store.duplicateScene(scene.id);
+                                            }}
+                                            className="rounded p-1 text-slate-500 hover:bg-slate-800 hover:text-indigo-400"
+                                        >
+                                            <Copy className="h-3.5 w-3.5" />
+                                        </button>
                                         {store.scenes.length > 1 && (
                                             <button
                                                 type="button"
@@ -727,6 +738,7 @@ export default function SimpleEditorWorkspace({
                                                         block={block}
                                                         isSelected={block.id === store.selectedBlockId}
                                                         onSelect={() => store.selectBlock(block.id)}
+                                                        onDuplicate={() => store.duplicateBlock(block.id)}
                                                         onDelete={() => store.deleteBlock(block.id)}
                                                     />
                                                 ))}

@@ -1,101 +1,90 @@
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { connection } from 'next/server';
-import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import VNPlayer, { PlayableScene } from '@/components/player/VNPlayer';
-import PaidGameGate from '@/components/player/PaidGameGate';
-import { SceneBlock, SceneType } from '@/lib/vn-schema';
-import { GameVariables } from '@/lib/vn-engine';
+import { auth } from '@/auth';
+import { SceneBlockSchema, SceneType } from '@/lib/vn-schema';
+import { VNThemeId } from '@/lib/vn-themes';
+import VNPlayer from '@/components/player/VNPlayer';
 
 interface PlayPageProps {
   params: Promise<{ projectId: string }>;
 }
 
-async function PlayerLoader({ params }: PlayPageProps) {
-  await connection();
+async function PlayProjectLoader({ params }: PlayPageProps) {
   const { projectId } = await params;
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
+  const isSignedIn = Boolean(userId);
 
-  const project =
-    projectId === 'demo'
-      ? await prisma.project.findFirst({
-          where: { title: 'The Clockwork Lighthouse' },
-          include: { scenes: { orderBy: { order: 'asc' } } },
-        })
-      : await prisma.project.findUnique({
-          where: { id: projectId },
-          include: { scenes: { orderBy: { order: 'asc' } } },
-        });
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    include: {
+      scenes: {
+        orderBy: { order: 'asc' },
+      },
+    },
+  });
 
-  if (!project || !project.startSceneId) {
+  if (!project || project.scenes.length === 0) {
     notFound();
   }
 
-  const session = await auth();
-  const viewerId = session?.user?.id;
-  const isOwner = Boolean(viewerId && project.userId === viewerId);
-  const canDebug = project.userId === null || isOwner;
-
-  if (project.priceCents > 0 && !isOwner) {
-    let hasPurchased = false;
-    if (viewerId) {
-      const purchase = await prisma.gamePurchase.findUnique({
-        where: {
-          userId_projectId: { userId: viewerId, projectId: project.id },
-        },
-      });
-      hasPurchased = Boolean(purchase);
-    }
-
-    if (!hasPurchased) {
-      return (
-        <PaidGameGate
-          projectId={project.id}
-          title={project.title}
-          description={project.description}
-          priceCents={project.priceCents}
-          isLoggedIn={Boolean(viewerId)}
-        />
-      );
-    }
-  }
-
   await prisma.project.update({
-    where: { id: project.id },
+    where: { id: projectId },
     data: { playCount: { increment: 1 } },
   });
 
-  const playableScenes: PlayableScene[] = project.scenes.map((scene) => ({
-    id: scene.id,
-    name: scene.name,
-    sceneType: scene.sceneType as SceneType,
-    blocks: scene.blocks as unknown as SceneBlock[],
-  }));
+  const parsedScenes = project.scenes.map((scene) => {
+    const rawBlocks = Array.isArray(scene.blocks) ? scene.blocks : [];
+    const validBlocks = rawBlocks
+      .map((blk) => SceneBlockSchema.safeParse(blk))
+      .filter((res) => res.success)
+      .map((res) => res.data);
+
+    return {
+      id: scene.id,
+      name: scene.name,
+      sceneType: scene.sceneType as SceneType,
+      order: scene.order,
+      blocks: validBlocks,
+    };
+  });
+
+  const initialVariables =
+    project.variables &&
+    typeof project.variables === 'object' &&
+    !Array.isArray(project.variables)
+      ? (project.variables as Record<string, string | number | boolean>)
+      : {};
+
+  const canDebug = Boolean(userId && project.userId === userId);
+  const firstSceneId = parsedScenes.at(0)?.id ?? '';
 
   return (
     <VNPlayer
       projectId={project.id}
       title={project.title}
-      startSceneId={project.startSceneId}
-      initialVariables={(project.variables as GameVariables) || {}}
-      scenes={playableScenes}
-      theme={project.theme}
+      theme={(project.theme as VNThemeId) || 'MODERN'}
       enableClock={project.enableClock}
       canDebug={canDebug}
+      isSignedIn={isSignedIn}
+      startSceneId={project.startSceneId ?? firstSceneId}
+      initialVariables={initialVariables}
+      scenes={parsedScenes}
     />
   );
 }
 
-export default function PlayPage({ params }: PlayPageProps) {
+export default function PlayProjectPage({ params }: PlayPageProps) {
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen items-center justify-center bg-slate-950 text-sm text-slate-400">
-          Loading Game...
+        <div className="flex min-h-screen items-center justify-center bg-slate-950 text-sm text-slate-400">
+          Loading adventure stage...
         </div>
       }
     >
-      <PlayerLoader params={params} />
+      <PlayProjectLoader params={params} />
     </Suspense>
   );
 }

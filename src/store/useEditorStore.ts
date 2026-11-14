@@ -17,6 +17,8 @@ interface EditorState {
   theme: VNThemeId;
   enableClock: boolean;
   assets: ProjectAsset[];
+  duplicateBlock: (blockId: string) => void;
+  duplicateScene: (sceneId: string) => void;
   setAssets: (assets: ProjectAsset[]) => void;
   addAsset: (asset: ProjectAsset) => void;
   renameAssetLocal: (assetId: string, name: string) => void;
@@ -79,7 +81,76 @@ export const useEditorStore = create<EditorState>((set) => ({
     set((state) => ({
       assets: state.assets.filter((a) => a.id !== assetId),
     })),
+  duplicateBlock: (blockId) =>
+    set((state) => {
+      if (!state.activeSceneId) return state;
+      let newSelectedId = state.selectedBlockId;
 
+      const updatedScenes = state.scenes.map((scene) => {
+        if (scene.id !== state.activeSceneId) return scene;
+        const idx = scene.blocks.findIndex((b) => b.id === blockId);
+        if (idx === -1) return scene;
+
+        const orig = scene.blocks.at(idx);
+        if (!orig) return scene;
+
+        const cloned = structuredClone(orig);
+        cloned.id = `blk_${crypto.randomUUID()}`;
+        newSelectedId = cloned.id;
+
+        const nextBlocks = [...scene.blocks];
+        nextBlocks.splice(idx + 1, 0, cloned);
+        return { ...scene, blocks: nextBlocks };
+      });
+
+      return {
+        scenes: updatedScenes,
+        selectedBlockId: newSelectedId,
+        isDirty: true,
+      };
+    }),
+
+  duplicateScene: (sceneId) =>
+    set((state) => {
+      const idx = state.scenes.findIndex((s) => s.id === sceneId);
+      if (idx === -1) return state;
+
+      const orig = state.scenes.at(idx);
+      if (!orig) return state;
+
+      const clonedBlocks = orig.blocks.map((blk) => {
+        const copy = structuredClone(blk);
+        copy.id = `blk_${crypto.randomUUID()}`;
+        return copy;
+      });
+
+      const newSceneId = `sc_${crypto.randomUUID()}`;
+      const clonedScene: ScenePayload = {
+        ...orig,
+        id: newSceneId,
+        name: `${orig.name} (Copy)`,
+        nodePos: {
+          x: (orig.nodePos?.x ?? 100) + 40,
+          y: (orig.nodePos?.y ?? 100) + 40,
+        },
+        blocks: clonedBlocks,
+      };
+
+      const inserted = [...state.scenes];
+      inserted.splice(idx + 1, 0, clonedScene);
+
+      const reordered = inserted.map((s, orderIdx) => ({
+        ...s,
+        order: orderIdx,
+      }));
+
+      return {
+        scenes: reordered,
+        activeSceneId: newSceneId,
+        selectedBlockId: clonedBlocks.at(0)?.id ?? null,
+        isDirty: true,
+      };
+    }),
   initProject: (
     projectId,
     projectTitle,
